@@ -46,9 +46,9 @@ namespace Core.Application.Features.Commands.JwtRegister
 
             public async Task<Response<AppUser>> Handle(CreateUser.Command request, CancellationToken cancellationToken)
             {
-                var validationResult = await new CreateUser.CommandValidator(_userManager).ValidateAsync(request, cancellationToken);
-                if (!validationResult.IsValid)
-                    return ResponseResult.Fail<AppUser>(validationResult.Errors.Select(e => new ResponseError(e.PropertyName, e.ErrorMessage)), null);
+                //var validationResult = await new CreateUser.CommandValidator(_userManager).ValidateAsync(request, cancellationToken);
+                //if (!validationResult.IsValid)
+                //    return ResponseResult.Fail<AppUser>(validationResult.Errors.Select(e => new ResponseError(e.PropertyName, e.ErrorMessage)), null);
 
                 var user = _mapper.Map<AppUser>(request);
                 var result = await _userManager.CreateAsync(user, request.Password);

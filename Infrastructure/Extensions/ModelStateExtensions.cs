@@ -17,10 +17,10 @@ namespace Infrastructure.Extensions
         }
 
         public static ModelStateDictionary AddModelErrors(this ModelStateDictionary modelState,
-          IEnumerable<ResponseError> responseErrors, string prefix = null)
+          IEnumerable<ResponseError> responseErrors)
         {
             foreach (var error in responseErrors)
-                modelState.AddModelError($"{prefix}{(string.IsNullOrEmpty(prefix) ? "" : ".")}{error.Name}", error.Description);
+                modelState.AddModelError(error.Name, error.Description);
 
             return modelState;
         }

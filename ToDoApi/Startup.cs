@@ -48,8 +48,8 @@ namespace ToDoApi
             services.AddControllers(o =>
             {
                 o.ReturnHttpNotAcceptable = true;
-                o.Filters.Add(new AuthorizeFilter());
                 o.SuppressAsyncSuffixInActionNames = false;
+                o.Filters.Add(new AuthorizeFilter()); // todo remove
             })
                 .AddNewtonsoftJson(options =>
                 {
@@ -62,12 +62,14 @@ namespace ToDoApi
                     //ValidatorOptions.Global.LanguageManager.Enabled = false;
                     //ValidatorOptions.Global.CascadeMode = CascadeMode.Stop;
 
+                    config.AutomaticValidationEnabled = false;
                     config.DisableDataAnnotationsValidation = true;
                     config.ImplicitlyValidateRootCollectionElements = true;
                     config.RegisterValidatorsFromAssembly(typeof(Startup).Assembly);
                 })
                 .ConfigureApiBehaviorOptions(setup =>
                 {
+                    //setup.SuppressModelStateInvalidFilter = true;
                     setup.InvalidModelStateResponseFactory = ctx =>
                     {
                         var problemDetailsFactory = ctx.HttpContext.RequestServices.GetRequiredService<ProblemDetailsFactory>();
@@ -75,12 +77,12 @@ namespace ToDoApi
 
                         problemDetails.Detail = "See the errors field for details.";
                         problemDetails.Instance = ctx.HttpContext.Request.Path;
-
+                        
                         var actionExecutingContext = ctx as Microsoft.AspNetCore.Mvc.Filters.ActionExecutingContext;
 
-                        if (ctx.ModelState.ErrorCount > 0 && actionExecutingContext?.ActionArguments.Count == ctx.ActionDescriptor.Parameters.Count)
+                        if (ctx.ModelState.ErrorCount > 0)// && actionExecutingContext?.ActionArguments.Count == ctx.ActionDescriptor.Parameters.Count)
                         {
-                            problemDetails.Type = "https://";
+                            problemDetails.Type = "https://localhost:5001/modelvalidationproblem";
                             problemDetails.Status = StatusCodes.Status422UnprocessableEntity;
                             problemDetails.Title = "One or more validation errors occured.";
 
@@ -100,6 +102,10 @@ namespace ToDoApi
                 });
             //.SetCompatibilityVersion(CompatibilityVersion.Latest);
 
+            var jwtSection = Configuration.GetSection("JwtOptions");
+            var jwtOptions = jwtSection.Get<JwtOptions>();
+            services.Configure<JwtOptions>(jwtSection);
+
             services.AddAuthentication(options =>
             {
                 // Override Identity default schemes
@@ -109,10 +115,6 @@ namespace ToDoApi
             })
                 .AddJwtBearer(config =>
                 {
-                    var jwtSection = Configuration.GetSection("JwtOptions");
-                    var jwtOptions = jwtSection.Get<JwtOptions>();
-                    services.Configure<JwtOptions>(jwtSection);
-
                     SymmetricSecurityKey jwtKey = jwtOptions.GetSymmetricSecurityKey();
 
                     //config.Events.on

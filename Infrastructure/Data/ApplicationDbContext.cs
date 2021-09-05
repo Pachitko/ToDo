@@ -1,14 +1,13 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Core.Domain.Entities;
 using System;
 
 namespace Infrastructure.Data
 {
-    public class ApplicationDbContext : IdentityDbContext<AppUser, AppRole, Guid>
+    public class ApplicationDbContext : IdentityDbContext<AppUser, AppRole, Guid>, IApplicationDbContext
     {
-        public DbSet<AppUser> Accounts { get; set; }
         public DbSet<ToDoItem> ToDoItems { get; set; }
         public DbSet<ToDoList> ToDoLists { get; set; }
 

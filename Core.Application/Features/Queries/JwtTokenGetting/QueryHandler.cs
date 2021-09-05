@@ -3,14 +3,29 @@ using Core.Application.Responses;
 using System.Threading.Tasks;
 using Core.Domain.Entities;
 using System.Threading;
-using System.Linq;
 using Core.Application.Services;
+using FluentValidation;
 
 namespace Core.Application.Features.Queries.JwtLogin
 {
-    public partial class JwtTokenGetting
+    public partial class GetJwtToken
 	{
-        public class QueryHandler : IHandlerWrapper<JwtTokenGetting.Query, string>
+		public record Query(string Username, string Password) : IRequestWrapper<string>;
+
+		public class QueryValidator : AbstractValidator<GetJwtToken.Query>
+		{
+			public QueryValidator()
+			{
+				RuleFor(u => u.Username)
+					.NotEmpty().WithMessage("Username is empty");
+				//.EmailAddress(EmailValidationMode.AspNetCoreCompatible).WithMessage("Invalid email");
+
+				RuleFor(u => u.Password)
+					.NotEmpty().WithMessage("Password is empty");
+			}
+		}
+
+		public class QueryHandler : IHandlerWrapper<GetJwtToken.Query, string>
         {
 			private readonly UserManager<AppUser> _userManager;
 			private readonly SignInManager<AppUser> _signInManager;
@@ -24,16 +39,13 @@ namespace Core.Application.Features.Queries.JwtLogin
 				_jwtGenerator = jwtGenerator;
 			}
 
-			public async Task<Response<string>> Handle(JwtTokenGetting.Query request, CancellationToken cancellationToken)
+			public async Task<Response<string>> Handle(GetJwtToken.Query request, CancellationToken cancellationToken)
 			{
-				var validationResult = await new JwtTokenGetting.QueryValidator().ValidateAsync(request, cancellationToken);
-				if (!validationResult.IsValid)
-					return ResponseResult.Fail<string>(validationResult.Errors.Select(e => new ResponseError(e.PropertyName, e.ErrorMessage)));
-
-				var user = await _userManager.FindByNameAsync(request.Username);
+                var user = await _userManager.FindByNameAsync(request.Username);
 				if (user == null)
 				{
-					return ResponseResult.Fail<string>(new[] { new ResponseError("", "Username does not exist") });
+					//return ResponseResult.Ok<string>(new[] { new ResponseError(string.Empty, "0 There's no user with such email and password") });
+					return ResponseResult.Ok<string>(null);
 				}
 
 				var result = await _signInManager.CheckPasswordSignInAsync(user, request.Password, lockoutOnFailure: false);
@@ -43,7 +55,7 @@ namespace Core.Application.Features.Queries.JwtLogin
 					return ResponseResult.Ok(await _jwtGenerator.CreateTokenAsync(user));
 				}
 
-				return ResponseResult.Fail<string>(new[] { new ResponseError("", "Unauthorized") });
+				return ResponseResult.Ok<string>(null);
 			}
 		}
     }

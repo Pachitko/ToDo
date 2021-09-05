@@ -50,11 +50,10 @@ namespace Core.Application.Features.Commands.RegisterUser
 
             public async Task<Response<IdentityResult>> Handle(RegisterUser.Command request, CancellationToken cancellationToken)
             {
-                var validator = new RegisterUser.CommandValidator(_userManager);
-                var validationResult = await validator.ValidateAsync(request, cancellationToken);
-                if (!validationResult.IsValid)
-                    return ResponseResult.Fail(validationResult.Errors.Select(e => new ResponseError(e.PropertyName, e.ErrorMessage)),
-                        IdentityResult.Failed());
+                //var validationResult = await new RegisterUser.CommandValidator(_userManager).ValidateAsync(request, cancellationToken);
+                //if (!validationResult.IsValid)
+                //    return ResponseResult.Fail(validationResult.Errors.Select(e => new ResponseError(e.PropertyName, e.ErrorMessage)),
+                //        IdentityResult.Failed());
 
                 var user = _mapper.Map<AppUser>(request);
                 var result = await _userManager.CreateAsync(user, request.Password);
