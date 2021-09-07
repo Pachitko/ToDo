@@ -1,4 +1,4 @@
-﻿namespace Core.Application.Features
+﻿namespace Core.Application.Helpers
 {
     public enum ResourcePageUriType
     {

@@ -8,7 +8,6 @@ using MediatR;
 
 namespace Core.Application.PipelineBehaviors
 {
-    // todo: fix and test
     public class ValidationBehaviorV3<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
         where TRequest : IValidateable
         where TResponse : class

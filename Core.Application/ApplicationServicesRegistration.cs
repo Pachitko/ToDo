@@ -11,7 +11,7 @@ namespace Core.Application
         {
             var assembly = typeof(ApplicationServicesRegistration).Assembly;
 
-            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>)); //todo: fix
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
             services.AddMediatR(assembly);
             services.AddValidatorsFromAssembly(assembly);
             services.AddAutoMapper(assembly);

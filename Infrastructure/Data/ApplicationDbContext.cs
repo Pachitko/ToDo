@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore;
 using Core.Domain.Entities;
 using System;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Core.Domain.Interfaces;
 
 namespace Infrastructure.Data
 {
@@ -14,6 +16,8 @@ namespace Infrastructure.Data
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
+            ChangeTracker.StateChanged += UpdateTimestamps;
+            ChangeTracker.Tracked += UpdateTimestamps;
         }
 
         protected override void OnModelCreating(ModelBuilder builder)
@@ -57,6 +61,28 @@ namespace Infrastructure.Data
 
             builder.Property(i => i.Title).HasMaxLength(128).IsRequired();
             builder.Property(i => i.Description).HasMaxLength(512);
+        }
+
+        private static void UpdateTimestamps(object sender, EntityEntryEventArgs e)
+        {
+            if (e.Entry.Entity is IHasTimestamps entityWithTimestamps)
+            {
+                switch (e.Entry.State)
+                {
+                    case EntityState.Deleted:
+                        entityWithTimestamps.Deleted = DateTime.UtcNow;
+                        Console.WriteLine($"Stamped for delete: {e.Entry.Entity}");
+                        break;
+                    case EntityState.Modified:
+                        entityWithTimestamps.Modified = DateTime.UtcNow;
+                        Console.WriteLine($"Stamped for update: {e.Entry.Entity}");
+                        break;
+                    case EntityState.Added:
+                        entityWithTimestamps.Added = DateTime.UtcNow;
+                        Console.WriteLine($"Stamped for insert: {e.Entry.Entity}");
+                        break;
+                }
+            }
         }
     }
 }

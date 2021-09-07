@@ -10,7 +10,7 @@ namespace ToDoApi.MapperProfiles
 
         public UsersProfile()
         {
-            CreateMap<AppUser, UserDto>()
+            CreateMap<AppUser, AppUserDto>()
                 .ForMember(dto => dto.Name, o => o.MapFrom(au => $"{au.UserProfile.FirstName} {au.UserProfile.LastName}"));
         }
     }

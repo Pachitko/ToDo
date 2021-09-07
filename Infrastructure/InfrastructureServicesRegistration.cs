@@ -5,6 +5,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Infrastructure.Data;
 using Core.Domain.Entities;
+using Core.Application.Services;
+using Infrastructure.Services;
+using Microsoft.AspNetCore.Identity.UI.Services;
 
 namespace Infrastructure
 {
@@ -29,6 +32,9 @@ namespace Infrastructure
             })
                 .AddDefaultTokenProviders()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
+
+            services.AddScoped<IJwtGenerator, JwtGenerator>();
+            services.AddScoped<IEmailSender, EmailSender>();
 
             services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
 

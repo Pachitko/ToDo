@@ -22,26 +22,26 @@ using Core.Application;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using FluentValidation.AspNetCore;
 using Newtonsoft.Json.Serialization;
+using ToDoApi.Services;
 
 namespace ToDoApi
 {
     public class Startup
     {
+        public IConfiguration Configuration { get; }
+        
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
         }
 
-        public IConfiguration Configuration { get; }
-
         public void ConfigureServices(IServiceCollection services)
         {
-            ILoggerFactory loggerFactory1 = LoggerFactory.Create(builder =>
+            ILoggerFactory loggerFactory = LoggerFactory.Create(builder =>
             {
                 builder.AddConsole();
-                builder.AddFilter(level => level == LogLevel.None);
+                builder.AddFilter(l => l == LogLevel.None);
             });
-            var loggerFactory = loggerFactory1;
 
             services.AddInfrastructureServices(loggerFactory, Configuration);
 
@@ -139,10 +139,9 @@ namespace ToDoApi
 
             services.AddAuthorization(options => ConfigureAuthorization(options));
 
-            services.AddScoped<IJwtGenerator, JwtGenerator>();
-            services.AddScoped<IEmailSender, EmailSender>();
-
+            services.AddTransient<IPropertyMappingService, PropertyMappingService>();
             services.AddAutoMapper(typeof(Startup).Assembly);
+
             services.AddApplicationServices();
         }
 

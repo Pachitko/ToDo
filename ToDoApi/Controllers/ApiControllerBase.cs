@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Mvc;
-using Core.Application.Features;
+using Core.Application.Helpers;
 
 namespace ToDoApi.Controllers
 {
@@ -13,24 +13,27 @@ namespace ToDoApi.Controllers
             return (ActionResult)options.Value.InvalidModelStateResponseFactory(ControllerContext);
         }
 
-        protected string CreateResourcePageUri(PageParameters query, string routeName, ResourcePageUriType type)
+        protected string CreateResourcePageUri(IHasPageParametersWithOrderBy query, string routeName, ResourcePageUriType type)
         {
             return type switch
             {
                 ResourcePageUriType.PreviousPage => Url.Link(routeName, new
                 {
                     pageNumber = query.PageNumber - 1,
-                    pageSize = query.PageSize
+                    pageSize = query.PageSize,
+                    orderBy = query.OrderBy
                 }),
                 ResourcePageUriType.NextPage => Url.Link(routeName, new
                 {
                     pageNumber = query.PageNumber + 1,
-                    pageSize = query.PageSize
+                    pageSize = query.PageSize,
+                    orderBy = query.OrderBy
                 }),
                 _ => Url.Link(routeName, new
                 {
                     pageNumber = query.PageNumber,
-                    pageSize = query.PageSize
+                    pageSize = query.PageSize,
+                    orderBy = query.OrderBy
                 }),
             };
         }

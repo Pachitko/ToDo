@@ -5,7 +5,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using System.Threading;
 
-namespace Core.Application.Features
+namespace Core.Application.Helpers
 {
     public class PagedList<T> : List<T>
     {
@@ -36,6 +36,7 @@ namespace Core.Application.Features
             var items = await source
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize).ToListAsync(cancellationToken);
+
             return new PagedList<T>(items, count, pageNumber, pageSize);
         }
     }

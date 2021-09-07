@@ -12,18 +12,14 @@ namespace Core.Application.MapperProfiles
         public UsersProfile()
         {
             CreateMap<RegisterUser.Command, AppUser>()
-                //.IgnoreAllUnmapped()
-                .ForMember(u => u.UserName, o => o.MapFrom(r => r.Username))
-                .ForMember(u => u.Email, o => o.MapFrom(r => r.Email))
-                .ForMember(u => u.PhoneNumber, o => o.MapFrom(r => r.PhoneNumber))
+                .ForPath(u => u.UserProfile.FirstName, o => o.MapFrom(c => c.FirstName))
+                .ForPath(u => u.UserProfile.LastName, o => o.MapFrom(c => c.LastName))
                 .ReverseMap();
 
             CreateMap<CreateUser.Command, AppUser>()
-               //.IgnoreAllUnmapped()
-               .ForMember(u => u.UserName, o => o.MapFrom(r => r.Username))
-               .ForMember(u => u.Email, o => o.MapFrom(r => r.Email))
-               .ForMember(u => u.PhoneNumber, o => o.MapFrom(r => r.PhoneNumber))
-               .ReverseMap();
+                .ForPath(u => u.UserProfile.FirstName, o => o.MapFrom(c => c.FirstName))
+                .ForPath(u => u.UserProfile.LastName, o => o.MapFrom(c => c.LastName))
+                .ReverseMap();
         }
     }
 }

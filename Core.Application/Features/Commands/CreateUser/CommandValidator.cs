@@ -34,8 +34,16 @@ namespace Core.Application.Features.Commands.JwtRegister
                 RuleFor(u => u.Password)
                     .Cascade(CascadeMode.Stop)
                     .NotEmpty().WithMessage("Password can't be empty");
-                    //.Matches(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,255}$")
-                    //.WithMessage("Min 8 / max 255 characters, at least one uppercase letter, one lowercase letter and one number");
+                //.Matches(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,255}$")
+                //.WithMessage("Min 8 / max 255 characters, at least one uppercase letter, one lowercase letter and one number");
+
+                RuleFor(u => u.FirstName)
+                    .NotEmpty().WithMessage("First name can't be empty")
+                    .MaximumLength(64);
+
+                RuleFor(u => u.LastName)
+                    .NotEmpty().WithMessage("Last name can't be empty")
+                    .MaximumLength(64);
 
                 //RuleFor(u => u.ConfirmPassword)
                 //    .Cascade(CascadeMode.Stop)
