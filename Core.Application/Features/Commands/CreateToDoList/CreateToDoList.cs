@@ -1,19 +1,22 @@
-﻿using Core.Application.Responses;
+﻿using Core.Application.Features.Queries.GetUserById;
+using Core.Application.Responses;
 using System.Threading.Tasks;
 using Core.Domain.Entities;
 using Infrastructure.Data;
 using System.Threading;
-using AutoMapper;
-using System;
-using MediatR;
-using Core.Application.Features.Queries.GetUserById;
 using FluentValidation;
+using AutoMapper;
+using MediatR;
+using System;
 
 namespace Core.Application.Features.Commands.CreateToDoList
 {
     public partial class CreateToDoList
     {
-        public record Command(string Title, Guid UserId) : IRequestWrapper<ToDoList>;
+        public record Command(string Title) : IRequestWrapper<ToDoList>
+        {
+            public Guid UserId { get; set; }
+        }
 
         public class CommandValidator : AbstractValidator<Command>
         {
@@ -43,18 +46,14 @@ namespace Core.Application.Features.Commands.CreateToDoList
                 var response = await _mediator.Send(new GetUserById.Query(request.UserId), cancellationToken);
                 if (response.Succeeded)
                 {
-                    var toDoList = response.Value;
-                    if (toDoList is null)
-                        return ResponseResult.Ok<ToDoList>(null);
-
                     var newToDoList = _mapper.Map<ToDoList>(request);
                     await _dbContext.ToDoLists.AddAsync(newToDoList, cancellationToken);
                     await _dbContext.SaveChangesAsync(cancellationToken);
-                    return ResponseResult.Ok(newToDoList);
+                    return Response<ToDoList>.Ok(newToDoList);
                 }
                 else
                 {
-                    return ResponseResult.Fail<ToDoList>(response.Errors, null);
+                    return Response<ToDoList>.Fail(response.Errors);
                 }
             }
         }

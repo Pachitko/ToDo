@@ -1,14 +1,13 @@
-﻿using Core.Application.Responses;
+﻿using Core.Application.Features.Queries.GetToDoListById;
+using Core.Application.Responses;
 using System.Threading.Tasks;
 using Core.Domain.Entities;
-using System.Threading;
-using System.Linq;
-using AutoMapper;
-using System;
 using Infrastructure.Data;
+using System.Threading;
 using FluentValidation;
+using AutoMapper;
 using MediatR;
-using Core.Application.Features.Queries.GetToDoListById;
+using System;
 
 namespace Core.Application.Features.Commands.CreateToDoItem
 {
@@ -16,6 +15,8 @@ namespace Core.Application.Features.Commands.CreateToDoItem
     {
         public class Command : IRequestWrapper<ToDoItem>
         {
+            public Guid UserId { get; set; }
+
             public Guid ToDoListId { get; set; }
 
             public string Title { get; set; }
@@ -45,14 +46,14 @@ namespace Core.Application.Features.Commands.CreateToDoItem
         public class CommandHandler : IHandlerWrapper<CreateToDoItem.Command, ToDoItem>
         {
             private readonly IApplicationDbContext _dbContext;
-            private readonly IMapper _mapper;
             private readonly IMediator _mediator;
+            private readonly IMapper _mapper;
 
             public CommandHandler(IApplicationDbContext dbContext, IMapper mapper, IMediator mediator)
             {
                 _dbContext = dbContext;
-                _mapper = mapper;
                 _mediator = mediator;
+                _mapper = mapper;
             }
 
             public async Task<Response<ToDoItem>> Handle(CreateToDoItem.Command request, CancellationToken cancellationToken)
@@ -61,21 +62,17 @@ namespace Core.Application.Features.Commands.CreateToDoItem
                 //if (!validationResult.IsValid)
                 //    return ResponseResult.Fail<ToDoItem>(validationResult.Errors.Select(e => new ResponseError(e.PropertyName, e.ErrorMessage)), null);
 
-                var response = await _mediator.Send(new GetToDoListById.Query(request.ToDoListId), cancellationToken);
+                var response = await _mediator.Send(new GetToDoListById.Query(request.UserId, request.ToDoListId), cancellationToken);
                 if (response.Succeeded)
                 {
-                    var toDoList = response.Value;
-                    if (toDoList is null)
-                        return ResponseResult.Ok<ToDoItem>(null);
-
                     var newToDoItem = _mapper.Map<ToDoItem>(request);
                     await _dbContext.ToDoItems.AddAsync(newToDoItem, cancellationToken);
                     await _dbContext.SaveChangesAsync(cancellationToken);
-                    return ResponseResult.Ok(newToDoItem);
+                    return Response<ToDoItem>.Ok(newToDoItem);
                 }
                 else
                 {
-                    return ResponseResult.Fail<ToDoItem>(response.Errors, null);
+                    return Response<ToDoItem>.Fail(response.Errors);
                 }
             }
         }

@@ -1,4 +1,5 @@
-﻿using Core.Domain.Entities;
+﻿using Core.Application.Features.Commands.CreateToDoItem;
+using Core.Domain.Entities;
 using ToDoApi.Models;
 using AutoMapper;
 
@@ -8,7 +9,7 @@ namespace ToDoApi.MapperProfiles
     {
         public ToDoItemsProfile()
         {
-            CreateMap<ToDoItem, ToDoItemDto>().ReverseMap();
+            CreateMap<ToDoItem, ToDoItemDto>();
         }
     }
 }

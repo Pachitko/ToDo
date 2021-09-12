@@ -6,8 +6,9 @@ namespace ToDoApi.Models
     {
         public Guid Id { get; set; }
         public string UserName { get; set; }
-        public string Name { get; set; } // first name + last name from UserProfile class
+        public string Name { get; set; } // FirstName + LastName
         public string Email { get; set; }
         public string PhoneNumber { get; set; }
+        public int? Age { get; set; }
     }
 }

@@ -1,12 +1,13 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Core.Application.Responses;
+using Core.Application.Services;
 using System.Threading.Tasks;
 using Core.Domain.Entities;
 using System.Threading;
-using Core.Application.Services;
 using FluentValidation;
+using MediatR;
 
-namespace Core.Application.Features.Queries.JwtLogin
+namespace Core.Application.Features.Queries.GetJwtToken
 {
     public partial class GetJwtToken
 	{
@@ -31,31 +32,30 @@ namespace Core.Application.Features.Queries.JwtLogin
 			private readonly SignInManager<AppUser> _signInManager;
 			private readonly IJwtGenerator _jwtGenerator;
 
-			public QueryHandler(UserManager<AppUser> userManager, 
-				SignInManager<AppUser> signInManager, IJwtGenerator jwtGenerator)
+			public QueryHandler(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager,
+				IJwtGenerator jwtGenerator)
 			{
-				_userManager = userManager;
-				_signInManager = signInManager;
-				_jwtGenerator = jwtGenerator;
+				_userManager = userManager ?? throw new System.ArgumentNullException(nameof(userManager));
+				_signInManager = signInManager ?? throw new System.ArgumentNullException(nameof(signInManager));
+				_jwtGenerator = jwtGenerator ?? throw new System.ArgumentNullException(nameof(jwtGenerator));
 			}
 
 			public async Task<Response<string>> Handle(GetJwtToken.Query request, CancellationToken cancellationToken)
 			{
-                var user = await _userManager.FindByNameAsync(request.Username);
+				var user = await _userManager.FindByNameAsync(request.Username);
 				if (user == null)
 				{
-					//return ResponseResult.Ok<string>(new[] { new ResponseError(string.Empty, "0 There's no user with such email and password") });
-					return ResponseResult.Ok<string>(null);
+					return Response<string>.Ok(null);
 				}
 
 				var result = await _signInManager.CheckPasswordSignInAsync(user, request.Password, lockoutOnFailure: false);
 
 				if (result.Succeeded)
 				{
-					return ResponseResult.Ok(await _jwtGenerator.CreateTokenAsync(user));
+					return Response<string>.Ok(await _jwtGenerator.CreateTokenAsync(user));
 				}
 
-				return ResponseResult.Ok<string>(null);
+				return Response<string>.Ok(null);
 			}
 		}
     }

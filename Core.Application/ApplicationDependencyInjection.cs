@@ -5,11 +5,11 @@ using MediatR;
 
 namespace Core.Application
 {
-    public static class ApplicationServicesRegistration
+    public static class ApplicationDependencyInjection
     {
         public static IServiceCollection AddApplicationServices(this IServiceCollection services)
         {
-            var assembly = typeof(ApplicationServicesRegistration).Assembly;
+            var assembly = typeof(ApplicationDependencyInjection).Assembly;
 
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
             services.AddMediatR(assembly);

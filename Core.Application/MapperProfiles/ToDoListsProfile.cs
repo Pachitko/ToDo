@@ -8,7 +8,7 @@ namespace ToDoApi.MapperProfiles
     {
         public ToDoListsProfile()
         {
-            CreateMap<ToDoList, CreateToDoList.Command>().ReverseMap();
+            CreateMap<CreateToDoList.Command, ToDoList>();
         }
     }
 }

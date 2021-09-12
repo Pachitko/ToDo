@@ -1,81 +1,84 @@
-﻿using AutoMapper;
-using MediatR;
-using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using ToDoApi.Models;
-using System;
-using Core.Application.Features.Queries.GetToDoLists;
+﻿using Core.Application.Features.Commands.DeleteToDoListById;
 using Core.Application.Features.Queries.GetToDoListById;
 using Core.Application.Features.Commands.CreateToDoList;
-using Infrastructure.Extensions;
+using Core.Application.Features.Queries.GetToDoLists;
+using System.Collections.Generic;
+using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
+using ToDoApi.Models;
+using AutoMapper;
+using System;
 
 namespace ToDoApi.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
-    public class TaskListsController : ApiControllerBase
+    [Route("api/users/{userId}/[controller]")]
+    public class TaskListsController : BaseApiController
     {
         private readonly IMapper _mapper;
-        private readonly IMediator _mediator;
 
-        public TaskListsController(IMapper mapper, IMediator mediator)
+        public TaskListsController(IMapper mapper)
         {
             _mapper = mapper;
-            _mediator = mediator;
         }
 
-        [HttpGet]
+        [HttpGet(Name = nameof(GetToDoListsAsync))]
         [HttpHead]
-        public async Task<ActionResult<List<ToDoListDto>>> GetToDoListsAsync()
+        public async Task<ActionResult<List<ToDoListDto>>> GetToDoListsAsync([FromRoute] GetToDoLists.Query query)
         {
-            var response = await _mediator.Send(new GetToDoLists.Query());
+            var response = await Mediator.Send(query);
             if(response.Succeeded)
             {
-                if (response.Value is null)
-                    return NotFound();
                 return _mapper.Map<List<ToDoListDto>>(response.Value);
             }
             else
             {
-                ModelState.AddModelErrors(response.Errors);
-                return ValidationProblem();
+                return ResponseFailed(response);
             }
         }
 
         [HttpGet("{toDoListId}", Name = nameof(GetToDoListAsync))]
-        public async Task<ActionResult<ToDoListDto>> GetToDoListAsync(Guid toDoListId)
+        public async Task<ActionResult<ToDoListDto>> GetToDoListAsync([FromRoute] GetToDoListById.Query query)
         {
-            var response = await _mediator.Send(new GetToDoListById.Query(toDoListId));
-            if(response.Succeeded)
+            var response = await Mediator.Send(query);
+            if(response.Succeeded)  
             {
-                var toDoList = response.Value;
-                if (toDoList is null)
-                    return NotFound();
                 return Ok(_mapper.Map<ToDoListDto>(response.Value));
             }
             else
             {
-                ModelState.AddModelErrors(response.Errors);
-                return ValidationProblem();
+                return ResponseFailed(response);
             }
         }
 
-        [HttpPost]
-        public async Task<ActionResult> CreateToDoListAsync(CreateToDoList.Command command)
+        [HttpPost(Name = nameof(CreateToDoListAsync))]
+        public async Task<ActionResult> CreateToDoListAsync(Guid userId, CreateToDoList.Command command)
         {
-            var response = await _mediator.Send(command);
+            command.UserId = userId;
+
+            var response = await Mediator.Send(command);
             if (response.Succeeded)
             {
-                if (response.Value is null)
-                    return NotFound();
                 var toDoListToReturn = _mapper.Map<ToDoListDto>(response.Value);
-                return CreatedAtAction(nameof(GetToDoListAsync), new { toDoListId = toDoListToReturn.Id }, toDoListToReturn);
+                return CreatedAtAction(nameof(GetToDoListAsync), new { userId, toDoListId = toDoListToReturn.Id }, toDoListToReturn);
             }
             else
             {
-                ModelState.AddModelErrors(response.Errors);
-                return ValidationProblem();
+                return ResponseFailed(response);
+            }
+        }
+
+        [HttpDelete("{toDoListId}", Name = nameof(DeleteToDoListAsync))]
+        public async Task<ActionResult> DeleteToDoListAsync([FromRoute] DeleteToDoListById.Command command)
+        {
+            var response = await Mediator.Send(command);
+            if (response.Succeeded)
+            {
+                return NoContent();
+            }
+            else
+            {
+                return ResponseFailed(response);
             }
         }
     }

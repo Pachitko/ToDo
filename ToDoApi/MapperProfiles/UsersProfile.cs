@@ -1,4 +1,5 @@
-﻿using Core.Domain.Entities;
+﻿using Core.Application.Extensions;
+using Core.Domain.Entities;
 using ToDoApi.Models;
 using AutoMapper;
 
@@ -11,7 +12,15 @@ namespace ToDoApi.MapperProfiles
         public UsersProfile()
         {
             CreateMap<AppUser, AppUserDto>()
-                .ForMember(dto => dto.Name, o => o.MapFrom(au => $"{au.UserProfile.FirstName} {au.UserProfile.LastName}"));
+                .ForMember(dest => dest.Name, o => o.MapFrom(src => $"{src.UserProfile.FirstName} {src.UserProfile.MiddleName} {src.UserProfile.LastName}"))
+                .ForMember(dest => dest.Age, o => o.MapFrom(src => src.UserProfile.DateOfBirth.GetCurrentAge(src.UserProfile.DateOfDeath)));
+
+            CreateMap<AppUser, AppUserFullDto>()
+                .ForMember(dest => dest.FirstName, o => o.MapFrom(src => src.UserProfile.FirstName))
+                .ForMember(dest => dest.MiddleName, o => o.MapFrom(src => src.UserProfile.MiddleName))
+                .ForMember(dest => dest.LastName, o => o.MapFrom(src => src.UserProfile.LastName))
+                .ForMember(dest => dest.DateOfBirth, o => o.MapFrom(src => src.UserProfile.DateOfBirth))
+                .ForMember(dest => dest.DateOfDeath, o => o.MapFrom(src => src.UserProfile.DateOfDeath));
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 using Core.Application.Responses;
 using System.Threading.Tasks;
 using Core.Domain.Entities;
@@ -11,7 +12,7 @@ namespace Core.Application.Features.Queries.GetToDoItems
 {
     public partial class GetToDoItems
     {
-        public record Query(Guid ToDoListId) : IRequestWrapper<IList<ToDoItem>>;
+        public record Query(Guid UserId, Guid ToDoListId) : IRequestWrapper<IList<ToDoItem>>;
 
         public class QueryHandler : IHandlerWrapper<Query, IList<ToDoItem>>
         {
@@ -20,25 +21,22 @@ namespace Core.Application.Features.Queries.GetToDoItems
 
             public QueryHandler(IApplicationDbContext dbContext, IMediator mediator)
             {
-                _dbContext = dbContext;
-                _mediator = mediator;
+                _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
+                _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
             }
 
             public async Task<Response<IList<ToDoItem>>> Handle(Query request, CancellationToken cancellationToken)
             {
-                var response = await _mediator.Send(new GetToDoListById.GetToDoListById.Query(request.ToDoListId), cancellationToken);
+                var response = await _mediator.Send(new GetToDoListById.GetToDoListById.Query(request.UserId, request.ToDoListId), cancellationToken);
                 if(response.Succeeded)
                 {
-                    var toDoList = response.Value;
-                    if (toDoList is null)
-                        return ResponseResult.Ok<IList<ToDoItem>>(null);
-
-                    await _dbContext.Entry(toDoList).Collection(l => l.ToDoItems).LoadAsync(cancellationToken);
-                    return ResponseResult.Ok(toDoList.ToDoItems);
+                    _dbContext.Entry(response.Value).State = EntityState.Unchanged;
+                    await _dbContext.Entry(response.Value).Collection(x => x.ToDoItems).LoadAsync(cancellationToken);
+                    return Response<IList<ToDoItem>>.Ok(response.Value.ToDoItems);
                 }
                 else
                 {
-                    return ResponseResult.Fail<IList<ToDoItem>>(response.Errors);
+                    return Response<IList<ToDoItem>>.Fail(response.Errors);
                 }
             }
         }

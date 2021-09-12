@@ -23,7 +23,10 @@ namespace Core.Application.Features.Queries.GetUserById
             public async Task<Response<AppUser>> Handle(Query request, CancellationToken cancellationToken)
             {
                 var userFromDb = await _userManager.FindByIdAsync(request.Id.ToString());
-                return ResponseResult.Ok(userFromDb);
+                if (userFromDb is null)
+                    return Response<AppUser>.Fail();
+                else
+                    return Response<AppUser>.Ok(userFromDb);
             }
         }
     }

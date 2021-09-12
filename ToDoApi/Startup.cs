@@ -23,6 +23,9 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 using FluentValidation.AspNetCore;
 using Newtonsoft.Json.Serialization;
 using ToDoApi.Services;
+using ToDoApi.ModelBinders;
+using System.Linq;
+using Microsoft.AspNetCore.Mvc.Formatters;
 
 namespace ToDoApi
 {
@@ -49,12 +52,23 @@ namespace ToDoApi
             {
                 o.ReturnHttpNotAcceptable = true;
                 o.SuppressAsyncSuffixInActionNames = false;
-                o.Filters.Add(new AuthorizeFilter()); // todo remove
+                //o.ValueProviderFactories.Insert(0, new RouteBodyValueProviderFactory());
+                //o.ModelBinderProviders.Insert(0, new CreateToDoItemCommandModelBinderProvider());
             })
                 .AddNewtonsoftJson(options =>
                 {
                     options.SerializerSettings.ContractResolver =
                         new CamelCasePropertyNamesContractResolver();
+                })
+                .AddMvcOptions(o =>
+                {
+                    var newtonsoftJsonOutputFormatter = o.OutputFormatters
+                       .OfType<NewtonsoftJsonOutputFormatter>().FirstOrDefault();
+
+                    if (newtonsoftJsonOutputFormatter is not null)
+                    {
+                        newtonsoftJsonOutputFormatter.SupportedMediaTypes.Add("application/vnd.redray.hateoas+json");
+                    }
                 })
                 .AddXmlDataContractSerializerFormatters()
                 .AddFluentValidation(config =>
@@ -139,9 +153,7 @@ namespace ToDoApi
 
             services.AddAuthorization(options => ConfigureAuthorization(options));
 
-            services.AddTransient<IPropertyMappingService, PropertyMappingService>();
-            services.AddAutoMapper(typeof(Startup).Assembly);
-
+            services.AddToDoApiServices();
             services.AddApplicationServices();
         }
 
@@ -195,9 +207,9 @@ namespace ToDoApi
                 .Build();
 
             //options.DefaultPolicy = fallbackPolicy;
-            options.FallbackPolicy = new AuthorizationPolicyBuilder()
-                .RequireAuthenticatedUser() // add DenyAnonymousAuthorizationRequirement
-                .Build();
+            //options.FallbackPolicy = new AuthorizationPolicyBuilder()
+            //    .RequireAuthenticatedUser() // add DenyAnonymousAuthorizationRequirement
+            //    .Build();
         }
 
         private void HandleException(IApplicationBuilder app)

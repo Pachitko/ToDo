@@ -32,7 +32,8 @@ namespace Infrastructure.Data
         {
             builder.OwnsOne(u => u.UserProfile, builder =>
             {
-                builder.Property(userProfile => userProfile.FirstName).HasMaxLength(64).IsRequired(false);
+                builder.Property(userProfile => userProfile.FirstName).HasMaxLength(64).IsRequired();
+                builder.Property(userProfile => userProfile.MiddleName).HasMaxLength(64);
                 builder.Property(userProfile => userProfile.LastName).HasMaxLength(64).IsRequired();
             });
             builder.Navigation(u => u.UserProfile).IsRequired();

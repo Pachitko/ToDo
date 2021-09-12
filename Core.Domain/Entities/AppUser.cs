@@ -13,7 +13,7 @@ namespace Core.Domain.Entities
         //public virtual ICollection<IdentityUserRole<string>> UserRoles { get; set; }
 
         public UserProfile UserProfile { get; set; }
-        public IList<ToDoList> ToDoLists { get; set; }
+        public IList<ToDoList> ToDoLists { get; set; } = new List<ToDoList>();
 
         public AppUser()
         {

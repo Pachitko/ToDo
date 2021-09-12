@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 
 namespace Infrastructure
 {
-    public static class InfrastructureServicesRegistration
+    public static class InfrastructureDependencyInjection
     {
         public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, ILoggerFactory loggerFactory, IConfiguration configuration)
         {

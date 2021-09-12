@@ -1,15 +1,13 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Core.Application.Features.Queries.JwtLogin;
+using Core.Application.Features.Queries.GetJwtToken;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using MediatR;
-using System.Linq;
-using Core.Application.Features.Commands.JwtRegister;
+using Core.Application.Features.Commands.CreateUser;
 using System.Collections.Generic;
 using Core.Application.Features.Queries.GetUserById;
 using Core.Application.Features.Commands.DeleteUser;
 using Core.Application.Features.Queries.GetUsers;
-using Infrastructure.Extensions;
 using ToDoApi.Models;
 using AutoMapper;
 using System;
@@ -17,52 +15,50 @@ using Newtonsoft.Json;
 using Core.Application.Helpers;
 using Core.Application.Services;
 using Core.Domain.Entities;
+using Core.Application.Extensions;
+using System.Linq;
+using Microsoft.Net.Http.Headers;
+using ToDoApi.ActionConstraints;
+using Core.Application.Features.Commands.CreateFullUser;
 
 namespace ToDoApi.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class UsersController : ApiControllerBase
+    public class UsersController : BaseApiController
     {
         private readonly IMapper _mapper;
-        private readonly IMediator _mediator;
         private readonly IPropertyMappingService _propertyMappingService;
+        private readonly IPropertyChecker _propertyChecker;
 
-        public UsersController(IMapper mapper, IMediator mediator, IPropertyMappingService propertyMappingService)
+        public UsersController(IMapper mapper, IPropertyMappingService propertyMappingService, IPropertyChecker propertyChecker)
         {
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
-            _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
             _propertyMappingService = propertyMappingService ?? throw new ArgumentNullException(nameof(propertyMappingService));
+            _propertyChecker = propertyChecker ?? throw new ArgumentNullException(nameof(propertyChecker));
         }
 
         [HttpGet(Name = nameof(GetUsersAsync))]
         [HttpHead]
-        public async Task<ActionResult<IEnumerable<AppUserDto>>> GetUsersAsync([FromQuery] GetUsers.Query query)
+        public async Task<IActionResult> GetUsersAsync([FromQuery] GetUsers.Query query)
         {
             if (!_propertyMappingService.ValidMappingExistsFor<AppUser>(query.OrderBy))
                 return BadRequest();
 
-            var response = await _mediator.Send(query);
+            if (!_propertyChecker.TypeHasProperties<AppUserDto>(query.Fields))
+                return BadRequest();
+
+            var response = await Mediator.Send(query);
             if(response.Succeeded)
             {
-                var pageedList = response.Value;
-                if (pageedList is null)
-                    return NotFound();
-
-                var previousPageLink = pageedList.HasPrevious ?
-                    CreateResourcePageUri(query, nameof(GetUsersAsync), ResourcePageUriType.PreviousPage) : null;
-
-                var nextPageLink = pageedList.HasNext ?
-                    CreateResourcePageUri(query, nameof(GetUsersAsync), ResourcePageUriType.NextPage) : null;
-
+                var pagedList = response.Value;
+               
                 var pageMetadata = new
                 {
-                    totalCount = pageedList.TotalCount,
-                    totalPages = pageedList.TotalPages,
-                    pageSize = pageedList.PageSize,
-                    currentPage = pageedList.CurrentPage,
-                    previousPageLink,
-                    nextPageLink,
+                    totalCount = pagedList.TotalCount,
+                    totalPages = pagedList.TotalPages,
+                    pageSize = pagedList.PageSize,
+                    currentPage = pagedList.CurrentPage
                 };
 
                 // When we are requesting an application/json,
@@ -70,43 +66,81 @@ namespace ToDoApi.Controllers
                 // it's a metadata related to that resource
                 Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(pageMetadata));
 
-                return Ok(_mapper.Map<IEnumerable<AppUserDto>>(response.Value));
+                var links = CreateLinksForUsers(query, pagedList.HasPrevious, pagedList.HasNext);
+                var shapedUsers = _mapper.Map<IEnumerable<AppUserDto>>(pagedList).ShapeData(query.Fields);
+
+                var shapedUsersWithLinks = shapedUsers.Select(user =>
+                {
+                    var userAsDictionary = user as IDictionary<string, object>;
+                    var links = CreateLinksForUser((Guid)userAsDictionary["Id"], null);
+                    //var resourceWithLinks = _mapper.Map<AppUserDto>(response.Value).ShapeData(fields) as IDictionary<string, object>;
+                    userAsDictionary.Add("links", links);
+                    return userAsDictionary;
+                });
+
+                var linkedUsers =
+                    new
+                    {
+                        value = shapedUsersWithLinks,
+                        links
+                    };
+
+                return Ok(linkedUsers);
             }
             else
             {
-                ModelState.AddModelErrors(response.Errors);
-                return ValidationProblem();
+                return ResponseFailed(response);
             }
         }
 
         [HttpGet("{userId}", Name = nameof(GetUserAsync))]
-        public async Task<ActionResult<AppUserDto>> GetUserAsync(Guid userId)
+        [Produces("application/json", 
+            "application/vnd.redray.hateoas+json", 
+            "application/vnd.redray.user.full+json",
+            "application/vnd.redray.user.full.hateoas+json", 
+            "application/vnd.redray.user.friendly+json",
+            "application/vnd.redray.user.friendly.hateoas+json")]
+        public async Task<ActionResult<AppUserDto>> GetUserAsync(Guid userId, string fields, [FromHeader(Name = "Accept")] string mediaType)
         {
-            var response = await _mediator.Send(new GetUserById.Query(userId));
+            if (!MediaTypeHeaderValue.TryParse(mediaType, out MediaTypeHeaderValue parsedMediaType))
+                BadRequest();
+
+            if (!_propertyChecker.TypeHasProperties<AppUserDto>(fields))
+                return BadRequest();
+
+            var response = await Mediator.Send(new GetUserById.Query(userId));
             if(response.Succeeded)
             {
-                var user = response.Value;
-                if (user is null)
-                    return NotFound();
-                return Ok(_mapper.Map<AppUserDto>(response.Value));
+                bool includeLinks = parsedMediaType.SubTypeWithoutSuffix
+                    .EndsWith("hateoas", StringComparison.InvariantCultureIgnoreCase);
+
+                IEnumerable<LinkDto> links = new List<LinkDto>();
+                if(includeLinks)
+                    links = CreateLinksForUser(userId, fields);
+
+                var primaryMediaType = parsedMediaType.SubTypeWithoutSuffix.Value[0..(includeLinks ? ^8 : ^0)];
+
+                if (primaryMediaType == "vnd.redray.user.full")
+                {
+                    var fullResourceToReturn = _mapper.Map<AppUserFullDto>(response.Value).ShapeData(fields) as IDictionary<string, object>;
+
+                    if(includeLinks)
+                        fullResourceToReturn.Add("links", links);
+
+                    return Ok(fullResourceToReturn);
+                }
+
+                var friendlyResourceToReturn = _mapper.Map<AppUserDto>(response.Value).ShapeData(fields) as IDictionary<string, object>;
+
+                if (includeLinks)
+                    friendlyResourceToReturn.Add("links", links);
+
+                return Ok(friendlyResourceToReturn);
             }
             else
             {
-                ModelState.AddModelErrors(response.Errors);
-                return ValidationProblem();
+                return ResponseFailed(response);
             }
-        }
-
-        [HttpGet("me")]
-        public ActionResult GetMe()
-        {
-            return Ok(new
-            {
-                User.Identity.Name,
-                User.Identity.AuthenticationType,
-                User.Identity.IsAuthenticated,
-                Calims = User.Claims.Select(c => new { c.Type, c.Value })
-            });
         }
 
         [HttpGet("token")]
@@ -115,55 +149,84 @@ namespace ToDoApi.Controllers
         [Produces("application/json")]
         public async Task<ActionResult> GetTokenAsync(GetJwtToken.Query query)
         {
-            var response = await _mediator.Send(query);  
+            var response = await Mediator.Send(query);  
             if (response.Succeeded)
             {
-                if (response.Value is null)
-                    return NotFound();
                 return Ok(new { token = response.Value });
             }
             else
             {
-                ModelState.AddModelErrors(response.Errors);
-                return ValidationProblem();
+                return ResponseFailed(response);
             }
         }
 
-        [HttpPost]
+        [HttpPost(Name = nameof(CreateUserAsync))]
         [AllowAnonymous]
-        [Consumes("application/json")]
-        [Produces("application/json")]
+        [RequestHeaderMatchesMediaType("Content-Type", "application/json", "application/vnd.redray.createusercommand+json")]
+        [Consumes("application/json", "application/vnd.redray.createusercommand+json")]
         public async Task<ActionResult> CreateUserAsync(CreateUser.Command command)
         {
-            var response = await _mediator.Send(command);
+            var response = await Mediator.Send(command);
             if (response.Succeeded)
             {
                 var userToReturn = _mapper.Map<AppUserDto>(response.Value);
+                var links = CreateLinksForUser(userToReturn.Id, null);
+
+                var resourceWithLinks = userToReturn.ShapeData(null);
+                resourceWithLinks.TryAdd("links", links);
+
                 //if (_userManager.Options.SignIn.RequireConfirmedAccount)
-                return CreatedAtAction(nameof(GetUserAsync), new { userId = userToReturn.Id }, userToReturn);
+                return CreatedAtAction(nameof(GetUserAsync), new
+                {
+                    userId = userToReturn.Id,
+                    fields = ""
+                }, resourceWithLinks);
             }
             else
             {
-                ModelState.AddModelErrors(response.Errors);
-                return ValidationProblem();
+                return ResponseFailed(response);
             }
         }
 
-        [HttpDelete("{userId}")]
-        public async Task<ActionResult> DeleteUser(Guid userId)
+        [HttpPost(Name = nameof(CreateFullUserAsync))]
+        [AllowAnonymous]
+        [RequestHeaderMatchesMediaType("Content-Type", "application/vnd.redray.createfullusercommand+json")]
+        [Consumes("application/vnd.redray.createfullusercommand+json")]
+        public async Task<ActionResult> CreateFullUserAsync(CreateFullUser.Command command)
         {
-            var response = await _mediator.Send(new GetUserById.Query(userId));
+            var response = await Mediator.Send(command);
             if (response.Succeeded)
             {
-                if (response.Value is null)
-                    return NotFound();
-                await _mediator.Send(new DeleteUser.Command(response.Value));
+                var userToReturn = _mapper.Map<AppUserFullDto>(response.Value);
+                var links = CreateLinksForUser(userToReturn.Id, null);
+
+                var resourceWithLinks = userToReturn.ShapeData(null);
+                resourceWithLinks.TryAdd("links", links);
+
+                //if (_userManager.Options.SignIn.RequireConfirmedAccount)
+                return CreatedAtAction(nameof(GetUserAsync), new
+                {
+                    userId = userToReturn.Id,
+                    fields = ""
+                }, resourceWithLinks);
+            }
+            else
+            {
+                return ResponseFailed(response);
+            }
+        }
+
+        [HttpDelete("{userId}", Name = nameof(DeleteUserAsync))]
+        public async Task<ActionResult> DeleteUserAsync([FromRoute] DeleteUserById.Command command)
+        {
+            var response = await Mediator.Send(command);
+            if (response.Succeeded)
+            {
                 return NoContent();
             }
             else
             {
-                ModelState.AddModelErrors(response.Errors);
-                return ValidationProblem();
+                return ResponseFailed(response);
             }
         }
 
@@ -172,6 +235,56 @@ namespace ToDoApi.Controllers
         {
             Response.Headers.Add("Allow", "GET,POST,OPTIONS");
             return Ok();
+        }
+
+        //[HttpPut]
+        //public async Task<IActionResult> UpdateUser(int id, UpdateProductCommand command)
+        //{
+        //    if (id != command.Id)
+        //    {
+        //        return BadRequest();
+        //    }
+        //    return Ok(await Mediator.Send(command));
+        //}
+
+        // HATEOAS - Hypermedia as the Engine of Application State
+        private IEnumerable<LinkDto> CreateLinksForUser(Guid userId, string fields)
+        {
+            List<LinkDto> links = new();
+
+            if(string.IsNullOrWhiteSpace(fields))
+            {
+                links.Add(new(Url.Link(nameof(GetUserAsync), new { userId }), "self", "GET"));
+            }
+            else
+            {
+                links.Add(new(Url.Link(nameof(GetUserAsync), new { userId, fields }), "self", "GET"));
+            }
+
+            links.Add(new(Url.Link(nameof(DeleteUserAsync), new { userId }), "delete_user", "DELETE"));
+
+            links.Add(new(Url.Link(nameof(TaskListsController.CreateToDoListAsync), new { userId }), "create_taskList_for_user", "POST"));
+            
+            links.Add(new(Url.Link(nameof(TaskListsController.GetToDoListsAsync), new { userId }), "taskLists", "GET"));
+
+            //links.Add(new(Url.Link(nameof(CreateUserAsync), new { userId }), "create_user", "POST"));
+
+            return links;
+        }
+
+        private IEnumerable<LinkDto> CreateLinksForUsers(GetUsers.Query query, bool hasPrevious, bool hasNext)
+        {
+            List<LinkDto> links = new();
+
+            links.Add(new(CreateResourcePageUri(query, nameof(GetUsersAsync), ResourcePageUriType.Current), "self", "GET"));
+
+            if (hasPrevious)
+                links.Add(new(CreateResourcePageUri(query, nameof(GetUsersAsync), ResourcePageUriType.PreviousPage), "previousPage", "GET"));
+
+            if (hasNext)
+                links.Add(new(CreateResourcePageUri(query, nameof(GetUsersAsync), ResourcePageUriType.NextPage), "nextPage", "GET"));
+
+            return links;
         }
     }
 }

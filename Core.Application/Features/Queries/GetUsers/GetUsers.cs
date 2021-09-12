@@ -13,11 +13,12 @@ namespace Core.Application.Features.Queries.GetUsers
 {
     public partial class GetUsers
     {
-        public class Query : IHasPageParametersWithOrderBy, IRequestWrapper<PagedList<AppUser>>
+        public class Query : IHasPageParametersAndOrderByAndFields, IHasFields, IRequestWrapper<PagedList<AppUser>>
         {
             public int PageNumber { get; set; } = 1;
             public int PageSize { get; set; } = 10;
             public string OrderBy { get; set; } = "ID";
+            public string Fields { get; set; }
         }
 
         public class QueryValidator : AbstractValidator<Query>
@@ -57,7 +58,7 @@ namespace Core.Application.Features.Queries.GetUsers
                     collection = collection.ApplySort(request.OrderBy, mappingDictionary);
                 }
 
-                return ResponseResult.Ok(await PagedList<AppUser>.CreateAsync(
+                return Response<PagedList<AppUser>>.Ok(await PagedList<AppUser>.CreateAsync(
                     collection, 
                     request.PageNumber, 
                     request.PageSize, 

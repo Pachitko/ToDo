@@ -12,7 +12,7 @@ namespace Core.Application.PipelineBehaviors
 {
     public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
         where TRequest : IValidateable
-        where TResponse : class
+        where TResponse : class // todo may not work with value type results
     {
         private readonly IEnumerable<IValidator<TRequest>> _validators;
         private readonly ILogger<TRequest> _logger;
@@ -54,8 +54,7 @@ namespace Core.Application.PipelineBehaviors
                     var resultType = responseType.GetGenericArguments()[0];
                     var invalidResponseType = typeof(Response<>).MakeGenericType(resultType);
 
-                    var invalidResponse =
-                        Activator.CreateInstance(invalidResponseType, null, errors) as TResponse;
+                    var invalidResponse = Activator.CreateInstance(invalidResponseType, null, false, errors) as TResponse;
 
                     //return ResponseResult.Fail<>(result.Errors.Select(x => new ResponseError(x.ErrorCode, x.ErrorMessage)), default) as TResponse;
                     return invalidResponse;

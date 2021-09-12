@@ -1,6 +1,7 @@
-﻿using AutoMapper;
+﻿using Core.Application.Features.Commands.CreateToDoList;
 using Core.Domain.Entities;
 using ToDoApi.Models;
+using AutoMapper;
 
 namespace ToDoApi.MapperProfiles
 {
@@ -8,7 +9,7 @@ namespace ToDoApi.MapperProfiles
     {
         public ToDoListsProfile()
         {
-            CreateMap<ToDoList, ToDoListDto>().ReverseMap();
+            CreateMap<ToDoList, ToDoListDto>();
         }
     }
 }
