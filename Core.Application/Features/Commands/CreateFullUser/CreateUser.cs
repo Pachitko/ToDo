@@ -63,7 +63,7 @@ namespace Core.Application.Features.Commands.CreateFullUser
                     .MaximumLength(64);
 
                 RuleFor(u => u.MiddleName)
-                   .NotEmpty().WithMessage("Middle name can't be empty")
+                   //.NotEmpty().WithMessage("Middle name can't be empty")
                    .MaximumLength(64);
 
                 RuleFor(u => u.LastName)

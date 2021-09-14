@@ -21,7 +21,6 @@ namespace ToDoApi.Controllers
         }
 
         protected ActionResult ResponseFailed<T>(Response<T> response)
-            //where T : class
         {
             if (response.Errors.Count > 0)
             {

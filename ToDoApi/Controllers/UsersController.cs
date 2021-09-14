@@ -24,6 +24,8 @@ using Core.Application.Features.Commands.CreateFullUser;
 namespace ToDoApi.Controllers
 {
     [ApiController]
+    [ApiVersion("1.0")]
+    [ApiVersion("1.1")]
     [Route("api/[controller]")]
     public class UsersController : BaseApiController
     {
@@ -93,13 +95,17 @@ namespace ToDoApi.Controllers
             }
         }
 
+        // application/vnd.todo[.VERSION][.friendly|full][.hateoas]+json
         [HttpGet("{userId}", Name = nameof(GetUserAsync))]
         [Produces("application/json", 
-            "application/vnd.redray.hateoas+json", 
-            "application/vnd.redray.user.full+json",
-            "application/vnd.redray.user.full.hateoas+json", 
-            "application/vnd.redray.user.friendly+json",
-            "application/vnd.redray.user.friendly.hateoas+json")]
+            "application/vnd.todo.hateoas+json", 
+            "application/vnd.todo.user.full+json",
+            "application/vnd.todo.user.full.hateoas+json", 
+            "application/vnd.todo.user.friendly+json",
+            "application/vnd.todo.user.friendly.hateoas+json")]
+        [ResponseCache(Duration = 30)]
+        //[MapToApiVersion("1.1")]
+        [AllowAnonymous]
         public async Task<ActionResult<AppUserDto>> GetUserAsync(Guid userId, string fields, [FromHeader(Name = "Accept")] string mediaType)
         {
             if (!MediaTypeHeaderValue.TryParse(mediaType, out MediaTypeHeaderValue parsedMediaType))
@@ -120,20 +126,22 @@ namespace ToDoApi.Controllers
 
                 var primaryMediaType = parsedMediaType.SubTypeWithoutSuffix.Value[0..(includeLinks ? ^8 : ^0)];
 
-                if (primaryMediaType == "vnd.redray.user.full")
+                if (primaryMediaType == "vnd.todo.user.full")
                 {
-                    var fullResourceToReturn = _mapper.Map<AppUserFullDto>(response.Value).ShapeData(fields) as IDictionary<string, object>;
+                    var fullResourceToReturn = _mapper.Map<AppUserFullDto>(response.Value)
+                        .ShapeData(fields);
 
                     if(includeLinks)
-                        fullResourceToReturn.Add("links", links);
+                        fullResourceToReturn.TryAdd("links", links);
 
                     return Ok(fullResourceToReturn);
                 }
 
-                var friendlyResourceToReturn = _mapper.Map<AppUserDto>(response.Value).ShapeData(fields) as IDictionary<string, object>;
+                var friendlyResourceToReturn = _mapper.Map<AppUserDto>(response.Value)
+                    .ShapeData(fields);
 
                 if (includeLinks)
-                    friendlyResourceToReturn.Add("links", links);
+                    friendlyResourceToReturn.TryAdd("links", links);
 
                 return Ok(friendlyResourceToReturn);
             }
@@ -143,27 +151,10 @@ namespace ToDoApi.Controllers
             }
         }
 
-        [HttpGet("token")]
-        [AllowAnonymous]
-        [Consumes("application/json")]
-        [Produces("application/json")]
-        public async Task<ActionResult> GetTokenAsync(GetJwtToken.Query query)
-        {
-            var response = await Mediator.Send(query);  
-            if (response.Succeeded)
-            {
-                return Ok(new { token = response.Value });
-            }
-            else
-            {
-                return ResponseFailed(response);
-            }
-        }
-
         [HttpPost(Name = nameof(CreateUserAsync))]
         [AllowAnonymous]
-        [RequestHeaderMatchesMediaType("Content-Type", "application/json", "application/vnd.redray.createusercommand+json")]
-        [Consumes("application/json", "application/vnd.redray.createusercommand+json")]
+        [RequestHeaderMatchesMediaType("Content-Type", "application/json", "application/vnd.todo.createusercommand+json")]
+        [Consumes("application/json", "application/vnd.todo.createusercommand+json")]
         public async Task<ActionResult> CreateUserAsync(CreateUser.Command command)
         {
             var response = await Mediator.Send(command);
@@ -190,8 +181,8 @@ namespace ToDoApi.Controllers
 
         [HttpPost(Name = nameof(CreateFullUserAsync))]
         [AllowAnonymous]
-        [RequestHeaderMatchesMediaType("Content-Type", "application/vnd.redray.createfullusercommand+json")]
-        [Consumes("application/vnd.redray.createfullusercommand+json")]
+        [RequestHeaderMatchesMediaType("Content-Type", "application/vnd.todo.createfullusercommand+json")]
+        [Consumes("application/vnd.todo.createfullusercommand+json")]
         public async Task<ActionResult> CreateFullUserAsync(CreateFullUser.Command command)
         {
             var response = await Mediator.Send(command);
@@ -223,6 +214,23 @@ namespace ToDoApi.Controllers
             if (response.Succeeded)
             {
                 return NoContent();
+            }
+            else
+            {
+                return ResponseFailed(response);
+            }
+        }
+
+        [HttpGet("token")]
+        [AllowAnonymous]
+        [Consumes("application/json")]
+        [Produces("application/json")]
+        public async Task<ActionResult> GetTokenAsync(GetJwtToken.Query query)
+        {
+            var response = await Mediator.Send(query);
+            if (response.Succeeded)
+            {
+                return Ok(new { token = response.Value });
             }
             else
             {

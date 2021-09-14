@@ -26,6 +26,7 @@ using ToDoApi.Services;
 using ToDoApi.ModelBinders;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc.Formatters;
+using Microsoft.AspNetCore.Mvc.Versioning;
 
 namespace ToDoApi
 {
@@ -48,10 +49,26 @@ namespace ToDoApi
 
             services.AddInfrastructureServices(loggerFactory, Configuration);
 
+            services.AddApiVersioning(o =>
+            {
+                o.DefaultApiVersion = new ApiVersion(1, 0); // default
+                o.AssumeDefaultVersionWhenUnspecified = true;
+                o.ReportApiVersions = true;
+                o.ApiVersionReader = ApiVersionReader.Combine(
+                    new QueryStringApiVersionReader("v", "ver", "version", "api-version"), 
+                    new HeaderApiVersionReader("X-Version"));
+                //o.Conventions.Controller<UserController>().HasApiVersion().Action(c => c.)
+            });
+
             services.AddControllers(o =>
             {
                 o.ReturnHttpNotAcceptable = true;
                 o.SuppressAsyncSuffixInActionNames = false;
+                //o.EnableEndpointRouting = false;
+                o.CacheProfiles.Add("60SecondsCacheProfile", new()
+                {
+                    Duration = 60
+                });
                 //o.ValueProviderFactories.Insert(0, new RouteBodyValueProviderFactory());
                 //o.ModelBinderProviders.Insert(0, new CreateToDoItemCommandModelBinderProvider());
             })
@@ -67,7 +84,7 @@ namespace ToDoApi
 
                     if (newtonsoftJsonOutputFormatter is not null)
                     {
-                        newtonsoftJsonOutputFormatter.SupportedMediaTypes.Add("application/vnd.redray.hateoas+json");
+                        newtonsoftJsonOutputFormatter.SupportedMediaTypes.Add("application/vnd.todo.hateoas+json");
                     }
                 })
                 .AddXmlDataContractSerializerFormatters()
@@ -114,7 +131,6 @@ namespace ToDoApi
                         };
                     };
                 });
-            //.SetCompatibilityVersion(CompatibilityVersion.Latest);
 
             var jwtSection = Configuration.GetSection("JwtOptions");
             var jwtOptions = jwtSection.Get<JwtOptions>();
@@ -151,6 +167,8 @@ namespace ToDoApi
                     };
                 });
 
+            services.AddResponseCaching();
+
             services.AddAuthorization(options => ConfigureAuthorization(options));
 
             services.AddToDoApiServices();
@@ -169,10 +187,9 @@ namespace ToDoApi
             }
 
             app.UseHttpsRedirection();
-
             //app.UseStatusCodePages();
 
-            app.UseStaticFiles();
+            app.UseResponseCaching();
 
             app.UseRouting();
 

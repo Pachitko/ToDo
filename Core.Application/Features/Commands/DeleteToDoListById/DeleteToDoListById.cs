@@ -10,9 +10,9 @@ namespace Core.Application.Features.Commands.DeleteToDoListById
 {
     public partial class DeleteToDoListById
     {
-        public record Command(Guid UserId, Guid ToDoListId) : IRequestWrapper<bool>;
+        public record Command(Guid UserId, Guid ToDoListId) : IRequestWrapper<bool?>;
 
-        public class CommandHandler : IHandlerWrapper<Command, bool>
+        public class CommandHandler : IHandlerWrapper<Command, bool?>
         {
             private readonly IMediator _mediator;
             private readonly IApplicationDbContext _dbContext;
@@ -23,18 +23,18 @@ namespace Core.Application.Features.Commands.DeleteToDoListById
                 _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
             }
 
-            public async Task<Response<bool>> Handle(Command request, CancellationToken cancellationToken)
+            public async Task<Response<bool?>> Handle(Command request, CancellationToken cancellationToken)
             {
                 var response = await _mediator.Send(new GetToDoListById.Query(request.UserId, request.ToDoListId), cancellationToken);
                 if (response.Succeeded)
                 {
                     _dbContext.ToDoLists.Remove(response.Value);
                     await _dbContext.SaveChangesAsync();
-                    return Response<bool>.Ok(true);
+                    return Response<bool?>.Ok(true);
                 }
                 else
                 {
-                    return Response<bool>.Fail(response.Errors);
+                    return Response<bool?>.Fail(response.Errors, null);
                 }
             }
         }

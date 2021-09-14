@@ -11,9 +11,9 @@ namespace Core.Application.Features.Commands.DeleteUser
 {
     public partial class DeleteUserById
     {
-        public record Command(Guid UserId) : IRequestWrapper<bool>;
+        public record Command(Guid UserId) : IRequestWrapper<bool?>;
         
-        public class CommandHandler : IHandlerWrapper<Command, bool>
+        public class CommandHandler : IHandlerWrapper<Command, bool?>
         {
             private readonly UserManager<AppUser> _userManager;
             private readonly IMediator _mediator;
@@ -24,17 +24,17 @@ namespace Core.Application.Features.Commands.DeleteUser
                 _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
             }
 
-            public async Task<Response<bool>> Handle(Command request, CancellationToken cancellationToken)
+            public async Task<Response<bool?>> Handle(Command request, CancellationToken cancellationToken)
             {
                 var response = await _mediator.Send(new GetUserById.Query(request.UserId), cancellationToken);
                 if (response.Succeeded)
                 {
                     /*var identityResult = */await _userManager.DeleteAsync(response.Value);
-                    return Response<bool>.Ok(true);
+                    return Response<bool?>.Ok(true);
                 }
                 else
                 {
-                    return Response<bool>.Fail(response.Errors);
+                    return Response<bool?>.Fail(response.Errors, null);
                 }
             }
         }
