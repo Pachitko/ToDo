@@ -45,8 +45,8 @@ namespace Core.Application.Features.Commands.CreateUser
 
                 RuleFor(u => u.Username)
                     .Cascade(CascadeMode.Stop)
-                    .NotEmpty().WithMessage("Email can't be empty")
-                    //.Matches(@"^(?=.{4,255}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$").WithMessage("Incorrect username")
+                    .NotEmpty().WithMessage("Username can't be empty")
+                    //.Matches(@"^(?=.{4,255}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$").WithMessage("Invalid username")
                     .MustAsync(async (username, _) => !string.IsNullOrEmpty(username) && await userManager.FindByNameAsync(username) == null)
                         .WithMessage("Username already exists");
 

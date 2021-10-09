@@ -8,6 +8,7 @@ namespace Infrastructure.Services
     {
         private readonly ILogger<EmailSender> _logger;
 
+        // todo: Use SendGrid NuGet Package
         public EmailSender(ILogger<EmailSender> logger)
         {
             _logger = logger;

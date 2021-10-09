@@ -12,7 +12,7 @@ namespace Core.Application.PipelineBehaviors
 {
     public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
         where TRequest : IValidateable
-        where TResponse : class // todo may not work with value type results
+        where TResponse : class // todo: may not work with value type results
     {
         private readonly IEnumerable<IValidator<TRequest>> _validators;
         private readonly ILogger<TRequest> _logger;

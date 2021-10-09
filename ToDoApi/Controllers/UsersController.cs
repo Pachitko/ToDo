@@ -105,7 +105,6 @@ namespace ToDoApi.Controllers
             "application/vnd.todo.user.friendly.hateoas+json")]
         [ResponseCache(Duration = 30)]
         //[MapToApiVersion("1.1")]
-        [AllowAnonymous]
         public async Task<ActionResult<AppUserDto>> GetUserAsync(Guid userId, string fields, [FromHeader(Name = "Accept")] string mediaType)
         {
             if (!MediaTypeHeaderValue.TryParse(mediaType, out MediaTypeHeaderValue parsedMediaType))

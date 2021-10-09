@@ -15,39 +15,38 @@ namespace Infrastructure.Services
 {
     public class JwtGenerator : IJwtGenerator
     {
-        private readonly UserManager<AppUser> _userManager;
-		private readonly JwtOptions _jwtOptions;
+        private readonly JwtOptions _jwtOptions;
+        private readonly IUserClaimsPrincipalFactory<AppUser> _userClaimsPrincipalFactory;
 
-		public JwtGenerator(UserManager<AppUser> userManager, IOptionsSnapshot<JwtOptions> jwtOptions)
+		public JwtGenerator(IOptionsSnapshot<JwtOptions> jwtOptions, 
+			IUserClaimsPrincipalFactory<AppUser> userClaimsPrincipalFactory)
 		{
-            _userManager = userManager;
-			_jwtOptions = jwtOptions.Value;
+            if (jwtOptions is null)
+            {
+                throw new ArgumentNullException(nameof(jwtOptions));
+            }
 
+            _jwtOptions = jwtOptions?.Value;
+            _userClaimsPrincipalFactory = userClaimsPrincipalFactory ?? throw new ArgumentNullException(nameof(userClaimsPrincipalFactory));
 		}
 
 		public async Task<string> CreateTokenAsync(AppUser user)
 		{
-			var claims = new List<Claim>
-			{
-				new Claim(JwtRegisteredClaimNames.NameId, user.UserName),
-			};
-
-			claims
-				.AddRange((await _userManager.GetRolesAsync(user))
-				.Select(roleName => new Claim(ClaimsIdentity.DefaultRoleClaimType, roleName)));
+			// Register own factory: AddScoped<IUserClaimsPrincipalFactory<AppUser>, AppUserClaimsPrincipalFactory>()
+			var claimsPrincipal = await _userClaimsPrincipalFactory.CreateAsync(user);
 
 			SigningCredentials credentials = new(_jwtOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha512Signature);
 
 			var now = DateTime.Now;
 			SecurityTokenDescriptor tokenDescriptor = new()
 			{
-				Subject = new ClaimsIdentity(claims),
+				Subject = new ClaimsIdentity(claimsPrincipal.Claims),
 				SigningCredentials = credentials,
                 Issuer = _jwtOptions.Issuer,
                 Audience = _jwtOptions.Audience,
                 IssuedAt = now,
                 NotBefore = now,
-                Expires = now.AddDays(7),
+                Expires = now.AddMinutes(_jwtOptions.MinutesExpiration),
 			};
 
 			JwtSecurityTokenHandler tokenHandler = new();

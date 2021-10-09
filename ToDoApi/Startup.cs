@@ -69,6 +69,7 @@ namespace ToDoApi
                 {
                     Duration = 60
                 });
+                //o.Filters.Add(new AuthorizeFilter());
                 //o.ValueProviderFactories.Insert(0, new RouteBodyValueProviderFactory());
                 //o.ModelBinderProviders.Insert(0, new CreateToDoItemCommandModelBinderProvider());
             })
@@ -139,6 +140,7 @@ namespace ToDoApi
             services.AddAuthentication(options =>
             {
                 // Override Identity default schemes
+                //options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultSignInScheme = "";
@@ -224,6 +226,7 @@ namespace ToDoApi
                 .Build();
 
             //options.DefaultPolicy = fallbackPolicy;
+            // todo: disabled for testing
             //options.FallbackPolicy = new AuthorizationPolicyBuilder()
             //    .RequireAuthenticatedUser() // add DenyAnonymousAuthorizationRequirement
             //    .Build();

@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using System.Threading.Tasks;
 using Infrastructure.Data;
+using MediatR;
+using Microsoft.Extensions.Logging;
 
 namespace ToDoApi
 {
@@ -11,6 +13,9 @@ namespace ToDoApi
     {
         public static async Task Main(string[] args)
         {
+            // For async tests
+            //System.Threading.ThreadPool.SetMaxThreads(System.Environment.ProcessorCount, System.Environment.ProcessorCount);
+
             var host = CreateHostBuilder(args).Build();
 
             using (var scope = host.Services.CreateScope())
@@ -21,13 +26,6 @@ namespace ToDoApi
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
-            .ConfigureAppConfiguration((hostContext, builder) =>
-            {
-                if (hostContext.HostingEnvironment.IsDevelopment())
-                {
-                    builder.AddUserSecrets<Program>();
-                }
-            })
             .ConfigureWebHostDefaults(webBuilder =>
             {
                 webBuilder.UseStartup<Startup>();
