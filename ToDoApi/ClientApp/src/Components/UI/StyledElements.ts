@@ -43,16 +43,17 @@ const SIconCheckBox = styled.input`
 const SButton = styled.button`
     border-radius: ${({ theme }) => theme.border.radius};
     font-size: 1rem;
+    font-weight: bold;
     transition: all 0.15s ease-in-out;
     padding: 8px;
     color: ${p => p.theme.colors.primary};
-    background-color: ${p => p.theme.colors.background};;
+    background-color: ${p => p.theme.colors.background};
     border: 2px solid ${props => props.theme.colors.primary};
     &:hover{
         background-color: ${props => props.theme.colors.primary};
         border: 2px solid ${props => props.theme.colors.primary};
         color: ${p => p.theme.colors.background};
-    }
+    };
 `
 
 const SButtonFilled = styled.button`
@@ -79,6 +80,11 @@ const STextButton = styled.button`
 `
 
 const SIconButtonFilled = styled.button`
+height: 32px;
+width: 32px;
+ display: flex;
+    align-items: center;
+    justify-content: center;
     font-size: 1rem;
     transition: all 0.15s ease-in-out;
     border: 2px solid ${p => p.theme.colors.primary};

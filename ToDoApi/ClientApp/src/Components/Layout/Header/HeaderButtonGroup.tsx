@@ -1,19 +1,15 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
-import { toggleTheme } from 'src/redux/actions/globalActions'
 import { useAppDispatch, useAppSelector } from 'src/redux/hooks'
 import BackScreen from 'src/Components/UI/BackScreen';
 import { SIconButtonFilled, SPanel } from 'src/Components/UI';
 import { logout } from 'src/redux/actions/userActions';
+import { ThemeButton } from 'src/Components/UI/ThemeButton';
 
 const HeaderButtonGroup: React.FC = () => {
     const dispatch = useAppDispatch();
     const [isUserPanelActive, setIsUserPanelActive] = useState(false)
     const user = useAppSelector(state => state.user)
-
-    const handleThemeToggle = () => {
-        dispatch(toggleTheme())
-    }
 
     const handleLogout = () => {
         dispatch(logout())
@@ -33,9 +29,7 @@ const HeaderButtonGroup: React.FC = () => {
             <BackScreen onClick={handleUserClick} />
             <SUserPanel>
                 <SUserButtonWrapper>
-                    <SUserButton onClick={handleThemeToggle}>
-                        <i className="fa fa-palette"></i>
-                    </SUserButton>
+                    <ThemeButton />
                     <SUserButton onClick={handleLogout}>
                         <i className="fa-solid fa-arrow-right-from-bracket"></i>
                     </SUserButton>
@@ -87,6 +81,7 @@ const SUserButton = styled(SIconButtonFilled)`
         font-size: 1rem;
     }
 `
+
 const SUserInfoWrapper = styled.div`
     user-select: none;
     padding: 4px;

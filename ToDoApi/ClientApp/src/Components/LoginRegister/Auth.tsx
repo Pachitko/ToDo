@@ -4,6 +4,7 @@ import Login from "./Login";
 import Register from "./Register";
 import { SInput, SPanel } from 'src/Components/UI'
 import { Navigate, NavLink, Route, Routes } from 'react-router-dom';
+import { ThemeButton } from '../UI/ThemeButton';
 
 const Auth: React.FC = () => {
     return (
@@ -27,11 +28,20 @@ const Auth: React.FC = () => {
                     </Routes>
                 </SAdditionalPanel>
             </SPanelsWrapper>
+            <SThemeButtonWrapper>
+                <ThemeButton />
+            </SThemeButtonWrapper>
         </AuthLayout>
     );
 }
 
 export default Auth;
+
+const SThemeButtonWrapper = styled.div`
+    position: fixed;
+    top: 0;
+    right: 0;
+`
 
 const AuthLayout = styled.div`
     background-color: ${({ theme }) => theme.colors.background};
@@ -46,6 +56,7 @@ const AuthLayout = styled.div`
 `
 
 const AuthForm = styled.form`
+    width: 260px;
     display: flex;
     flex-direction: column;
     padding: ${props => props.theme.padding.small}px;
@@ -65,9 +76,19 @@ const SSeparator = styled.div`
     height: 16px;
 `
 
-export const SAuthInput = styled(SInput)`
-    margin-bottom: 16px;
+export const SAuthInput = styled(SInput) <{ isValid: boolean }>`
+    width: 100%;
+    border-color: ${p => !p.isValid && p.theme.colors.error};
     padding: 8px;
+`
+
+export const SAuthInputWrapper = styled.div`
+    margin-bottom: 16px;
+`
+
+export const SAuthError = styled.div`
+    color: ${p => p.theme.colors.error};
+    margin-bottom: 4px;
 `
 
 export const STitle = styled.div`
@@ -76,5 +97,4 @@ export const STitle = styled.div`
     font-size: 1.25rem;
     text-align: center;
     padding: 4px 8px;
-    margin-bottom: 15px;
 `

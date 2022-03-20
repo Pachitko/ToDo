@@ -44,7 +44,7 @@ namespace Core.Application.Features.Queries.GetJwtToken
 				var user = await _userManager.FindByNameAsync(request.Username);
 				if (user == null)
 				{
-					return Response<string>.Ok(null);
+					return Response<string>.Fail(null);
 				}
 
 				var result = await _signInManager.CheckPasswordSignInAsync(user, request.Password, lockoutOnFailure: false);
@@ -54,7 +54,7 @@ namespace Core.Application.Features.Queries.GetJwtToken
 					return Response<string>.Ok(await _jwtGenerator.CreateTokenAsync(user));
 				}
 
-				return Response<string>.Ok(null);
+				return Response<string>.Fail(null);
 			}
 		}
     }

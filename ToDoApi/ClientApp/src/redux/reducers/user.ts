@@ -1,7 +1,12 @@
-import { LOGIN_SUCCESS, LOGOUT, LOGGING, LOGIN_ERROR, REGISTRATION_SUCCESS } from "src/redux/actions/actionTypes";
+import { LOGIN_SUCCESS, LOGOUT, LOGGING, LOGIN_ERROR, REGISTRATION_SUCCESS, REGISTRATION_ERROR, REGISTERING } from "src/redux/actions/actionTypes";
 
 export interface IUserState extends IUser {
     isLogging: boolean,
+    isRegistering: boolean,
+    loginError: string,
+    registrationErrors: {
+        [key: string]: string[]
+    }
 }
 
 export interface IUser {
@@ -11,10 +16,13 @@ export interface IUser {
 }
 
 const initialState: IUserState = {
-    name: '',
-    email: '',
+    name: "",
+    email: "",
     token: null,
-    isLogging: false
+    isLogging: false,
+    isRegistering: false,
+    loginError: "",
+    registrationErrors: {}
 };
 
 const user = (state = initialState, action: any): IUserState => {
@@ -22,6 +30,10 @@ const user = (state = initialState, action: any): IUserState => {
         case LOGGING: {
             console.log(LOGGING);
             return { ...state, isLogging: true }
+        }
+        case REGISTERING: {
+            console.log(REGISTERING);
+            return { ...state, isRegistering: true, registrationErrors: {} }
         }
         case LOGIN_SUCCESS: {
             console.log(LOGIN_SUCCESS);
@@ -35,7 +47,7 @@ const user = (state = initialState, action: any): IUserState => {
         case LOGIN_ERROR: {
             const { error } = action.payload;
             console.log(error);
-            return { ...state, isLogging: false }
+            return { ...state, isLogging: false, loginError: error }
         }
         case LOGOUT: {
             localStorage.removeItem("token")
@@ -43,7 +55,14 @@ const user = (state = initialState, action: any): IUserState => {
         }
         case REGISTRATION_SUCCESS: {
             console.log(REGISTRATION_SUCCESS);
-            return initialState;
+            return { ...state, isRegistering: false }
+        }
+        case REGISTRATION_ERROR: {
+            console.log(REGISTRATION_ERROR);
+            const { response } = action.payload.error;
+            console.log(response);
+
+            return { ...state, isRegistering: false, registrationErrors: response.data.errors }
         }
         default:
             return state;

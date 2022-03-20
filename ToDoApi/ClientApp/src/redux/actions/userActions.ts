@@ -1,5 +1,5 @@
 import { AppDispatch, AppState } from "../store"
-import { LOGIN_SUCCESS, LOGOUT, LOGGING, LOGIN_ERROR, REGISTRATION_SUCCESS } from "./actionTypes"
+import { LOGIN_SUCCESS, LOGOUT, LOGGING, LOGIN_ERROR, REGISTRATION_SUCCESS, REGISTERING, REGISTRATION_ERROR } from "./actionTypes"
 import { loginAsync as loginApi, getMeAsync as getMeApi, IUserToRegister, registerUser } from "src/libs/api"
 import { IUser } from "../reducers/user"
 
@@ -30,13 +30,12 @@ export const loginWithTokenAsync = (token: string | null) => {
 
 export const registerUserAsync = (userToCreate: IUserToRegister) => {
     return async (state: AppState, dispatch: AppDispatch) => {
-        dispatch(logging())
+        dispatch(registering())
         try {
             const newUser = await registerUser(userToCreate)
-            console.log(newUser)
             dispatch(registratoinSuccess())
         } catch (error) {
-            dispatch(loginError(error))
+            dispatch(registrationError(error))
         }
     }
 }
@@ -48,6 +47,12 @@ export const getMeAsync = async (token: string | null): Promise<IUser | null> =>
 export const logging = () => {
     return {
         type: LOGGING,
+    }
+}
+
+export const registering = () => {
+    return {
+        type: REGISTERING,
     }
 }
 
@@ -70,6 +75,16 @@ export const registratoinSuccess = () => {
 export const loginError = (error: string) => {
     return {
         type: LOGIN_ERROR,
+        payload:
+        {
+            error
+        }
+    }
+}
+
+export const registrationError = (error: string) => {
+    return {
+        type: REGISTRATION_ERROR,
         payload:
         {
             error

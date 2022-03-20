@@ -169,7 +169,6 @@ namespace ToDoApi.Controllers
                 //if (_userManager.Options.SignIn.RequireConfirmedAccount)
                 return CreatedAtAction(nameof(GetUserAsync), new
                 {
-                    userId = userToReturn.Id,
                     fields = ""
                 }, resourceWithLinks);
             }

@@ -1,4 +1,4 @@
-import axios from "axios"
+import axios, { AxiosError } from "axios"
 import { ITask, ITaskList, Recurrence } from "src/redux/reducers/tasks";
 import { IUser } from "src/redux/reducers/user"
 import { JsonPatch } from "./jsonPatches";

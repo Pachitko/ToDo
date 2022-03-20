@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import Layout from './Layout/Layout'
 import { Header } from './Layout/Header'
@@ -8,27 +8,22 @@ import {
 } from './Layout/Main'
 import { useAppSelector } from "src/redux/hooks";
 import { ThemeProvider } from "styled-components";
-import { Auth } from './Auth'
+import { Auth } from './LoginRegister'
 import { loginWithTokenAsync } from "src/redux/actions/userActions";
 import { useDispatch } from "react-redux";
 import { loadThemeFromStorage } from "src/redux/actions/globalActions";
 
-let tryToLogin = true;
+let tryAutoLogin = true;
 
 const App = () => {
     const activeTheme = useAppSelector(state => state.global.theme)
 
     const dispath = useDispatch();
-    const isLogging = useAppSelector(state => state.user.isLogging)
     const token = useAppSelector(state => state.user.token)
     const tokenFromLocalStorage = localStorage.getItem("token");
 
-    if (isLogging) {
-        return <div>Logging</div>
-    }
-
-    if (tryToLogin && tokenFromLocalStorage && !token) {
-        tryToLogin = false;
+    if (tryAutoLogin && tokenFromLocalStorage && !token) {
+        tryAutoLogin = false;
         dispath(loginWithTokenAsync(tokenFromLocalStorage))
     }
 
