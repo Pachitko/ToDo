@@ -17,7 +17,9 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Serialization;
+using System;
 using System.Linq;
 using System.Net;
 using System.Security.Claims;
@@ -186,6 +188,31 @@ namespace ToDoApi
             {
                 configuration.RootPath = "ClientApp/dist";
             });
+
+            services.AddSwaggerGen(options =>
+            {
+                options.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Version = "v1",
+                    Title = "ToDo API",
+                    Description = "ASP.NET Core ToDo Web API",
+                    TermsOfService = new Uri("https://example.com/terms"),
+                    Contact = new OpenApiContact
+                    {
+                        Name = "Timofei Shibaev",
+                        Email = "pachitko@mail.ru",
+                        Url = new Uri("https://github.com/Pachitko"),
+                    },
+                    License = new OpenApiLicense
+                    {
+                        Name = "Use under ...",
+                        Url = new Uri("https://example.com/license"),
+                    }
+                });
+
+                options.CustomSchemaIds(type => type.ToString());
+                options.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
+            });
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -193,6 +220,12 @@ namespace ToDoApi
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                app.UseSwagger();
+                app.UseSwaggerUI(options =>
+                {
+                    options.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+                    options.RoutePrefix = string.Empty;
+                });
             }
             else
             {
@@ -211,12 +244,12 @@ namespace ToDoApi
                 }
             };
 
-            app.UseStaticFiles(staticFileOptions);
             if (!env.IsDevelopment())
             {
                 app.UseSpaStaticFiles(staticFileOptions);
             }
 
+            app.UseStaticFiles(staticFileOptions);
             app.UseResponseCaching();
 
             app.UseRouting();
