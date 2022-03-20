@@ -1,7 +1,7 @@
-﻿using Core.Application.Features.Commands.CreateToDoItem;
-using Core.Domain.Entities;
+﻿using Core.Domain.Entities;
 using ToDoApi.Models;
 using AutoMapper;
+using Core.Domain.Entities.Enums;
 
 namespace ToDoApi.MapperProfiles
 {
@@ -9,6 +9,8 @@ namespace ToDoApi.MapperProfiles
     {
         public ToDoItemsProfile()
         {
+            CreateMap<Recurrence, RecurrenceDto>();
+                //.ForMember(to => to.Type, o => o.MapFrom(from => from.Type.ToString()));
             CreateMap<ToDoItem, ToDoItemDto>();
         }
     }

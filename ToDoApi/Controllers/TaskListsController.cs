@@ -12,7 +12,7 @@ using System;
 namespace ToDoApi.Controllers
 { 
     [ApiController]
-    [Route("api/users/{userId}/[controller]")]
+    [Route("api/[controller]")]
     public class TaskListsController : BaseApiController
     {
         private readonly IMapper _mapper;
@@ -52,15 +52,17 @@ namespace ToDoApi.Controllers
         }
 
         [HttpPost(Name = nameof(CreateToDoListAsync))]
-        public async Task<ActionResult> CreateToDoListAsync(Guid userId, CreateToDoList.Command command)
+        public async Task<ActionResult> CreateToDoListAsync(CreateToDoList.Command command)
         {
-            command.UserId = userId;
-
             var response = await Mediator.Send(command);
             if (response.Succeeded)
             {
                 var toDoListToReturn = _mapper.Map<ToDoListDto>(response.Value);
-                return CreatedAtAction(nameof(GetToDoListAsync), new { userId, toDoListId = toDoListToReturn.Id }, toDoListToReturn);
+                return CreatedAtAction(nameof(GetToDoListAsync), 
+                    new 
+                    {
+                        toDoListId = toDoListToReturn.Id
+                    }, toDoListToReturn);
             }
             else
             {

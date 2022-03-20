@@ -1,5 +1,4 @@
-﻿using Core.Application.Features.Commands.CreateToDoList;
-using Core.Domain.Entities;
+﻿using Core.Domain.Entities;
 using ToDoApi.Models;
 using AutoMapper;
 

@@ -13,7 +13,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core.DomainServices", "Core
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Infrastructure", "Infrastructure\Infrastructure.csproj", "{4664C830-BB9C-46E6-8544-112F3289C7D0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IdentityServer", "IdentityServer\IdentityServer.csproj", "{4C5FFC9D-5F14-4A16-8D4B-0E90CCDCAA77}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServer", "IdentityServer\IdentityServer.csproj", "{4C5FFC9D-5F14-4A16-8D4B-0E90CCDCAA77}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{7E4E3911-73B8-4245-9C62-58E6A4B3D790}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ToDoApi.Unit.Tests", "Tests\ToDoApi.Unit.Tests\ToDoApi.Unit.Tests.csproj", "{8E38AF83-953F-442A-84CC-8522BC7CFDBA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,9 +49,16 @@ Global
 		{4C5FFC9D-5F14-4A16-8D4B-0E90CCDCAA77}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4C5FFC9D-5F14-4A16-8D4B-0E90CCDCAA77}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4C5FFC9D-5F14-4A16-8D4B-0E90CCDCAA77}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8E38AF83-953F-442A-84CC-8522BC7CFDBA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E38AF83-953F-442A-84CC-8522BC7CFDBA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E38AF83-953F-442A-84CC-8522BC7CFDBA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E38AF83-953F-442A-84CC-8522BC7CFDBA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{8E38AF83-953F-442A-84CC-8522BC7CFDBA} = {7E4E3911-73B8-4245-9C62-58E6A4B3D790}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {95511AAD-695B-4025-AA12-5B946D896705}

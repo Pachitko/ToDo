@@ -12,7 +12,7 @@ namespace Core.Application.PipelineBehaviors
 {
     public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
         where TRequest : IValidateable
-        where TResponse : class // todo: may not work with value type results
+        where TResponse : class
     {
         private readonly IEnumerable<IValidator<TRequest>> _validators;
         private readonly ILogger<TRequest> _logger;
@@ -35,9 +35,9 @@ namespace Core.Application.PipelineBehaviors
 
             ValidationContext<TRequest> context = new(request);
             var validationResults = await Task.WhenAll(_validators.Select(v => v.ValidateAsync(context, cancellationToken)));
-            var errors = validationResults.
-                SelectMany(x => x.Errors.Select(e => new ResponseError(e.PropertyName, e.ErrorMessage)))
-                .Where(f => f is not null);
+            var errors = validationResults
+                .SelectMany(validationResult => validationResult.Errors.Select(e => new ResponseError(e.PropertyName, e.ErrorMessage)))
+                .Where(responseError => responseError is not null);
 
             if (errors.Any())
             {
@@ -56,7 +56,7 @@ namespace Core.Application.PipelineBehaviors
 
                     var invalidResponse = Activator.CreateInstance(invalidResponseType, null, false, errors) as TResponse;
 
-                    //return ResponseResult.Fail<>(result.Errors.Select(x => new ResponseError(x.ErrorCode, x.ErrorMessage)), default) as TResponse;
+                    //return Response.Fail<>(result.Errors.Select(x => new ResponseError(x.ErrorCode, x.ErrorMessage)), default) as TResponse;
                     return invalidResponse;
                 }
             }

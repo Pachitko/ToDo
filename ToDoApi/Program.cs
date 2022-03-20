@@ -30,10 +30,10 @@ namespace ToDoApi
             {
                 webBuilder.UseStartup<Startup>();
 
-                //webBuilder.ConfigureKestrel(o =>
-                //{
-                //    o.AddServerHeader = false;
-                //});
+                webBuilder.ConfigureKestrel(o =>
+                {
+                    o.AddServerHeader = false;
+                });
             });
     }
 }

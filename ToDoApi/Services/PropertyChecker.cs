@@ -1,4 +1,4 @@
-﻿using Core.Application.Services;
+﻿using Core.Application.Abstractions;
 using System.Reflection;
 
 namespace ToDoApi.Services

@@ -5,9 +5,9 @@ namespace Core.Domain.Entities
 {
     public class ToDoList : BaseEntity<Guid>
     {
-        public string Title { get; set; }
-
         public Guid UserId { get; set; }
+
+        public string Title { get; set; }
 
         public AppUser User { get; set; }
 

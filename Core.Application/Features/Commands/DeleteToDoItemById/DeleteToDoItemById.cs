@@ -11,12 +11,12 @@ namespace Core.Application.Features.Commands.DeleteToDoItemById
 {
     public partial class DeleteToDoItemById
     {
-        public record Command(Guid UserId, Guid ToDoListId, Guid ToDoItemId) : IRequestWrapper<bool?>;
+        public record Command(Guid ToDoItemId) : IRequestWrapper<bool?>;
 
         public class CommandHandler : IHandlerWrapper<Command, bool?>
         {
-            private readonly IMediator _mediator;
             private readonly IApplicationDbContext _dbContext;
+            private readonly IMediator _mediator;
 
             public CommandHandler(IMediator mediator, IApplicationDbContext dbContext)
             {
@@ -26,11 +26,11 @@ namespace Core.Application.Features.Commands.DeleteToDoItemById
 
             public async Task<Response<bool?>> Handle(Command request, CancellationToken cancellationToken)
             {
-                var response = await _mediator.Send(new GetToDoItemById.Query(request.UserId, request.ToDoListId, request.ToDoItemId), cancellationToken);
+                var response = await _mediator.Send(new GetToDoItemById.Query(request.ToDoItemId), cancellationToken);
                 if (response.Succeeded)
                 {
                     _dbContext.ToDoItems.Remove(response.Value);
-                    await _dbContext.SaveChangesAsync();
+                    await _dbContext.SaveChangesAsync(cancellationToken);
                     return Response<bool?>.Ok(true);
                 }
                 else

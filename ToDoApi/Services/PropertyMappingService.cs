@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
-using Core.Application.Services;
 using Core.Domain.Entities;
 using System.Linq;
 using System;
+using Core.Application.Abstractions;
+using Core.Application.MapperProfiles;
 
 namespace ToDoApi.Services
 {
@@ -59,6 +60,11 @@ namespace ToDoApi.Services
             {
                 throw new Exception($"Cannot find exact property mapping instance for <, {typeof(TDestination)}>");
             }
+        }
+
+        Dictionary<string, PropertyMappingValue> IPropertyMappingService.GetPropertyMapping<TDestination>()
+        {
+            throw new NotImplementedException();
         }
     }
 }

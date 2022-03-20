@@ -1,39 +1,34 @@
-using Core.Application.Services;
+using Core.Application;
+using FluentValidation.AspNetCore;
 using Infrastructure;
 using Infrastructure.Options;
-using Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Authorization;
+using Microsoft.AspNetCore.Mvc.Formatters;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json.Serialization;
+using System.Linq;
 using System.Net;
 using System.Security.Claims;
 using ToDoApi.Models;
-using Core.Application;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
-using FluentValidation.AspNetCore;
-using Newtonsoft.Json.Serialization;
-using ToDoApi.Services;
-using ToDoApi.ModelBinders;
-using System.Linq;
-using Microsoft.AspNetCore.Mvc.Formatters;
-using Microsoft.AspNetCore.Mvc.Versioning;
 
 namespace ToDoApi
 {
     public class Startup
     {
         public IConfiguration Configuration { get; }
-        
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -55,7 +50,7 @@ namespace ToDoApi
                 o.AssumeDefaultVersionWhenUnspecified = true;
                 o.ReportApiVersions = true;
                 o.ApiVersionReader = ApiVersionReader.Combine(
-                    new QueryStringApiVersionReader("v", "ver", "version", "api-version"), 
+                    new QueryStringApiVersionReader("v", "ver", "version", "api-version"),
                     new HeaderApiVersionReader("X-Version"));
                 //o.Conventions.Controller<UserController>().HasApiVersion().Action(c => c.)
             });
@@ -69,6 +64,7 @@ namespace ToDoApi
                 {
                     Duration = 60
                 });
+                //o.InputFormatters.Insert(0, GetJsonPatchInputFormatter());
                 //o.Filters.Add(new AuthorizeFilter());
                 //o.ValueProviderFactories.Insert(0, new RouteBodyValueProviderFactory());
                 //o.ModelBinderProviders.Insert(0, new CreateToDoItemCommandModelBinderProvider());
@@ -109,7 +105,7 @@ namespace ToDoApi
 
                         problemDetails.Detail = "See the errors field for details.";
                         problemDetails.Instance = ctx.HttpContext.Request.Path;
-                        
+
                         var actionExecutingContext = ctx as Microsoft.AspNetCore.Mvc.Filters.ActionExecutingContext;
 
                         if (ctx.ModelState.ErrorCount > 0)// && actionExecutingContext?.ActionArguments.Count == ctx.ActionDescriptor.Parameters.Count)
@@ -132,6 +128,16 @@ namespace ToDoApi
                         };
                     };
                 });
+            
+            services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(builder =>
+                {
+                    builder.WithOrigins("http://localhost:9000")
+                        .AllowAnyHeader()
+                        .AllowAnyMethod();
+                });
+            });
 
             var jwtSection = Configuration.GetSection("JwtOptions");
             var jwtOptions = jwtSection.Get<JwtOptions>();
@@ -165,7 +171,7 @@ namespace ToDoApi
                         ValidAudience = jwtOptions.Audience,
 
                         RoleClaimType = ClaimTypes.Role,
-                        NameClaimType = ClaimTypes.NameIdentifier
+                        NameClaimType = ClaimTypes.Name
                     };
                 });
 
@@ -173,8 +179,13 @@ namespace ToDoApi
 
             services.AddAuthorization(options => ConfigureAuthorization(options));
 
-            services.AddToDoApiServices();
             services.AddApplicationServices();
+            services.AddToDoApiServices();
+
+            services.AddSpaStaticFiles(configuration =>
+            {
+                configuration.RootPath = "ClientApp/dist";
+            });
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -185,15 +196,31 @@ namespace ToDoApi
             }
             else
             {
-                app.UseExceptionHandler(HandleException);
+                //app.UseExceptionHandler(HandleException);
             }
 
             app.UseHttpsRedirection();
             //app.UseStatusCodePages();
 
+            var staticFileOptions = new StaticFileOptions()
+            {
+                OnPrepareResponse = context =>
+                {
+                    context.Context.Response.Headers.Add("Cache-Control", "no-cache, no-store");
+                    context.Context.Response.Headers.Add("Expires", "-1");
+                }
+            };
+
+            app.UseStaticFiles(staticFileOptions);
+            if (!env.IsDevelopment())
+            {
+                app.UseSpaStaticFiles(staticFileOptions);
+            }
+
             app.UseResponseCaching();
 
             app.UseRouting();
+            app.UseCors();
 
             app.UseAuthentication(); // Sets HttpContext.User
             app.UseAuthorization();
@@ -202,21 +229,24 @@ namespace ToDoApi
             {
                 endpoints.MapControllers();
             });
+
+            app.UseSpa(spa =>
+            {
+                spa.Options.SourcePath = "ClientApp";
+                if (env.IsDevelopment())
+                {
+                    //spa.UseProxyToSpaDevelopmentServer("http://localhost:9000");
+                    //spa.UseReactDevelopmentServer(npmScript: "dev");
+                }
+            });
         }
 
         private static void ConfigureAuthorization(AuthorizationOptions options)
         {
-            options.AddPolicy("AdminsOnly", o =>
+            options.AddPolicy(Constants.AdminsOnly, o =>
             {
                 o.RequireAuthenticatedUser();
                 o.RequireRole("Admin");
-                o.AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme);
-            });
-
-            options.AddPolicy("UsersOnly", o =>
-            {
-                o.RequireAuthenticatedUser();
-                o.RequireRole("User");
                 o.AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme);
             });
 
@@ -227,9 +257,9 @@ namespace ToDoApi
 
             //options.DefaultPolicy = fallbackPolicy;
             // todo: disabled for testing
-            //options.FallbackPolicy = new AuthorizationPolicyBuilder()
-            //    .RequireAuthenticatedUser() // add DenyAnonymousAuthorizationRequirement
-            //    .Build();
+            options.FallbackPolicy = new AuthorizationPolicyBuilder()
+                .RequireAuthenticatedUser() // add DenyAnonymousAuthorizationRequirement
+                .Build();
         }
 
         private void HandleException(IApplicationBuilder app)
@@ -247,6 +277,22 @@ namespace ToDoApi
                     Message = "Internal Server Error."
                 }.ToString());
             });
+        }
+
+        private static NewtonsoftJsonPatchInputFormatter GetJsonPatchInputFormatter()
+        {
+            var builder = new ServiceCollection()
+                .AddLogging()
+                .AddMvc()
+                .AddNewtonsoftJson()
+                .Services.BuildServiceProvider();
+
+            return builder
+                .GetRequiredService<IOptions<MvcOptions>>()
+                .Value
+                .InputFormatters
+                .OfType<NewtonsoftJsonPatchInputFormatter>()
+                .First();
         }
     }
 }

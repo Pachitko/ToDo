@@ -1,4 +1,4 @@
-﻿using Core.Application.Features.Queries.GetUserById;
+﻿using Core.Application.Features.Queries.GetCurrentUser;
 using Core.Application.Responses;
 using System.Threading.Tasks;
 using Core.Domain.Entities;
@@ -7,16 +7,12 @@ using System.Threading;
 using FluentValidation;
 using AutoMapper;
 using MediatR;
-using System;
 
 namespace Core.Application.Features.Commands.CreateToDoList
 {
     public partial class CreateToDoList
     {
-        public record Command(string Title) : IRequestWrapper<ToDoList>
-        {
-            public Guid UserId { get; set; }
-        }
+        public record Command(string Title) : IRequestWrapper<ToDoList>;
 
         public class CommandValidator : AbstractValidator<Command>
         {
@@ -43,10 +39,11 @@ namespace Core.Application.Features.Commands.CreateToDoList
 
             public async Task<Response<ToDoList>> Handle(CreateToDoList.Command request, CancellationToken cancellationToken)
             {
-                var response = await _mediator.Send(new GetUserById.Query(request.UserId), cancellationToken);
+                var response = await _mediator.Send(new GetCurrentUser.Query(), cancellationToken);
                 if (response.Succeeded)
                 {
                     var newToDoList = _mapper.Map<ToDoList>(request);
+                    newToDoList.UserId = response.Value.Id;
                     await _dbContext.ToDoLists.AddAsync(newToDoList, cancellationToken);
                     await _dbContext.SaveChangesAsync(cancellationToken);
                     return Response<ToDoList>.Ok(newToDoList);

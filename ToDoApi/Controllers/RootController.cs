@@ -1,8 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
-using System.Linq;
+using System.Security.Claims;
 using ToDoApi.Models;
+using System.Linq;
 
 namespace ToDoApi.Controllers
 {
@@ -25,14 +26,28 @@ namespace ToDoApi.Controllers
         [HttpGet("me")]
         public ActionResult GetMe()
         {
-            return Ok(new
+            if (User.Identity.IsAuthenticated)
             {
-                User.Identity.Name,
-                User.Identity.AuthenticationType,
-                User.Identity.IsAuthenticated,
-                Calims = User.Claims.Select(c => new { c.Type, c.Value })
-            });
+                return Ok(new
+                {
+                    name = User.Identity.Name,
+                    email = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value,
+                    isAuthenticated = User.Identity.IsAuthenticated,
+                }); ;
+            }
+            else
+            {
+                return NotFound();
+            }
+
         }
 
+        [HttpOptions("me")]
+        public ActionResult GetMeOptions()
+        {
+            Response.Headers.Remove("Allow");
+            Response.Headers.Add("Allow", "GET");
+            return Ok();
+        }
     }
 }

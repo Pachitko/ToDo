@@ -12,7 +12,7 @@ namespace Core.Application.Features.Queries.GetToDoLists
 {
     public partial class GetToDoLists
     {
-        public record Query(Guid UserId) : IRequestWrapper<IList<ToDoList>>;
+        public record Query() : IRequestWrapper<IList<ToDoList>>;
 
         public class QueryHandler : IHandlerWrapper<Query, IList<ToDoList>>
         {
@@ -22,12 +22,12 @@ namespace Core.Application.Features.Queries.GetToDoLists
             public QueryHandler(IApplicationDbContext dbContext, IMediator mediator)
             {
                 _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
-                _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator)); ;
+                _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
             }
 
             public async Task<Response<IList<ToDoList>>> Handle(Query request, CancellationToken cancellationToken)
             {
-                var response = await _mediator.Send(new GetUserById.GetUserById.Query(request.UserId), cancellationToken);
+                var response = await _mediator.Send(new GetCurrentUser.GetCurrentUser.Query(), cancellationToken);
                 if(response.Succeeded)
                 {
                     var userFromDb = response.Value;

@@ -10,9 +10,9 @@ using MediatR;
 
 namespace Core.Application.Features.Queries.GetToDoItems
 {
-    public partial class GetToDoItems
+    public partial class GetToDoListItems
     {
-        public record Query(Guid UserId, Guid ToDoListId) : IRequestWrapper<IList<ToDoItem>>;
+        public record Query(Guid ToDoListId) : IRequestWrapper<IList<ToDoItem>>;
 
         public class QueryHandler : IHandlerWrapper<Query, IList<ToDoItem>>
         {
@@ -27,12 +27,17 @@ namespace Core.Application.Features.Queries.GetToDoItems
 
             public async Task<Response<IList<ToDoItem>>> Handle(Query request, CancellationToken cancellationToken)
             {
-                var response = await _mediator.Send(new GetToDoListById.GetToDoListById.Query(request.UserId, request.ToDoListId), cancellationToken);
+                var response = await _mediator.Send(new GetToDoListById.GetToDoListById.Query(request.ToDoListId), cancellationToken);
                 if(response.Succeeded)
                 {
-                    _dbContext.Entry(response.Value).State = EntityState.Unchanged;
-                    await _dbContext.Entry(response.Value).Collection(x => x.ToDoItems).LoadAsync(cancellationToken);
-                    return Response<IList<ToDoItem>>.Ok(response.Value.ToDoItems);
+                    var toDoListFromDb = response.Value;
+                    _dbContext.Entry(toDoListFromDb).State = EntityState.Unchanged;
+
+                    await _dbContext.Entry(toDoListFromDb)
+                        .Collection(x => x.ToDoItems)
+                        .LoadAsync(cancellationToken);
+
+                    return Response<IList<ToDoItem>>.Ok(toDoListFromDb.ToDoItems);
                 }
                 else
                 {

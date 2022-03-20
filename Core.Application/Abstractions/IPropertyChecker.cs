@@ -1,4 +1,4 @@
-﻿namespace Core.Application.Services
+﻿namespace Core.Application.Abstractions
 {
     public interface IPropertyChecker
     {

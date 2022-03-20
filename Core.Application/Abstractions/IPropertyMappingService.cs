@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using Core.Application.MapperProfiles;
+using System.Collections.Generic;
 
-namespace Core.Application.Services
+namespace Core.Application.Abstractions
 {
     public interface IPropertyMappingService
     {

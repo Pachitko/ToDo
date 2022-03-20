@@ -1,25 +1,24 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Core.Application.Features.Queries.GetJwtToken;
-using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
-using MediatR;
-using Core.Application.Features.Commands.CreateUser;
-using System.Collections.Generic;
-using Core.Application.Features.Queries.GetUserById;
-using Core.Application.Features.Commands.DeleteUser;
-using Core.Application.Features.Queries.GetUsers;
-using ToDoApi.Models;
-using AutoMapper;
-using System;
-using Newtonsoft.Json;
-using Core.Application.Helpers;
-using Core.Application.Services;
-using Core.Domain.Entities;
+﻿using AutoMapper;
+using Core.Application.Abstractions;
 using Core.Application.Extensions;
-using System.Linq;
-using Microsoft.Net.Http.Headers;
-using ToDoApi.ActionConstraints;
 using Core.Application.Features.Commands.CreateFullUser;
+using Core.Application.Features.Commands.CreateUser;
+using Core.Application.Features.Commands.DeleteUser;
+using Core.Application.Features.Queries.GetJwtToken;
+using Core.Application.Features.Queries.GetUserById;
+using Core.Application.Features.Queries.GetUsers;
+using Core.Application.Helpers;
+using Core.Domain.Entities;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Net.Http.Headers;
+using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using ToDoApi.ActionConstraints;
+using ToDoApi.Models;
 
 namespace ToDoApi.Controllers
 {
@@ -40,8 +39,9 @@ namespace ToDoApi.Controllers
             _propertyChecker = propertyChecker ?? throw new ArgumentNullException(nameof(propertyChecker));
         }
 
-        [HttpGet(Name = nameof(GetUsersAsync))]
         [HttpHead]
+        [HttpGet(Name = nameof(GetUsersAsync))]
+        [Authorize(Policy = Constants.AdminsOnly)]
         public async Task<IActionResult> GetUsersAsync([FromQuery] GetUsers.Query query)
         {
             if (!_propertyMappingService.ValidMappingExistsFor<AppUser>(query.OrderBy))
@@ -51,10 +51,10 @@ namespace ToDoApi.Controllers
                 return BadRequest();
 
             var response = await Mediator.Send(query);
-            if(response.Succeeded)
+            if (response.Succeeded)
             {
                 var pagedList = response.Value;
-               
+
                 var pageMetadata = new
                 {
                     totalCount = pagedList.TotalCount,
@@ -95,16 +95,18 @@ namespace ToDoApi.Controllers
             }
         }
 
+        // only from admins
         // application/vnd.todo[.VERSION][.friendly|full][.hateoas]+json
         [HttpGet("{userId}", Name = nameof(GetUserAsync))]
-        [Produces("application/json", 
-            "application/vnd.todo.hateoas+json", 
+        [Produces("application/json",
+            "application/vnd.todo.hateoas+json",
             "application/vnd.todo.user.full+json",
-            "application/vnd.todo.user.full.hateoas+json", 
+            "application/vnd.todo.user.full.hateoas+json",
             "application/vnd.todo.user.friendly+json",
             "application/vnd.todo.user.friendly.hateoas+json")]
         [ResponseCache(Duration = 30)]
         //[MapToApiVersion("1.1")]
+        [Authorize(Policy = Constants.AdminsOnly)]
         public async Task<ActionResult<AppUserDto>> GetUserAsync(Guid userId, string fields, [FromHeader(Name = "Accept")] string mediaType)
         {
             if (!MediaTypeHeaderValue.TryParse(mediaType, out MediaTypeHeaderValue parsedMediaType))
@@ -114,13 +116,13 @@ namespace ToDoApi.Controllers
                 return BadRequest();
 
             var response = await Mediator.Send(new GetUserById.Query(userId));
-            if(response.Succeeded)
+            if (response.Succeeded)
             {
                 bool includeLinks = parsedMediaType.SubTypeWithoutSuffix
                     .EndsWith("hateoas", StringComparison.InvariantCultureIgnoreCase);
 
                 IEnumerable<LinkDto> links = new List<LinkDto>();
-                if(includeLinks)
+                if (includeLinks)
                     links = CreateLinksForUser(userId, fields);
 
                 var primaryMediaType = parsedMediaType.SubTypeWithoutSuffix.Value[0..(includeLinks ? ^8 : ^0)];
@@ -130,7 +132,7 @@ namespace ToDoApi.Controllers
                     var fullResourceToReturn = _mapper.Map<AppUserFullDto>(response.Value)
                         .ShapeData(fields);
 
-                    if(includeLinks)
+                    if (includeLinks)
                         fullResourceToReturn.TryAdd("links", links);
 
                     return Ok(fullResourceToReturn);
@@ -220,11 +222,11 @@ namespace ToDoApi.Controllers
             }
         }
 
-        [HttpGet("token")]
+        [HttpPost("token")]
         [AllowAnonymous]
         [Consumes("application/json")]
         [Produces("application/json")]
-        public async Task<ActionResult> GetTokenAsync(GetJwtToken.Query query)
+        public async Task<ActionResult> GetTokenAsync([FromBody] GetJwtToken.Query query)
         {
             var response = await Mediator.Send(query);
             if (response.Succeeded)
@@ -237,6 +239,14 @@ namespace ToDoApi.Controllers
             }
         }
 
+        [HttpOptions("token")]
+        public ActionResult GetUserTokenOptions()
+        {
+            Response.Headers.Remove("Allow");
+            Response.Headers.Add("Allow", "GET");
+            return Ok();
+        }
+
         [HttpOptions]
         public ActionResult GetUsersOptions()
         {
@@ -244,22 +254,14 @@ namespace ToDoApi.Controllers
             return Ok();
         }
 
-        //[HttpPut]
-        //public async Task<IActionResult> UpdateUser(int id, UpdateProductCommand command)
-        //{
-        //    if (id != command.Id)
-        //    {
-        //        return BadRequest();
-        //    }
-        //    return Ok(await Mediator.Send(command));
-        //}
-
-        // HATEOAS - Hypermedia as the Engine of Application State
+        // Refresh & Verify
+        // https://dev.to/moe23/refresh-jwt-with-refresh-tokens-in-asp-net-core-5-rest-api-step-by-step-3en5
+        
         private IEnumerable<LinkDto> CreateLinksForUser(Guid userId, string fields)
         {
             List<LinkDto> links = new();
 
-            if(string.IsNullOrWhiteSpace(fields))
+            if (string.IsNullOrWhiteSpace(fields))
             {
                 links.Add(new(Url.Link(nameof(GetUserAsync), new { userId }), "self", "GET"));
             }
@@ -271,7 +273,7 @@ namespace ToDoApi.Controllers
             links.Add(new(Url.Link(nameof(DeleteUserAsync), new { userId }), "delete_user", "DELETE"));
 
             links.Add(new(Url.Link(nameof(TaskListsController.CreateToDoListAsync), new { userId }), "create_taskList_for_user", "POST"));
-            
+
             links.Add(new(Url.Link(nameof(TaskListsController.GetToDoListsAsync), new { userId }), "taskLists", "GET"));
 
             //links.Add(new(Url.Link(nameof(CreateUserAsync), new { userId }), "create_user", "POST"));

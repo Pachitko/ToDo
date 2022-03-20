@@ -5,15 +5,16 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Infrastructure.Data;
 using Core.Domain.Entities;
-using Core.Application.Services;
 using Infrastructure.Services;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Core.Application.Abstractions;
 
 namespace Infrastructure
 {
     public static class InfrastructureDependencyInjection
     {
-        public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, ILoggerFactory loggerFactory, IConfiguration configuration)
+        public static IServiceCollection AddInfrastructureServices(this IServiceCollection services,
+            ILoggerFactory loggerFactory, IConfiguration configuration)
         {
             //ILogger logger = loggerFactory.CreateLogger<InfrastructureServicesRegistration>();
 

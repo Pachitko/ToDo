@@ -1,11 +1,10 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Core.Application.Responses;
-using Core.Application.Services;
 using System.Threading.Tasks;
 using Core.Domain.Entities;
 using System.Threading;
 using FluentValidation;
-using MediatR;
+using Core.Application.Abstractions;
 
 namespace Core.Application.Features.Queries.GetJwtToken
 {

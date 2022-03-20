@@ -1,4 +1,5 @@
-﻿using Core.Application.Services;
+﻿using Core.Application.MapperProfiles;
+using Core.Application.Abstractions;
 using System.Collections.Generic;
 using System;
 

@@ -1,14 +1,15 @@
 ﻿using System.Collections.Generic;
-using Core.Application.Services;
 using System.Linq.Dynamic.Core;
 using System.Linq;
 using System;
+using Core.Application.MapperProfiles;
 
 namespace Core.Application.Extensions
 {
     public static class IQueryableExtensions
     {
-        public static IQueryable<T> ApplySort<T>(this IQueryable<T> source, string orderBy, Dictionary<string, PropertyMappingValue> mappingDictionary)
+        public static IQueryable<T> ApplySort<T>(this IQueryable<T> source, string orderBy, 
+            Dictionary<string, PropertyMappingValue> mappingDictionary)
         {
             if (source is null)
             {

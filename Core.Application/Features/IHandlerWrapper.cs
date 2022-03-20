@@ -1,5 +1,4 @@
-﻿using Core.Application.PipelineBehaviors;
-using Core.Application.Responses;
+﻿using Core.Application.Responses;
 using MediatR;
 
 namespace Core.Application.Features

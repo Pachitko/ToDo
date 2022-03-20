@@ -1,6 +1,7 @@
 ﻿using Core.Application.Features.Commands.DeleteToDoItemById;
 using Core.Application.Features.Queries.GetToDoItemById;
 using Core.Application.Features.Commands.CreateToDoItem;
+using Core.Application.Features.Commands.PatchToDoItem;
 using Core.Application.Features.Queries.GetToDoItems;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
@@ -12,7 +13,7 @@ using System;
 namespace ToDoApi.Controllers
 {
     [ApiController]
-    [Route("api/users/{userId}/taskLists/{toDoListId}/[controller]")]
+    [Route("api/taskLists/{toDoListId}/[controller]")]
     public class TasksController : BaseApiController
     {
         private readonly IMapper _mapper;
@@ -24,7 +25,7 @@ namespace ToDoApi.Controllers
 
         [HttpGet]
         [HttpHead]
-        public async Task<ActionResult<List<ToDoItemDto>>> GetToDoItemsAsync([FromRoute] GetToDoItems.Query query)
+        public async Task<ActionResult<List<ToDoItemDto>>> GetToDoItemsAsync([FromRoute] GetToDoListItems.Query query)
         {
             var response = await Mediator.Send(query);
             if (response.Succeeded)
@@ -52,21 +53,21 @@ namespace ToDoApi.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> CreateToDoItemAsync(Guid userId, Guid toDoListId, CreateToDoItem.Command command)
+        public async Task<ActionResult> CreateToDoItemAsync(Guid toDoListId, CreateToDoItem.Command command)
         {
-            command.UserId = userId;
-            command.ToDoListId = toDoListId;
+            command = command with { ToDoListId = toDoListId };
 
             var response = await Mediator.Send(command);
             if (response.Succeeded)
             {
                 var toDoItemToReturn = _mapper.Map<ToDoItemDto>(response.Value);
-                return CreatedAtAction(nameof(GetToDoItemAsync), new 
-                {
-                    userId = command.UserId,
-                    toDoListId = command.ToDoListId, 
-                    toDoItemId = toDoItemToReturn.Id
-                }, toDoItemToReturn);
+                return CreatedAtAction(nameof(GetToDoItemAsync),
+                    new 
+                    {
+                        toDoListId = command.ToDoListId, 
+                        toDoItemId = toDoItemToReturn.Id
+                    }, toDoItemToReturn
+                );
             }
             else
             {
@@ -81,6 +82,24 @@ namespace ToDoApi.Controllers
             if (response.Succeeded)
             {
                 return NoContent();
+            }
+            else
+            {
+                return ResponseFailed(response);
+            }
+        }
+
+        [HttpPatch("{toDoItemId}", Name = nameof(PatchToDoItemAsync))]
+        public async Task<ActionResult> PatchToDoItemAsync(Guid toDoItemId,
+            [FromBody] PatchToDoItem.Command command)
+        {
+            command = command with { ToDoItemId = toDoItemId };
+
+            var response = await Mediator.Send(command);
+            if (response.Succeeded)
+            {
+                var toDoItemToReturn = _mapper.Map<ToDoItemDto>(response.Value);
+                return new ObjectResult(toDoItemToReturn);
             }
             else
             {

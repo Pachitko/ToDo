@@ -4,14 +4,15 @@ using System.Threading.Tasks;
 using Core.Domain.Entities;
 using Infrastructure.Data;
 using System.Threading;
-using System;
+using System.Linq;
 using MediatR;
+using System;
 
 namespace Core.Application.Features.Queries.GetToDoListById
 {
-    public class GetToDoListById
+    public partial class GetToDoListById
     {
-        public record Query(Guid UserId, Guid ToDoListId) : IRequestWrapper<ToDoList>;
+        public record Query(Guid ToDoListId) : IRequestWrapper<ToDoList>;
 
         public class QueryHandler : IHandlerWrapper<Query, ToDoList>
         {
@@ -26,12 +27,12 @@ namespace Core.Application.Features.Queries.GetToDoListById
 
             public async Task<Response<ToDoList>> Handle(Query request, CancellationToken cancellationToken)
             {
-                var response = await _mediator.Send(new GetUserById.GetUserById.Query(request.UserId), cancellationToken);
+                var response = await _mediator.Send(new GetCurrentUser.GetCurrentUser.Query(), cancellationToken);
                 if (response.Succeeded)
                 {
-                    var toDoListFromDb = await _dbContext.ToDoLists
+                    var toDoListFromDb = _dbContext.ToDoLists
                         .AsNoTracking()
-                        .SingleOrDefaultAsync(x => x.Id == request.ToDoListId, cancellationToken: cancellationToken);
+                        .FirstOrDefault(l => l.Id == request.ToDoListId && l.UserId == response.Value.Id);
                     if(toDoListFromDb is null)
                         return Response<ToDoList>.Fail();
                     else

@@ -1,40 +1,46 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
-
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
     <UserSecretsId>d2ac518b-0b1e-434e-87e3-7c65a5b339be</UserSecretsId>
+    <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.9" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="FluentValidation" Version="10.3.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.15" />
+    <PackageReference Include="FluentValidation" Version="10.3.6" />
     <PackageReference Include="MediatR" Version="9.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="5.0.9" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="5.0.9" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="5.0.9" />
-    <PackageReference Include="Microsoft.AspNetCore.JsonPatch" Version="5.0.9" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.9" />
+    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="5.0.15" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="5.0.15" />
+    <!--<PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="5.0.15" />-->
+    <PackageReference Include="Microsoft.AspNetCore.JsonPatch" Version="5.0.15" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.15" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="5.0.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.9" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="5.0.9">
+    <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="5.0.15" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.15" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="5.0.15">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <!--<PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="5.0.2" ExcludeAssets="All" />-->
   </ItemGroup>
-  
+
   <ItemGroup>
     <ProjectReference Include="..\Core.Application\Core.Application.csproj" />
     <ProjectReference Include="..\Core.DomainServices\Core.DomainServices.csproj" />
     <ProjectReference Include="..\Core.Domain\Core.Domain.csproj" />
     <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
   </ItemGroup>
-  
+
   <ItemGroup>
-    <Folder Include="Validators\" />
+    <Folder Include="Options\" />
   </ItemGroup>
+
+  <Target Name="Test" BeforeTargets="BeforeBuild" Condition="false">
+    <Error Condition="!Exists('App.Debug.config')" Text="File App.Debug.config not found"></Error>
+    <Copy SourceFiles="App.config;App.config" DestinationFiles="$(OutputPath)/Test/App.config;$(OutputPath)/Test/App.test.config"></Copy>
+    <Message Text="$(SpaRoot)" Importance="high"></Message>
+    <Message Text="$(MessageText)" Condition="'$(Configuration)' == 'Debug'" Importance="high"></Message>
+    <Message Text="$(MessageText)" Condition="'$(Configuration)' == 'Release'" Importance="high"></Message>
+  </Target>
 
 </Project>

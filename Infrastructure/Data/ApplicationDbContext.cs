@@ -59,9 +59,13 @@ namespace Infrastructure.Data
         private void InitializeEntities(EntityTypeBuilder<ToDoItem> builder)
         {
             builder.HasKey(i => i.Id);
+            builder.Property(i => i.UserId);
 
             builder.Property(i => i.Title).HasMaxLength(128).IsRequired();
-            builder.Property(i => i.Description).HasMaxLength(512);
+            builder.Property(i => i.CreatedAt).HasDefaultValueSql("GETDATE()");
+            builder.Property(i => i.ModifiedAt).HasDefaultValueSql("GETDATE()");
+
+            builder.OwnsOne(u => u.Recurrence);
         }
 
         private static void UpdateTimestamps(object sender, EntityEntryEventArgs e)

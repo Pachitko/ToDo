@@ -30,11 +30,10 @@ namespace ToDoApi.ModelBinders
 
             //string title = bindingContext.HttpContext.
 
-            bindingContext.Result = ModelBindingResult.Success(new CreateToDoItem.Command()
-            { 
-                UserId = userId, 
-                ToDoListId = toDoListId 
-            });
+            //bindingContext.Result = ModelBindingResult.Success(new CreateToDoItem.Command()
+            //{ 
+            //    ToDoListId = toDoListId 
+            //});
             return Task.CompletedTask;
         }
     }

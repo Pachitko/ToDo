@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Core.Application.Services;
+using Core.Application.Abstractions;
 using ToDoApi.Services;
 
-namespace Core.Application
+namespace ToDoApi
 {
     public static class ToDoApiDependencyInjectionn
     {

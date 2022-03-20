@@ -16,7 +16,7 @@ namespace Infrastructure.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
-                .HasAnnotation("ProductVersion", "5.0.9")
+                .HasAnnotation("ProductVersion", "5.0.15")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             modelBuilder.Entity("Core.Domain.Entities.AppRole", b =>
@@ -119,9 +119,10 @@ namespace Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Description")
-                        .HasMaxLength(512)
-                        .HasColumnType("nvarchar(512)");
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
 
                     b.Property<DateTime?>("DueDate")
                         .HasColumnType("datetime2");
@@ -132,12 +133,20 @@ namespace Infrastructure.Migrations
                     b.Property<bool?>("IsImportant")
                         .HasColumnType("bit");
 
+                    b.Property<DateTime>("ModifiedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
+
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(128)
                         .HasColumnType("nvarchar(128)");
 
                     b.Property<Guid>("ToDoListId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
@@ -316,6 +325,30 @@ namespace Infrastructure.Migrations
                         .HasForeignKey("ToDoListId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.OwnsOne("Core.Domain.Entities.Recurrence", "Recurrence", b1 =>
+                        {
+                            b1.Property<Guid>("ToDoItemId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<int>("Interval")
+                                .HasColumnType("int");
+
+                            b1.Property<DateTime>("StartedtAt")
+                                .HasColumnType("datetime2");
+
+                            b1.Property<int>("Type")
+                                .HasColumnType("int");
+
+                            b1.HasKey("ToDoItemId");
+
+                            b1.ToTable("ToDoItems");
+
+                            b1.WithOwner()
+                                .HasForeignKey("ToDoItemId");
+                        });
+
+                    b.Navigation("Recurrence");
 
                     b.Navigation("ToDoList");
                 });

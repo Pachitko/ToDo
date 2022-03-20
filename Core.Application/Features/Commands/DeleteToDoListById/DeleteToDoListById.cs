@@ -10,7 +10,7 @@ namespace Core.Application.Features.Commands.DeleteToDoListById
 {
     public partial class DeleteToDoListById
     {
-        public record Command(Guid UserId, Guid ToDoListId) : IRequestWrapper<bool?>;
+        public record Command(Guid ToDoListId) : IRequestWrapper<bool?>;
 
         public class CommandHandler : IHandlerWrapper<Command, bool?>
         {
@@ -25,7 +25,7 @@ namespace Core.Application.Features.Commands.DeleteToDoListById
 
             public async Task<Response<bool?>> Handle(Command request, CancellationToken cancellationToken)
             {
-                var response = await _mediator.Send(new GetToDoListById.Query(request.UserId, request.ToDoListId), cancellationToken);
+                var response = await _mediator.Send(new GetToDoListById.Query(request.ToDoListId), cancellationToken);
                 if (response.Succeeded)
                 {
                     _dbContext.ToDoLists.Remove(response.Value);

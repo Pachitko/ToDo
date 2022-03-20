@@ -1,4 +1,4 @@
-﻿using Core.Application.Features.Queries.GetToDoListById;
+﻿using Core.Application.Features.Queries.GetCurrentUser;
 using Core.Application.Responses;
 using System.Threading.Tasks;
 using Core.Domain.Entities;
@@ -13,33 +13,18 @@ namespace Core.Application.Features.Commands.CreateToDoItem
 {
     public partial class CreateToDoItem
     {
-        public class Command : IRequestWrapper<ToDoItem>
-        {
-            public Guid UserId { get; set; }
-
-            public Guid ToDoListId { get; set; }
-
-            public string Title { get; set; }
-
-            public string Description { get; set; }
-
-            public bool? IsCompleted { get; set; }
-
-            public bool? IsImportant { get; set; }
-
-            public DateTime? DueDate { get; set; }
-        }
-
+        // todo edit according to the ToDoItem Entity
+        public record Command(Guid ToDoListId, string Title, bool? IsCompleted, bool? IsImportant, DateTime ModifiedAt,
+            DateTime CreatedAt, DateTime? DueDate, Recurrence Recurrence) : IRequestWrapper<ToDoItem>;
+       
         public class CommandValidator : AbstractValidator<CreateToDoItem.Command>
         {
             public CommandValidator()
             {
+                // todo: complete validation
                 RuleFor(x => x.Title)
                     .NotEmpty()
                     .MaximumLength(128);
-
-                RuleFor(x => x.Description)
-                    .MaximumLength(512);
             }
         }
 
@@ -51,9 +36,9 @@ namespace Core.Application.Features.Commands.CreateToDoItem
 
             public CommandHandler(IApplicationDbContext dbContext, IMapper mapper, IMediator mediator)
             {
-                _dbContext = dbContext;
-                _mediator = mediator;
-                _mapper = mapper;
+                _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
+                _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
+                _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             }
 
             public async Task<Response<ToDoItem>> Handle(CreateToDoItem.Command request, CancellationToken cancellationToken)
@@ -62,10 +47,15 @@ namespace Core.Application.Features.Commands.CreateToDoItem
                 //if (!validationResult.IsValid)
                 //    return ResponseResult.Fail<ToDoItem>(validationResult.Errors.Select(e => new ResponseError(e.PropertyName, e.ErrorMessage)), null);
 
-                var response = await _mediator.Send(new GetToDoListById.Query(request.UserId, request.ToDoListId), cancellationToken);
+                var response = await _mediator.Send(new GetCurrentUser.Query(), cancellationToken);
                 if (response.Succeeded)
                 {
+                    var userFromDb = response.Value;
                     var newToDoItem = _mapper.Map<ToDoItem>(request);
+                    newToDoItem.UserId = userFromDb.Id;
+                    newToDoItem.CreatedAt = DateTime.UtcNow;
+                    newToDoItem.ModifiedAt = DateTime.UtcNow;
+
                     await _dbContext.ToDoItems.AddAsync(newToDoItem, cancellationToken);
                     await _dbContext.SaveChangesAsync(cancellationToken);
                     return Response<ToDoItem>.Ok(newToDoItem);

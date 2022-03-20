@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Core.Application.Abstractions;
+using Microsoft.AspNetCore.Identity;
 using Core.Application.Extensions;
 using Core.Application.Responses;
-using Core.Application.Services;
 using Core.Application.Helpers;
 using System.Threading.Tasks;
 using Core.Domain.Entities;
@@ -13,7 +13,7 @@ namespace Core.Application.Features.Queries.GetUsers
 {
     public partial class GetUsers
     {
-        public class Query : IHasPageParametersAndOrderByAndFields, IHasFields, IRequestWrapper<PagedList<AppUser>>
+        public class Query : IRequestWrapper<PagedList<AppUser>>, IHasPageParametersAndOrderByAndFields // todo: apply ISP
         {
             public int PageNumber { get; set; } = 1;
             public int PageSize { get; set; } = 10;
@@ -47,7 +47,7 @@ namespace Core.Application.Features.Queries.GetUsers
                 _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
                 _propertyMappingService = propertyMappingService ?? throw new ArgumentNullException(nameof(propertyMappingService));
             }
-
+             
             public async Task<Response<PagedList<AppUser>>> Handle(Query request, CancellationToken cancellationToken)
             {
                 var collection = _userManager.Users;
