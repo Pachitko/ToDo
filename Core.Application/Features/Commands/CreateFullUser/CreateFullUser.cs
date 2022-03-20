@@ -24,6 +24,10 @@ namespace Core.Application.Features.Commands.CreateFullUser
         public record Command : CreateUser.CreateUser.Command, IRequestWrapper<AppUser>
         {
             public string MiddleName { get; set; }
+            public string FirstName { get; set; }
+            public string LastName { get; set; }
+            public string PhoneNumber { get; set; }
+
             public DateTimeOffset? DateOfBirth { get; set; } // 2000-10-31T21:00:00
             public DateTimeOffset? DateOfDeath { get; set; } 
         }

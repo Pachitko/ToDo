@@ -52,8 +52,10 @@ const AuthForm = styled.form`
 `
 
 const SAdditionalPanel = styled(SPanel)`
-    color: ${({ theme }) => theme.colors.onSurface};
     text-align: center;
+    >a{
+        color: ${({ theme }) => theme.colors.onSurface};
+    }
 `
 
 const SPanelsWrapper = styled.div`

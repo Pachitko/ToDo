@@ -1,4 +1,4 @@
-import { LOGIN_SUCCESS, LOGOUT, LOGGING, LOGIN_ERROR } from "src/redux/actions/actionTypes";
+import { LOGIN_SUCCESS, LOGOUT, LOGGING, LOGIN_ERROR, REGISTRATION_SUCCESS } from "src/redux/actions/actionTypes";
 
 export interface IUserState extends IUser {
     isLogging: boolean,
@@ -7,14 +7,12 @@ export interface IUserState extends IUser {
 export interface IUser {
     name: string,
     email: string,
-    isAuthenticated: boolean,
     token: string | null,
 }
 
 const initialState: IUserState = {
     name: '',
     email: '',
-    isAuthenticated: false,
     token: null,
     isLogging: false
 };
@@ -41,6 +39,10 @@ const user = (state = initialState, action: any): IUserState => {
         }
         case LOGOUT: {
             localStorage.removeItem("token")
+            return initialState;
+        }
+        case REGISTRATION_SUCCESS: {
+            console.log(REGISTRATION_SUCCESS);
             return initialState;
         }
         default:

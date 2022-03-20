@@ -25,5 +25,8 @@ export const LOGGING = 'LOGGING';
 export const LOGIN_SUCCESS = 'LOGIN_SUCCESS';
 export const LOGIN_ERROR = 'LOGIN_ERROR';
 
+export const REGISTER_USER = 'REGISTER_USER';
+export const REGISTRATION_SUCCESS = 'REGISTRATION_SUCCESS';
+
 export const LOGOUT = 'LOGOUT';
 export const GET_ME = 'GET_ME';

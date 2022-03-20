@@ -23,27 +23,8 @@ namespace ToDoApi.Controllers
             return links;
         }
 
-        [HttpGet("me")]
-        public ActionResult GetMe()
-        {
-            if (User.Identity.IsAuthenticated)
-            {
-                return Ok(new
-                {
-                    name = User.Identity.Name,
-                    email = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value,
-                    isAuthenticated = User.Identity.IsAuthenticated,
-                }); ;
-            }
-            else
-            {
-                return NotFound();
-            }
-
-        }
-
-        [HttpOptions("me")]
-        public ActionResult GetMeOptions()
+        [HttpOptions()]
+        public ActionResult GetOptions()
         {
             Response.Headers.Remove("Allow");
             Response.Headers.Add("Allow", "GET");

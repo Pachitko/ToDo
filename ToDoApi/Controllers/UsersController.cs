@@ -4,8 +4,8 @@ using Core.Application.Extensions;
 using Core.Application.Features.Commands.CreateFullUser;
 using Core.Application.Features.Commands.CreateUser;
 using Core.Application.Features.Commands.DeleteUser;
+using Core.Application.Features.Queries.GetCurrentUser;
 using Core.Application.Features.Queries.GetJwtToken;
-using Core.Application.Features.Queries.GetUserById;
 using Core.Application.Features.Queries.GetUsers;
 using Core.Application.Helpers;
 using Core.Domain.Entities;
@@ -74,7 +74,7 @@ namespace ToDoApi.Controllers
                 var shapedUsersWithLinks = shapedUsers.Select(user =>
                 {
                     var userAsDictionary = user as IDictionary<string, object>;
-                    var links = CreateLinksForUser((Guid)userAsDictionary["Id"], null);
+                    var links = CreateLinksForUser(/*(Guid)userAsDictionary["Id"], */null);
                     //var resourceWithLinks = _mapper.Map<AppUserDto>(response.Value).ShapeData(fields) as IDictionary<string, object>;
                     userAsDictionary.Add("links", links);
                     return userAsDictionary;
@@ -97,7 +97,7 @@ namespace ToDoApi.Controllers
 
         // only from admins
         // application/vnd.todo[.VERSION][.friendly|full][.hateoas]+json
-        [HttpGet("{userId}", Name = nameof(GetUserAsync))]
+        [HttpGet("me", Name = nameof(GetUserAsync))]
         [Produces("application/json",
             "application/vnd.todo.hateoas+json",
             "application/vnd.todo.user.full+json",
@@ -106,8 +106,7 @@ namespace ToDoApi.Controllers
             "application/vnd.todo.user.friendly.hateoas+json")]
         [ResponseCache(Duration = 30)]
         //[MapToApiVersion("1.1")]
-        [Authorize(Policy = Constants.AdminsOnly)]
-        public async Task<ActionResult<AppUserDto>> GetUserAsync(Guid userId, string fields, [FromHeader(Name = "Accept")] string mediaType)
+        public async Task<ActionResult<AppUserDto>> GetUserAsync(string fields, [FromHeader(Name = "Accept")] string mediaType)
         {
             if (!MediaTypeHeaderValue.TryParse(mediaType, out MediaTypeHeaderValue parsedMediaType))
                 BadRequest();
@@ -115,7 +114,7 @@ namespace ToDoApi.Controllers
             if (!_propertyChecker.TypeHasProperties<AppUserDto>(fields))
                 return BadRequest();
 
-            var response = await Mediator.Send(new GetUserById.Query(userId));
+            var response = await Mediator.Send(new GetCurrentUser.Query());
             if (response.Succeeded)
             {
                 bool includeLinks = parsedMediaType.SubTypeWithoutSuffix
@@ -123,7 +122,7 @@ namespace ToDoApi.Controllers
 
                 IEnumerable<LinkDto> links = new List<LinkDto>();
                 if (includeLinks)
-                    links = CreateLinksForUser(userId, fields);
+                    links = CreateLinksForUser(fields);
 
                 var primaryMediaType = parsedMediaType.SubTypeWithoutSuffix.Value[0..(includeLinks ? ^8 : ^0)];
 
@@ -162,7 +161,7 @@ namespace ToDoApi.Controllers
             if (response.Succeeded)
             {
                 var userToReturn = _mapper.Map<AppUserDto>(response.Value);
-                var links = CreateLinksForUser(userToReturn.Id, null);
+                var links = CreateLinksForUser(null);
 
                 var resourceWithLinks = userToReturn.ShapeData(null);
                 resourceWithLinks.TryAdd("links", links);
@@ -190,7 +189,7 @@ namespace ToDoApi.Controllers
             if (response.Succeeded)
             {
                 var userToReturn = _mapper.Map<AppUserFullDto>(response.Value);
-                var links = CreateLinksForUser(userToReturn.Id, null);
+                var links = CreateLinksForUser(null);
 
                 var resourceWithLinks = userToReturn.ShapeData(null);
                 resourceWithLinks.TryAdd("links", links);
@@ -257,24 +256,24 @@ namespace ToDoApi.Controllers
         // Refresh & Verify
         // https://dev.to/moe23/refresh-jwt-with-refresh-tokens-in-asp-net-core-5-rest-api-step-by-step-3en5
         
-        private IEnumerable<LinkDto> CreateLinksForUser(Guid userId, string fields)
+        private IEnumerable<LinkDto> CreateLinksForUser(string fields)
         {
             List<LinkDto> links = new();
 
             if (string.IsNullOrWhiteSpace(fields))
             {
-                links.Add(new(Url.Link(nameof(GetUserAsync), new { userId }), "self", "GET"));
+                links.Add(new(Url.Link(nameof(GetUserAsync), new {  }), "self", "GET"));
             }
             else
             {
-                links.Add(new(Url.Link(nameof(GetUserAsync), new { userId, fields }), "self", "GET"));
+                links.Add(new(Url.Link(nameof(GetUserAsync), new { fields }), "self", "GET"));
             }
 
-            links.Add(new(Url.Link(nameof(DeleteUserAsync), new { userId }), "delete_user", "DELETE"));
+            links.Add(new(Url.Link(nameof(DeleteUserAsync), new {  }), "delete_user", "DELETE"));
 
-            links.Add(new(Url.Link(nameof(TaskListsController.CreateToDoListAsync), new { userId }), "create_taskList_for_user", "POST"));
+            links.Add(new(Url.Link(nameof(TaskListsController.CreateToDoListAsync), new {  }), "create_taskList_for_user", "POST"));
 
-            links.Add(new(Url.Link(nameof(TaskListsController.GetToDoListsAsync), new { userId }), "taskLists", "GET"));
+            links.Add(new(Url.Link(nameof(TaskListsController.GetToDoListsAsync), new {  }), "taskLists", "GET"));
 
             //links.Add(new(Url.Link(nameof(CreateUserAsync), new { userId }), "create_user", "POST"));
 

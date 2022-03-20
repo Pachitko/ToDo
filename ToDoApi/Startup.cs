@@ -229,7 +229,7 @@ namespace ToDoApi
             }
             else
             {
-                //app.UseExceptionHandler(HandleException);
+                app.UseExceptionHandler(HandleException);
             }
 
             app.UseHttpsRedirection();

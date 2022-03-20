@@ -61,10 +61,5 @@ namespace ToDoApi.Services
                 throw new Exception($"Cannot find exact property mapping instance for <, {typeof(TDestination)}>");
             }
         }
-
-        Dictionary<string, PropertyMappingValue> IPropertyMappingService.GetPropertyMapping<TDestination>()
-        {
-            throw new NotImplementedException();
-        }
     }
 }

@@ -12,7 +12,11 @@ export type IUserToken = string | null
 
 const getToken = () => localStorage.getItem("token")
 
-const getConfig = (token: IUserToken) => ({
+interface Config {
+    [key: string]: any
+}
+
+const getConfig = (token: IUserToken): Config => ({
     baseURL,
     headers: {
         "Authorization": `Bearer ${token}`
@@ -42,16 +46,19 @@ export const getMeAsync = async (token: IUserToken): Promise<IUser | null> => {
         throw new Error("Token in null");
 
     try {
-        const response = await axios.get("me", getConfig(token))
+        const config = getConfig(token)
+        config.headers["Accept"] = "application/vnd.todo.user.friendly.hateoas+json"
+
+        const response = await axios.get("users/me?fields=username,email", config)
         const user = response.data;
+        console.log(response);
 
         if (!user)
             throw new Error("User info not found");
 
         return {
-            name: user.name,
+            name: user.userName,
             email: user.email,
-            isAuthenticated: user.isAuthenticated,
             token: token,
         }
     } catch (error) {
@@ -153,6 +160,24 @@ export const deleteTaskList = async (listId: string) => {
     try {
         const response = await axios.delete(`taskLists/${listId}`, getConfig(getToken()))
         return response.data
+    } catch (error) {
+        throw error
+    }
+}
+
+export interface IUserToRegister {
+    username: string,
+    email: string,
+    password: string,
+    passwordConfirmation: string,
+}
+
+export const registerUser = async (userToCreate: IUserToRegister): Promise<IUser> => {
+    try {
+        const response = await axios.post(`users`, userToCreate, getConfig(getToken()))
+        const createdUser = response.data as IUser
+        console.log("CreatedUser:", createdUser);
+        return createdUser
     } catch (error) {
         throw error
     }

@@ -13,6 +13,8 @@ import { loginWithTokenAsync } from "src/redux/actions/userActions";
 import { useDispatch } from "react-redux";
 import { loadThemeFromStorage } from "src/redux/actions/globalActions";
 
+let tryToLogin = true;
+
 const App = () => {
     const activeTheme = useAppSelector(state => state.global.theme)
 
@@ -25,7 +27,8 @@ const App = () => {
         return <div>Logging</div>
     }
 
-    if (tokenFromLocalStorage && !token) {
+    if (tryToLogin && tokenFromLocalStorage && !token) {
+        tryToLogin = false;
         dispath(loginWithTokenAsync(tokenFromLocalStorage))
     }
 
