@@ -1,4 +1,4 @@
-import { LOGOUT, SET_SEARCH_TEXT } from "src/redux/actions/actionTypes";
+import { LOGOUT, SELECT_TASK_LIST, SET_SEARCH_TEXT } from "src/redux/actions/actionTypes";
 
 export interface ISearchToolState {
     searchText: string
@@ -10,6 +10,9 @@ const initialState: ISearchToolState = {
 
 const searchTool = (state = initialState, action: any): ISearchToolState => {
     switch (action.type) {
+        case SELECT_TASK_LIST: {
+            return initialState;
+        }
         case LOGOUT: {
             return initialState;
         }

@@ -10,11 +10,11 @@ import AddTask from './AddTask';
 const TaskList = () => {
     // const activeListId = useAppSelector(state => state.tasks.activeListId)
     let activeTaskList = useAppSelector(state => state.tasks.activeList)
-    const smartTaskLists = useAppSelector(state => state.tasks.smartTaskLists)
     const tasks = useAppSelector(state => state.tasks.tasks)
     const isTasksLoading = useAppSelector(state => state.tasks.isLoading)
     const [title, setTitle] = useState('')
     const dispatch = useDispatch()
+    const searchText = useAppSelector(state => state.searchTool.searchText)
 
     useEffect(() => {
         if (activeTaskList) {
@@ -29,6 +29,24 @@ const TaskList = () => {
     // if (isTasksLoading) {
     //     return <div>Loading</div>
     // }
+
+    if (searchText) {
+        return (
+            <STaskListWrapper>
+                <STaskListTitleWrapper>
+                    <STaskListTitle>
+                        <span>Search by query: &quot;{searchText}&quot;</span>
+                    </STaskListTitle>
+                </STaskListTitleWrapper>
+                {/* todo change for smart lists */}
+                <STaskListItems>
+                    {
+                        tasks.filter(t => t.title.includes(searchText)).map((task, i) =>
+                            <TaskItem key={task.id} task={task} />)
+                    }
+                </STaskListItems>
+            </STaskListWrapper>)
+    }
 
     const handleTitleChange = (e: any) => {
         setTitle(e.target.value)
@@ -85,7 +103,7 @@ const STaskListTitle = styled.div`
     padding: 0 4px;
     width: 100%;
     font-weight: bold;
-    font-size: 2.5rem;
+    font-size: 2rem;
     border: 1px solid transparent;
     color: ${p => p.theme.colors.primary};
 `
