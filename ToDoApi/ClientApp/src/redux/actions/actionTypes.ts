@@ -19,6 +19,7 @@ export const DELETE_TASK = 'DELETE_TASK';
 export const DELETE_TASK_LIST = 'DELETE_TASK_LIST';
 export const POST_TASK = 'POST_TASK';
 export const POST_TASK_LIST = 'POST_TASK_LIST';
+export const RENAME_TASK_LIST = 'RENAME_TASK_LIST';
 
 //* user
 export const LOGGING = 'LOGGING';

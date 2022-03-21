@@ -1,13 +1,13 @@
 import {
     getUserTaskLists, deleteTask, ITaskToCreate, postTask,
-    patchTask, ITaskListToCreate, postTaskList, deleteTaskList
+    patchTask, ITaskListToCreate, postTaskList, deleteTaskList, renameTaskList
 } from 'src/libs/api';
 import { JsonPatch } from 'src/libs/jsonPatches';
 import { ITask, ITaskList } from '../reducers/tasks'
 import { AppDispatch, AppState } from '../store';
 import {
     SELECT_TASK, DELETE_TASK, SELECT_TASK_LIST, PATCH_TASK, HIDE_TASK_DETAILS,
-    TASKS_LOADING, LOAD_TASKS_SUCCESS, LOAD_TASKS_ERROR, POST_TASK, POST_TASK_LIST, DELETE_TASK_LIST
+    TASKS_LOADING, LOAD_TASKS_SUCCESS, LOAD_TASKS_ERROR, POST_TASK, POST_TASK_LIST, DELETE_TASK_LIST, RENAME_TASK_LIST
 } from './actionTypes'
 
 export const selectTaskAction = (task: ITask) => {
@@ -33,6 +33,15 @@ export const postTaskListAction = (createdTaskList: ITaskList) => {
         type: POST_TASK_LIST,
         payload: {
             createdTaskList
+        }
+    }
+}
+
+export const renameTaskListAction = (renamedTaskList: ITaskList) => {
+    return {
+        type: RENAME_TASK_LIST,
+        payload: {
+            renamedTaskList
         }
     }
 }
@@ -173,6 +182,18 @@ export const deleteTaskListAsync = (listId: string) => {
         try {
             await deleteTaskList(listId)
             dispatch(deleteTaskListAction(listId))
+        } catch (error) {
+            dispatch(taskErrorAction(error))
+        }
+    }
+}
+
+export const renameTaskListAsync = (listId: string, newTitle: string) => {
+    return async (state: AppState, dispatch: AppDispatch) => {
+        dispatch(tasksLoadingAction())
+        try {
+            const renamedTaskList = await renameTaskList(listId, newTitle)
+            dispatch(renameTaskListAction(renamedTaskList))
         } catch (error) {
             dispatch(taskErrorAction(error))
         }

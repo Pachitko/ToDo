@@ -9,7 +9,7 @@ namespace ToDoApi.Models
 
         public string Title { get; set; }
 
-        public Guid UserId { get; set; }
+        //public Guid UserId { get; set; }
 
         //public IList<ToDoItemDto> ToDoItems { get; private set; } = new List<ToDoItemDto>();
     }

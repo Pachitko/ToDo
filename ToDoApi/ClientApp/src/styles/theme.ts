@@ -25,7 +25,7 @@ export const lightTheme: DefaultTheme = {
         white: '#fff',
         black: '#212121',
         gray: "#e5e5e5",
-        disabled: '#a5a5a5',
+        disabled: '#c5c5c5',
 
         background: '#fff',
         surface: '#f2f2f2',

@@ -1,10 +1,11 @@
 import React, { useState } from 'react'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 import { useAppDispatch, useAppSelector } from 'src/redux/hooks'
 import BackScreen from 'src/Components/UI/BackScreen';
 import { SIconButtonFilled, SPanel } from 'src/Components/UI';
 import { logout } from 'src/redux/actions/userActions';
 import { ThemeButton } from 'src/Components/UI/ThemeButton';
+import ContextMenu from 'src/Components/UI/ContextMenu';
 
 const HeaderButtonGroup: React.FC = () => {
     const dispatch = useAppDispatch();
@@ -25,9 +26,8 @@ const HeaderButtonGroup: React.FC = () => {
                 <i className="fa-solid fa-user"></i>
             </SMenuBtn>
         </SMenuBtnWrapper>
-        {isUserPanelActive && <>
-            <BackScreen onClick={handleUserClick} />
-            <SUserPanel>
+        {isUserPanelActive &&
+            <ContextMenu onClickOutside={handleUserClick} ctxMenuStyles={UserPanelStyle}>
                 <SUserButtonWrapper>
                     <ThemeButton />
                     <SUserButton onClick={handleLogout}>
@@ -42,8 +42,7 @@ const HeaderButtonGroup: React.FC = () => {
                         <span>{user.email}</span>
                     </SUserInfoFieldWrapper>
                 </SUserInfoWrapper>
-            </SUserPanel>
-        </>
+            </ContextMenu>
         }
     </SHeaderButtonGroup >
     )
@@ -51,17 +50,10 @@ const HeaderButtonGroup: React.FC = () => {
 
 export default HeaderButtonGroup
 
-const SUserPanel = styled(SPanel)`
-    padding: 0;
-    position: absolute;
-    box-shadow: ${({ theme }) => theme.shadow.light.soft};
-    z-index: ${p => p.theme.zIndices.contextMenu};
-    background-color: ${p => p.theme.colors.surface};
-    display: flex;
-    justify-content: right;
+const UserPanelStyle = css`
+    width: 200px;
     top: 100%;
     right: 0;
-    min-width: 200px;
 `
 
 const SUserButtonWrapper = styled.div`

@@ -165,6 +165,15 @@ export const deleteTaskList = async (listId: string) => {
     }
 }
 
+export const renameTaskList = async (listId: string, newTitle: string) => {
+    try {
+        const response = await axios.post(`taskLists/${listId}`, { newTitle }, getConfig(getToken()))
+        return response.data as ITaskList
+    } catch (error) {
+        throw error
+    }
+}
+
 export interface IUserToRegister {
     username: string,
     email: string,

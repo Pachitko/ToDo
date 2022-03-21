@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { SIconButton, SPanel } from 'src/Components/UI';
-import BackScreen from 'src/Components/UI/BackScreen';
 import CompleteTaskCheckbox from 'src/Components/UI/TaskCompletionCheckBox';
 import ImportantTaskCheckbox from 'src/Components/UI/TaskImportanceCheckbox';
 import { removeTaskDueDatePatch, removeTaskRecurrencePatch, replaceTaskDueDatePatch, replaceTaskRecurrencePatch, replaceTaskTitlePatch } from 'src/libs/jsonPatches';
@@ -9,12 +8,18 @@ import { patchTaskAsync } from 'src/redux/actions/taskActions';
 import { useAppSelector } from 'src/redux/hooks';
 import { ITask, RecurenceType, Recurrence } from 'src/redux/reducers/tasks';
 import styled from 'styled-components';
-import ContextMenu from './ContextMenu';
+import TaskDetailsContextMenu from '../../../UI/TaskDetailsContextMenu';
 
 const TaskDetails = () => {
     const dispatch = useDispatch();
     const activeTask = useAppSelector(state => state.tasks.activeTask)
-    const [title, setTitle] = useState(activeTask ? activeTask.title : '')
+    const [title, setTitle] = useState('')
+
+    useEffect(() => {
+        if (activeTask)
+            setTitle(activeTask.title)
+    }, [activeTask?.title])
+
     if (!activeTask)
         return null
 
@@ -40,8 +45,9 @@ const TaskDetails = () => {
             <STaskDetailsHeader>
                 <CompleteTaskCheckbox taskId={activeTask.id} isChecked={activeTask.isCompleted} />
                 <STaskDetailsTitleInput spellCheck={false}
+                    value={title}
                     onKeyDown={handleTitleKeyDown} onChange={handleTitleChange}
-                    onBlur={handleTitleBlur} defaultValue={activeTask.title} />
+                    onBlur={handleTitleBlur} />
                 <ImportantTaskCheckbox taskId={activeTask.id} isChecked={activeTask.isImportant} />
             </STaskDetailsHeader>
             <SSection>
@@ -91,9 +97,9 @@ const DueDateSectionItem: React.FC<SectionItemProps> = ({ activeTask }) => {
                 </SIconButton>
             }
             {isFocused &&
-                <ContextMenu title={"Due date"} onClickOutside={handleFocus}>
+                <TaskDetailsContextMenu title={"Due date"} onClickOutside={handleFocus}>
                     <SDueDateCalendar autoFocus type="date" name="calendar" onChange={handleSet}></SDueDateCalendar>
-                </ContextMenu>
+                </TaskDetailsContextMenu>
             }
         </SSectionItem >
     )
@@ -170,7 +176,7 @@ const RecurrenceSectionItem: React.FC<SectionItemProps> = ({ activeTask }) => {
             }
             {
                 isFocused &&
-                <ContextMenu title={"Recurrence"} onClickOutside={handleFocus}>
+                <TaskDetailsContextMenu title={"Recurrence"} onClickOutside={handleFocus}>
                     <SIntervalWrapper>
                         <span>Repeat every </span>
                         <SRecurrenceInterval onChange={handleRecurrenceIntervalChange}
@@ -183,7 +189,7 @@ const RecurrenceSectionItem: React.FC<SectionItemProps> = ({ activeTask }) => {
                         <SContextMenuButton onClick={e => handleSet(RecurenceType.Monthly)}>Month</SContextMenuButton>
                         <SContextMenuButton onClick={e => handleSet(RecurenceType.Yearly)}>Year</SContextMenuButton>
                     </SContextMenuButtons>
-                </ContextMenu>
+                </TaskDetailsContextMenu>
             }
         </SSectionItem >
     )
@@ -284,6 +290,7 @@ const STaskDetailsHeader = styled(SSection)`
 `
 
 const STaskDetailsTitleInput = styled.input` // todo textarea
+    width: 100%;
     padding: 0 4px;
     height: 100%;
     font-size: 1rem;

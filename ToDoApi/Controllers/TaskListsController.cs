@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using ToDoApi.Models;
 using AutoMapper;
 using System;
+using Core.Application.Features.Commands.RenameToDoList;
 
 namespace ToDoApi.Controllers
 { 
@@ -22,8 +23,8 @@ namespace ToDoApi.Controllers
             _mapper = mapper;
         }
 
-        [HttpGet(Name = nameof(GetToDoListsAsync))]
         [HttpHead]
+        [HttpGet(Name = nameof(GetToDoListsAsync))]
         public async Task<ActionResult<List<ToDoListDto>>> GetToDoListsAsync([FromRoute] GetToDoLists.Query query)
         {
             var response = await Mediator.Send(query);
@@ -63,6 +64,22 @@ namespace ToDoApi.Controllers
                     {
                         toDoListId = toDoListToReturn.Id
                     }, toDoListToReturn);
+            }
+            else
+            {
+                return ResponseFailed(response);
+            }
+        }
+
+        [HttpPost("{toDoListId}", Name = nameof(RenameToDoListAsync))]
+        public async Task<ActionResult> RenameToDoListAsync([FromRoute] Guid toDoListId, RenameToDoList.Command command)
+        {
+            command = command with { ToDoListId = toDoListId };
+
+            var response = await Mediator.Send(command);
+            if (response.Succeeded)
+            {
+                return Ok(_mapper.Map<ToDoListDto>(response.Value));
             }
             else
             {

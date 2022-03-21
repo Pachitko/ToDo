@@ -1,6 +1,6 @@
 import {
     PATCH_TASK, DELETE_TASK, HIDE_TASK_DETAILS, SELECT_TASK, SELECT_TASK_LIST, SET_SEARCH_TEXT,
-    TASKS_LOADING, LOAD_TASKS_SUCCESS, LOAD_TASKS_ERROR, POST_TASK, POST_TASK_LIST, DELETE_TASK_LIST, LOGOUT
+    TASKS_LOADING, LOAD_TASKS_SUCCESS, LOAD_TASKS_ERROR, POST_TASK, POST_TASK_LIST, DELETE_TASK_LIST, LOGOUT, RENAME_TASK_LIST
 } from "src/redux/actions/actionTypes";
 
 export interface ITask {
@@ -136,6 +136,17 @@ const tasks = (state = initialState, action: any): ITasksState => {
             return {
                 ...state,
                 taskLists: state.taskLists.concat(createdTaskList),
+                isLoading: false
+            };
+        }
+        case RENAME_TASK_LIST: {
+            console.log(RENAME_TASK_LIST);
+            const { renamedTaskList } = action.payload
+            return {
+                ...state,
+                taskLists: state.taskLists.map(l => l.id === renamedTaskList.id
+                    ? { ...l, title: renamedTaskList.title }
+                    : l),
                 isLoading: false
             };
         }
