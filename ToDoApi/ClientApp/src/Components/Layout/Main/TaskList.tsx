@@ -8,22 +8,23 @@ import { loadTasksAsync, renameTaskListAsync } from 'src/redux/actions/taskActio
 import AddTask from './AddTask';
 
 const TaskList = () => {
-    const activeListId = useAppSelector(state => state.tasks.activeListId)
-    const activeTaskList = useAppSelector(state => state.tasks.taskLists
-        .find(l => l.id === activeListId))
+    // const activeListId = useAppSelector(state => state.tasks.activeListId)
+    let activeTaskList = useAppSelector(state => state.tasks.activeList)
+    const smartTaskLists = useAppSelector(state => state.tasks.smartTaskLists)
+    const tasks = useAppSelector(state => state.tasks.tasks)
     const isTasksLoading = useAppSelector(state => state.tasks.isLoading)
     const [title, setTitle] = useState('')
     const dispatch = useDispatch()
 
     useEffect(() => {
-        dispatch(loadTasksAsync())
-        console.log(1, activeListId, activeTaskList);
-    }, [])
+        if (activeTaskList) {
+            setTitle(activeTaskList.title)
+        }
+    }, [activeTaskList?.title])
 
     useEffect(() => {
-        if (activeTaskList)
-            setTitle(activeTaskList.title)
-    }, [activeTaskList?.title])
+        dispatch(loadTasksAsync())
+    }, [])
 
     // if (isTasksLoading) {
     //     return <div>Loading</div>
@@ -39,27 +40,37 @@ const TaskList = () => {
     }
 
     const handleTitleBlur = () => {
-        if (activeTaskList === undefined)
+        if (activeTaskList === null)
             return
 
         dispatch(renameTaskListAsync(activeTaskList.id, title))
     }
 
+    if (activeTaskList === null)
+        return <span>Список не найден</span>
+
     return (
         <Routes>
-            <Route path={activeListId} element={
+            <Route path={activeTaskList.id} element={
                 <STaskListWrapper>
                     <STaskListTitleWrapper>
-                        <STaskListTitle spellCheck={false}
-                            value={title}
-                            onKeyDown={handleTitleKeyDown} onChange={handleTitleChange}
-                            onBlur={handleTitleBlur} />
+                        <STaskListTitle>
+                            {activeTaskList.isSmart
+                                ? <span>{title}</span>
+                                : <STaskListTitleInput spellCheck={false}
+                                    value={title}
+                                    onKeyDown={handleTitleKeyDown} onChange={handleTitleChange}
+                                    onBlur={handleTitleBlur} />
+                            }
+                        </STaskListTitle>
                     </STaskListTitleWrapper>
+                    {/* todo change for smart lists */}
                     <AddTask />
                     <STaskListItems>
-                        {activeTaskList !== undefined && activeTaskList.tasks.map((task, i) =>
-                            <TaskItem key={task.id} task={task} />
-                        )}
+                        {
+                            tasks.filter(t => activeTaskList?.isSmart ? activeTaskList.filter(t) : t.toDoListId === activeTaskList.id).map((task, i) =>
+                                <TaskItem key={task.id} task={task} />)
+                        }
                     </STaskListItems>
                 </STaskListWrapper>
             } />
@@ -70,13 +81,22 @@ const TaskList = () => {
 
 export default TaskList
 
-const STaskListTitle = styled.input`
+const STaskListTitle = styled.div`
     padding: 0 4px;
     width: 100%;
     font-weight: bold;
     font-size: 2.5rem;
     border: 1px solid transparent;
     color: ${p => p.theme.colors.primary};
+`
+
+const STaskListTitleInput = styled.input`
+    padding: inherit;
+    width: inherit;
+    font-weight: inherit;
+    font-size: inherit;
+    border: inherit;
+    color: inherit;
     :focus{
         border: 1px solid ${p => p.theme.colors.onSurface};
     }

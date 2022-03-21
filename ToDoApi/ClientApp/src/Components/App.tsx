@@ -17,17 +17,16 @@ let tryAutoLogin = true;
 
 const App = () => {
     const activeTheme = useAppSelector(state => state.global.theme)
-
-    const dispath = useDispatch();
+    const dispatch = useDispatch();
     const token = useAppSelector(state => state.user.token)
     const tokenFromLocalStorage = localStorage.getItem("token");
 
     if (tryAutoLogin && tokenFromLocalStorage && !token) {
         tryAutoLogin = false;
-        dispath(loginWithTokenAsync(tokenFromLocalStorage))
+        dispatch(loginWithTokenAsync(tokenFromLocalStorage))
     }
 
-    dispath(loadThemeFromStorage())
+    dispatch(loadThemeFromStorage())
 
     return <ThemeProvider theme={activeTheme}>
         {!token ?
@@ -38,7 +37,7 @@ const App = () => {
             <Layout>
                 <Header />
                 <Routes>
-                    <Route path="*" element={<Navigate to={'/tasks/today'} />} />
+                    <Route path="*" element={<Navigate to={'/tasks/all'} />} />
                     <Route path='/tasks/*' element={
                         <Main>
                             <LeftColumn>

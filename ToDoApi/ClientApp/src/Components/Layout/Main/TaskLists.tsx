@@ -6,22 +6,25 @@ import AddList from './AddList'
 
 const TaskLists = () => {
     const taskLists = useAppSelector(state => state.tasks.taskLists)
+    const smartTaskLists = useAppSelector(state => state.tasks.smartTaskLists)
     return (
         <div>
             <SSmartLists>
-                Smart lists
+                {smartTaskLists.map(smartTaskList => smartTaskList.isVisible &&
+                    <TaskListButton key={smartTaskList.id} list={smartTaskList} isUserDefined={false} />
+                )}
             </SSmartLists>
             <SUserDefinedLists>
                 {
-                    taskLists.map((list) => (
-                        <TaskListButton listTitle={list.title} key={list.id} listId={list.id} isUserDefined />
-                    ))
-                }
+                    taskLists.map((list) =>
+                        <TaskListButton key={list.id} list={list} isUserDefined />
+                    )}
             </SUserDefinedLists>
             <AddList />
         </div>
     )
 }
+
 export default TaskLists
 
 const SSmartLists = styled.div`
@@ -31,8 +34,4 @@ const SSmartLists = styled.div`
 
 const SUserDefinedLists = styled.div`
     margin-bottom: 16px;
-`
-
-const STaskListDelimiter = styled.div`
-    margin: 16px 0;
 `

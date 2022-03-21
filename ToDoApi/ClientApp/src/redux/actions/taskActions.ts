@@ -1,6 +1,6 @@
 import {
-    getUserTaskLists, deleteTask, ITaskToCreate, postTask,
-    patchTask, ITaskListToCreate, postTaskList, deleteTaskList, renameTaskList
+    getTaskLists, deleteTask, ITaskToCreate, postTask,
+    patchTask, ITaskListToCreate, postTaskList, deleteTaskList, renameTaskList, getListTasks
 } from 'src/libs/api';
 import { JsonPatch } from 'src/libs/jsonPatches';
 import { ITask, ITaskList } from '../reducers/tasks'
@@ -65,11 +65,11 @@ export const deleteTaskListAction = (listId: string) => {
     }
 }
 
-export const selectTaskListAction = (listId: string) => {
+export const selectTaskListAction = (list: ITaskList) => {
     return {
         type: SELECT_TASK_LIST,
         payload: {
-            listId
+            list
         }
     }
 }
@@ -96,11 +96,12 @@ export const tasksLoadingAction = () => {
     }
 }
 
-export const loadTasksSuccessAction = (taskLists: ITaskList[]) => {
+export const loadTasksSuccessAction = (taskLists: ITaskList[], tasks: ITask[]) => {
     return {
         type: LOAD_TASKS_SUCCESS,
         payload: {
-            taskLists
+            taskLists,
+            tasks
         }
     }
 }
@@ -131,8 +132,9 @@ export const loadTasksAsync = () => {
     return async (state: AppState, dispatch: AppDispatch) => {
         dispatch(tasksLoadingAction())
         try {
-            const tasks = await getUserTaskLists()
-            dispatch(loadTasksSuccessAction(tasks))
+            const lists = await getTaskLists()
+            const tasks = await getListTasks(lists)
+            dispatch(loadTasksSuccessAction(lists, tasks))
         } catch (error) {
             dispatch(taskErrorAction(error))
         }

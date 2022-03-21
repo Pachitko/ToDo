@@ -10,7 +10,7 @@ const AddTask: React.FC = () => {
     const [isInputActive, setIsInputActive] = useState(false)
     const [taskTitle, setTaskTitle] = useState('')
     const dispatch = useDispatch()
-    const listId = useAppSelector(state => state.tasks.activeListId)
+    const activeList = useAppSelector(state => state.tasks.activeList)
 
     const handleFocus = () => {
         setIsInputActive(true)
@@ -26,6 +26,9 @@ const AddTask: React.FC = () => {
 
     const handleAddTask = (e: any) => {
         e.preventDefault()
+        if (activeList === null)
+            return
+
         const taskToCreate: ITaskToCreate = {
             title: taskTitle,
             isCompleted: false,
@@ -35,7 +38,7 @@ const AddTask: React.FC = () => {
         }
         setTaskTitle('')
         setIsInputActive(false)
-        dispatch(postTaskAsync(listId, taskToCreate))
+        dispatch(postTaskAsync(activeList.id, taskToCreate))
     }
 
     return (

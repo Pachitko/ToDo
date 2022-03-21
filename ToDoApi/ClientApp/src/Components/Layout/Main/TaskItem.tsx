@@ -15,12 +15,19 @@ const TaskItem = ({ task }: { task: ITask }) => {
 
     return (
         <STaskItem>
-            <TaskCompletionCheckBox taskId={task.id} isChecked={task.isCompleted} />
+            <TaskCompletionCheckBox task={task} />
             <STaskBody onClick={handleTaskSelect}>
                 <STaskTitle>{task.title}</STaskTitle>
-                <STaskOptions>Task options</STaskOptions>
+                <STaskOptions>
+                    <STaskDueDateOption>
+                        {task.dueDate && new Date(task.dueDate).toLocaleDateString()}
+                    </STaskDueDateOption>
+                    <STaskReccurenceOption>
+                        {task.recurrence && <i className="fa-solid fa-repeat"></i>}
+                    </STaskReccurenceOption>
+                </STaskOptions>
             </STaskBody>
-            <TaskImportanceCheckbox taskId={task.id} isChecked={task.isImportant} />
+            <TaskImportanceCheckbox task={task} />
         </STaskItem>
     )
 }
@@ -59,5 +66,13 @@ const STaskTitle = styled.span`
 `
 
 const STaskOptions = styled.span`
-    color: ${p => p.theme.colors.onSurface};
+    display: flex;
+    color: ${p => p.theme.colors.primary};
+`
+
+const STaskDueDateOption = styled.div`
+    margin-right: 8px;
+`
+
+const STaskReccurenceOption = styled.div`
 `

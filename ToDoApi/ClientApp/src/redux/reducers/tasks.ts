@@ -1,6 +1,8 @@
 import {
-    PATCH_TASK, DELETE_TASK, HIDE_TASK_DETAILS, SELECT_TASK, SELECT_TASK_LIST, SET_SEARCH_TEXT,
-    TASKS_LOADING, LOAD_TASKS_SUCCESS, LOAD_TASKS_ERROR, POST_TASK, POST_TASK_LIST, DELETE_TASK_LIST, LOGOUT, RENAME_TASK_LIST
+    PATCH_TASK, DELETE_TASK, HIDE_TASK_DETAILS, SELECT_TASK,
+    SELECT_TASK_LIST, SET_SEARCH_TEXT,
+    TASKS_LOADING, LOAD_TASKS_SUCCESS, LOAD_TASKS_ERROR, POST_TASK,
+    POST_TASK_LIST, DELETE_TASK_LIST, LOGOUT, RENAME_TASK_LIST
 } from "src/redux/actions/actionTypes";
 
 export interface ITask {
@@ -32,25 +34,49 @@ export enum RecurenceType {
 export interface ITaskList {
     id: string,
     title: string,
-    tasks: ITask[]
+    isVisible?: boolean,
+    isSmart?: boolean,
+    filter?: (task: ITask) => boolean
 }
 
 export interface ITasksState {
     isLoading: boolean,
-    activeListId: string,
-    activeTaskId: string,
     activeTask: ITask | null,
     activeList: ITaskList | null,
-    taskLists: ITaskList[]
+    taskLists: ITaskList[],
+    tasks: ITask[],
+    smartTaskLists: ITaskList[]
 }
 
 const initialState: ITasksState = {
     isLoading: false,
-    activeListId: "",
-    activeTaskId: "",
     activeTask: null,
     activeList: null,
-    taskLists: []
+    taskLists: [],
+    tasks: [],
+    smartTaskLists: [
+        {
+            id: "all",
+            title: "All",
+            isSmart: true,
+            isVisible: true,
+            filter: (task: ITask) => true
+        },
+        {
+            id: "important",
+            title: "Important",
+            isSmart: true,
+            isVisible: true,
+            filter: (task: ITask) => task.isImportant
+        },
+        {
+            id: "planned",
+            title: "Planned",
+            isSmart: true,
+            isVisible: true,
+            filter: (task: ITask) => !!task.dueDate
+        }
+    ]
 };
 
 const tasks = (state = initialState, action: any): ITasksState => {
@@ -62,55 +88,52 @@ const tasks = (state = initialState, action: any): ITasksState => {
             const { task } = action.payload
             return {
                 ...state,
-                activeTask: task,
-                activeTaskId: task.id
+                activeTask: task
             };
         }
         case SELECT_TASK_LIST: {
+            const { list } = action.payload
             return {
-                ...state, activeListId: action.payload.listId, activeTaskId: ''
+                ...state,
+                activeList: list,
+                activeTask: null
             };
         }
         case DELETE_TASK: {
             const { listId, taskId } = action.payload
             return {
                 ...state,
-                taskLists: state.taskLists
-                    .map(list => list.id === listId
-                        ? { ...list, tasks: list.tasks.filter(t => t.id !== taskId) }
-                        : list),
-                activeTaskId: '',
+                tasks: state.tasks.filter(t => t.toDoListId === listId && t.id !== taskId),
+                activeTask: null,
                 isLoading: false
             };
         }
         case PATCH_TASK: {
+            console.log(PATCH_TASK);
             const { listId, patchedTask } = action.payload
             return {
                 ...state,
                 activeTask: patchedTask,
-                taskLists: state.taskLists
-                    .map(list => list.id === listId
-                        ? {
-                            ...list,
-                            tasks: list.tasks.map(t => t.id === patchedTask.id ? patchedTask : t)
-                        }
-                        : list),
+                tasks: state.tasks.map(t => t.toDoListId === listId && t.id === patchedTask.id
+                    ? patchedTask
+                    : t),
                 isLoading: false
             };
         }
         case HIDE_TASK_DETAILS: {
-            return { ...state, activeTaskId: '' }
+            return { ...state, activeTask: null }
         }
         case TASKS_LOADING: {
             return { ...state, isLoading: true }
         }
         case LOAD_TASKS_SUCCESS: {
-            const { taskLists } = action.payload
+            const { taskLists, tasks } = action.payload
             console.log(taskLists);
             return {
                 ...state,
-                activeListId: taskLists[0].id,
+                activeList: state.smartTaskLists[0],
                 taskLists,
+                tasks,
                 isLoading: false
             }
         }
@@ -123,10 +146,7 @@ const tasks = (state = initialState, action: any): ITasksState => {
             const { createdTask } = action.payload
             return {
                 ...state,
-                taskLists: state.taskLists
-                    .map(list => list.id === createdTask.toDoListId
-                        ? { ...list, tasks: list.tasks.concat(createdTask) }
-                        : list),
+                tasks: state.tasks.concat(createdTask),
                 isLoading: false
             };
         }
@@ -156,8 +176,8 @@ const tasks = (state = initialState, action: any): ITasksState => {
                 ...state,
                 taskLists: state.taskLists.filter(l => l.id !== listId),
                 activeTask: null,
-                activeTaskId: '',
-                activeListId: state.activeListId === listId ? '' : state.activeListId,
+                activeList: null,
+                // activeList: state.taskLists.find(l => l.id === listId),
                 isLoading: false
             };
         }

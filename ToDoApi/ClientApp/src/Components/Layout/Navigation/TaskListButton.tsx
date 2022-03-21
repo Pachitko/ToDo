@@ -5,31 +5,31 @@ import { deleteTaskListAsync, selectTaskListAction } from 'src/redux/actions/tas
 import { useDispatch } from 'react-redux'
 import { SIconButton } from 'src/Components/UI'
 import { useAppSelector } from 'src/redux/hooks'
+import { ITaskList } from 'src/redux/reducers/tasks'
 
 type Props = {
-    listTitle: string,
-    listId: string
+    list: ITaskList,
     isUserDefined: boolean
 }
 
-const TaskListButton: React.FC<Props> = ({ listTitle, listId, isUserDefined }) => {
+const TaskListButton: React.FC<Props> = ({ list, isUserDefined }) => {
     const dispatch = useDispatch()
-    const activeListId = useAppSelector(state => state.tasks.activeListId)
+    const activeList = useAppSelector(state => state.tasks.activeList)
 
     const handleListSelect = () => {
-        if (activeListId !== listId)
-            dispatch(selectTaskListAction(listId))
+        if (activeList?.id !== list.id)
+            dispatch(selectTaskListAction(list))
     }
 
     const handleListDelete = () => {
-        dispatch(deleteTaskListAsync(listId))
+        dispatch(deleteTaskListAsync(list.id))
     }
 
     return (
         <STaskListBtnWrapper>
-            <STaskListLink to={listId}
+            <STaskListLink to={list.id}
                 onClick={handleListSelect}>
-                <SListTitle>{listTitle}</SListTitle>
+                <SListTitle>{list.title}</SListTitle>
             </STaskListLink>
             {isUserDefined ?
                 <SIconButton onClick={handleListDelete}>

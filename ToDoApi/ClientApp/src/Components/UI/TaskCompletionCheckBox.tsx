@@ -4,25 +4,24 @@ import { useDispatch } from 'react-redux';
 import { patchTaskAsync } from 'src/redux/actions/taskActions';
 import { useAppSelector } from 'src/redux/hooks';
 import { replaceTaskIsCompletedPatch } from 'src/libs/jsonPatches';
+import { ITask } from 'src/redux/reducers/tasks';
 
 type Props = {
-    taskId: string,
-    isChecked: boolean
+    task: ITask
 }
 
-const TaskCompletionCheckBox: React.FC<Props> = ({ taskId, isChecked }) => {
+const TaskCompletionCheckBox: React.FC<Props> = ({ task }) => {
     const dispatch = useDispatch();
-    const listId = useAppSelector(state => state.tasks.activeListId)
 
     const handleCheckBoxChange = (e: any) => {
-        dispatch(patchTaskAsync(listId, taskId, [replaceTaskIsCompletedPatch(e.target.checked)]))
+        dispatch(patchTaskAsync(task.toDoListId, task.id, [replaceTaskIsCompletedPatch(e.target.checked)]))
     }
 
     return (
         <STaskCheckBoxLabel>
-            <i className={isChecked ? 'fa-regular fa-circle-check' : 'fa-regular fa-circle'}></i>
+            <i className={task.isCompleted ? 'fa-regular fa-circle-check' : 'fa-regular fa-circle'}></i>
             <STaskCheckBox
-                checked={isChecked}
+                checked={task.isCompleted}
                 type='checkbox'
                 onChange={handleCheckBoxChange}
             />

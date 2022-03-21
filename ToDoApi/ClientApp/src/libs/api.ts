@@ -66,7 +66,7 @@ export const getMeAsync = async (token: IUserToken): Promise<IUser | null> => {
     }
 }
 
-export const getUserTaskLists = async (): Promise<ITaskList[]> => {
+export const getTaskLists = async (): Promise<ITaskList[]> => {
     try {
         const response = await axios.get(`taskLists`, getConfig(getToken()))
         const taskLists: ITaskList[] = response.data.map((l: ITaskList) => {
@@ -74,24 +74,25 @@ export const getUserTaskLists = async (): Promise<ITaskList[]> => {
                 ...l
             }
         })
-        for (const list of taskLists) {
-            list.tasks = await getListTasks(list.id)
-        }
         return taskLists
     } catch (error) {
         throw error
     }
 }
 
-export const getListTasks = async (listId: string): Promise<ITask[]> => {
+export const getListTasks = async (taskLists: ITaskList[]): Promise<ITask[]> => {
     try {
-        const response = await axios.get(`taskLists/${listId}/tasks`, getConfig(getToken()))
-        const tasks: ITask[] = response.data.map((t: ITask) => {
-            return {
-                ...t
-            }
-        })
-        return tasks
+        const result: ITask[] = []
+        for (const list of taskLists) {
+            const response = await axios.get(`taskLists/${list.id}/tasks`, getConfig(getToken()))
+            const tasks: ITask[] = response.data.map((t: ITask) => {
+                return {
+                    ...t
+                }
+            })
+            result.push(...tasks)
+        }
+        return result
     } catch (error) {
         throw error
     }

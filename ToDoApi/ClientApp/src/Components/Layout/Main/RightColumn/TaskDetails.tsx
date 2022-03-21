@@ -20,8 +20,9 @@ const TaskDetails = () => {
             setTitle(activeTask.title)
     }, [activeTask?.title])
 
-    if (!activeTask)
+    if (activeTask === null) {
         return null
+    }
 
     const handleTitleChange = (e: any) => {
         setTitle(e.target.value)
@@ -43,12 +44,12 @@ const TaskDetails = () => {
     return (activeTask === undefined ? null :
         <STaskDetails>
             <STaskDetailsHeader>
-                <CompleteTaskCheckbox taskId={activeTask.id} isChecked={activeTask.isCompleted} />
+                <CompleteTaskCheckbox task={activeTask} />
                 <STaskDetailsTitleInput spellCheck={false}
                     value={title}
                     onKeyDown={handleTitleKeyDown} onChange={handleTitleChange}
                     onBlur={handleTitleBlur} />
-                <ImportantTaskCheckbox taskId={activeTask.id} isChecked={activeTask.isImportant} />
+                <ImportantTaskCheckbox task={activeTask} />
             </STaskDetailsHeader>
             <SSection>
                 <DueDateSectionItem activeTask={activeTask} />

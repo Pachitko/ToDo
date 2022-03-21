@@ -16,10 +16,10 @@ const SRightColumn = styled.div<Props>`
 `
 
 const RightColumn: React.FC = ({ children }) => {
-    const activeTaskId = useAppSelector(state => state.tasks.activeTaskId)
+    const activeTask = useAppSelector(state => state.tasks.activeTask)
 
     return (
-        <SRightColumn isActive={activeTaskId !== ''}>
+        <SRightColumn isActive={activeTask !== null}>
             {children}
         </SRightColumn>
     )
