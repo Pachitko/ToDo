@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace Core.Application.PipelineBehaviors
 {
     public class ValidationBehaviorV2<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
-        where TRequest : IValidateable
+        where TRequest : IRequest<TResponse>, IValidateable
         where TResponse : class
     {
         private readonly IEnumerable<IValidator<TRequest>> _validators;

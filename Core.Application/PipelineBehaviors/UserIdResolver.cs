@@ -7,7 +7,7 @@ using System;
 namespace Core.Application.PipelineBehaviors
 {
     public class UserIdResolver<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
-        where TRequest : IWithUserId
+        where TRequest : IRequest<TResponse>, IWithUserId
         where TResponse : class
     {
         public UserIdResolver()
