@@ -5,13 +5,6 @@ import { useAppDispatch, useAppSelector } from 'src/redux/hooks'
 import styled from 'styled-components'
 import TaskLists from './TaskLists'
 
-const SLeftColumn = styled.div`
-    background-color: ${p => p.theme.colors.surface};
-    min-width: 224px;
-    display: flex;
-    flex-direction: column;
-`
-
 const LeftColumn: React.FC = () => {
     const isLeftColumnActive = useAppSelector(state => state.global.isLeftColumnActive)
     const dispatch = useAppDispatch()
@@ -34,6 +27,24 @@ const LeftColumn: React.FC = () => {
 
 export default LeftColumn
 
+const SLeftColumn = styled.div`
+    border-right: 1px solid #ddd;
+    background-color: ${p => p.theme.colors.surface};
+    width: 256px;
+    display: flex;
+    flex-direction: column;
+    @media ${p => p.theme.media.m} {
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        box-shadow: ${p => p.theme.shadow.light.soft};
+    }
+    @media ${p => p.theme.media.l} {
+        width: 192px;
+    }
+`
+
 const SLeftColumnHeader = styled.div`
-    padding: 8px;
+padding: 8px;
 `

@@ -112,7 +112,6 @@ const TaskList = () => {
 export default TaskList
 
 const STaskListTitleWrapper = styled.div`
-    height: 48px;
     margin: 0 8px;
     display: flex;
     align-items: center;
@@ -139,6 +138,8 @@ const STaskListTitleInput = styled.input`
     border: inherit;
     color: inherit;
     padding-left: 4px;
+    overflow: hidden;
+    text-overflow: ellipsis;
     :focus{
         border: 1px solid ${p => p.theme.colors.onSurface};
     }

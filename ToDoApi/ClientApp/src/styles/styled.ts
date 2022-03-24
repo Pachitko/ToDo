@@ -35,10 +35,11 @@ export interface ITheme {
         radius: string
     },
     media: {
-        extraLarge: string
-        large: string
-        medium: string
-        small: string
+        xs: string,
+        s: string,
+        m: string,
+        l: string,
+        xl: string
     }
 
     sizes: {

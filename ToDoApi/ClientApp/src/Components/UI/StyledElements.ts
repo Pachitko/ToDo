@@ -80,9 +80,9 @@ const STextButton = styled.button`
 `
 
 const SIconButtonFilled = styled.button`
-height: 32px;
-width: 32px;
- display: flex;
+    height: 32px;
+    width: 32px;
+    display: flex;
     align-items: center;
     justify-content: center;
     font-size: 1rem;

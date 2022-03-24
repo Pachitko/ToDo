@@ -33,7 +33,9 @@ const TaskListButton: React.FC<Props> = ({ list }) => {
                         <i className={list.iconClass ? list.iconClass : "fa-solid fa-list"}></i>
                     </STaskListIcon>
                     <SListTitle>
-                        {list.title}
+                        <div>
+                            {list.title}
+                        </div>
                     </SListTitle>
                 </SListBody>
             </STaskListLink>
@@ -41,9 +43,9 @@ const TaskListButton: React.FC<Props> = ({ list }) => {
             </SNumberOfTask>
             {
                 !list.isSmart ?
-                    <SIconButton onClick={handleListDelete}>
+                    <SIconButtonClear onClick={handleListDelete}>
                         <i className="fa-solid fa-times"></i>
-                    </SIconButton>
+                    </SIconButtonClear>
                     : null
             }
         </STaskListBtnWrapper >
@@ -96,7 +98,12 @@ const SListBody = styled.div`
 `
 
 const SListTitle = styled.div`
+    overflow: hidden;
+    text-overflow: ellipsis;
+`
 
+const SIconButtonClear = styled(SIconButton)`
+    flex-shrink: 0;
 `
 
 const STaskListIcon = styled.div`
@@ -104,4 +111,5 @@ const STaskListIcon = styled.div`
     justify-content: center;
     align-items: center;
     width: 32px;
+    flex-shrink: 0;
 `

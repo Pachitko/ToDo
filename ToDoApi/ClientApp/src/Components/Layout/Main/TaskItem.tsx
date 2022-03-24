@@ -1,7 +1,7 @@
 import React from 'react'
 import { ITask } from 'src/redux/reducers/tasks'
 import { useAppDispatch, useAppSelector } from 'src/redux/hooks';
-import { selectTaskAction } from 'src/redux/actions/taskActions';
+import { hideTaskDetailsAction, selectTaskAction } from 'src/redux/actions/taskActions';
 import TaskImportanceCheckbox from 'src/Components/UI/TaskImportanceCheckbox';
 import TaskCompletionCheckBox from 'src/Components/UI/TaskCompletionCheckBox';
 import styled from 'styled-components'
@@ -11,7 +11,12 @@ const TaskItem = ({ task }: { task: ITask }) => {
     const activeTask = useAppSelector(state => state.tasks.activeTask)
 
     const handleTaskSelect = () => {
-        dispatch(selectTaskAction(task))
+        if (activeTask && activeTask.id === task.id) {
+            dispatch(hideTaskDetailsAction())
+        }
+        else {
+            dispatch(selectTaskAction(task))
+        }
     }
 
     return (

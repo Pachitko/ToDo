@@ -40,15 +40,16 @@ export const lightTheme: DefaultTheme = {
         radius: '2px'
     },
     media: {
-        small: '(max-width: 540px)',
-        medium: '(max-width: 720px)',
-        large: '(max-width: 960px)',
-        extraLarge: '(max-width: 1140px)',
+        xs: '(max-width: 320px)',
+        s: '(max-width: 540px)',
+        m: '(max-width: 720px)',
+        l: '(max-width: 960px)',
+        xl: '(max-width: 1140px)',
     },
 
     // in px
     sizes: {
-        header: { height: 56 },
+        header: { height: 48 },
         container: { width: 1200 },
         footer: { height: 128 },
         modal: { width: 540 },
@@ -117,12 +118,6 @@ export const darkTheme: DefaultTheme = {
     },
     border: {
         radius: '4px'
-    },
-    media: {
-        extraLarge: '',
-        large: '',
-        medium: '',
-        small: ''
     },
     sizes: {
         header: {

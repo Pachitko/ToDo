@@ -26,7 +26,7 @@ const SearchTool: React.FC = () => {
     }
 
     return (
-        <SSearch>
+        <SSearchTool>
             <SSearchToolWrapper focus={isSearchInputFocused}>
                 <SSearchBtn focus={isSearchInputFocused}>
                     <i className="fa-solid fa-magnifying-glass"></i>
@@ -46,13 +46,13 @@ const SearchTool: React.FC = () => {
                         </SClearBtn>
                     ) : null}
             </SSearchToolWrapper>
-        </SSearch>
+        </SSearchTool>
     )
 }
 
 export default SearchTool
 
-const SSearch = styled.div`
+const SSearchTool = styled.div`
     flex-grow: 1;
     display: flex;
     justify-content: center;
@@ -61,28 +61,28 @@ const SSearch = styled.div`
 
 const SSearchToolWrapper = styled.div<{ focus: boolean }>`
     height: 32px;
-    width: 100%;
     display: flex;
+    width: 100%;
     justify-content: center;
     align-items: center;
     transition: all .1s ease-in-out;
     border-radius: 5px;
-    max-width: 400px;
-    min-width: 50px;
+    max-width: 320px;
     background-color: ${p => !p.focus && p.theme.colors.primaryDark};
     border: 2px solid ${p => p.focus && p.theme.colors.primaryDark || 'transparent'};
 `
 
 const SSearchInput = styled.input`
-    ::placeholder{
-        color: ${p => p.theme.colors.disabled};
-    }
+    width: 100%;
     height: 100%;
     color: ${p => p.theme.colors.white};
     padding: 0 5px;
     flex-grow: 1;
     font-size: 1rem;
     caret-color: ${p => p.theme.colors.white};
+    ::placeholder{
+        color: ${p => p.theme.colors.disabled};
+    }
 `
 
 const SBtn = styled.button`
@@ -107,5 +107,8 @@ const SSearchBtn = styled(SBtn) <{ focus: boolean }>`
 const SClearBtn = styled(SBtn)`
     &:hover{
         color: ${p => p.theme.colors.primaryDark};
+    }
+    @media ${p => p.theme.media.s} {
+        display: none;
     }
 `

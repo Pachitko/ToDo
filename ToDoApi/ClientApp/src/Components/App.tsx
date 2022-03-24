@@ -64,6 +64,7 @@ const SLayout = styled.div`
 `
 
 const SMain = styled.div`
+    position: relative;
     flex-grow: 1;
     display: flex;
     flex-direction: row;

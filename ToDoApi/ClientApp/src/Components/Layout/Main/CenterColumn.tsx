@@ -14,6 +14,4 @@ export default CenterColumn
 const SCenterColumn = styled.div`
     flex-grow: 1;
     background-color: ${p => p.theme.colors.background};
-    border-left: 1px solid #ddd;
-    border-right: 1px solid #ddd;
 `
