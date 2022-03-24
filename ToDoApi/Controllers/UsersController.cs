@@ -4,6 +4,7 @@ using Core.Application.Extensions;
 using Core.Application.Features.Commands.CreateFullUser;
 using Core.Application.Features.Commands.CreateUser;
 using Core.Application.Features.Commands.DeleteUser;
+using Core.Application.Features.Commands.ConfirmEmail;
 using Core.Application.Features.Queries.GetCurrentUser;
 using Core.Application.Features.Queries.GetJwtToken;
 using Core.Application.Features.Queries.GetUsers;
@@ -252,9 +253,24 @@ namespace ToDoApi.Controllers
             return Ok();
         }
 
+        [HttpGet("confirm")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ConfirmEmail([FromQuery] ConfirmEmail.Command command)
+        {
+            var response = await Mediator.Send(command);
+            if (response.Succeeded)
+            {
+                return Ok(response.Value);
+            }
+            else
+            {
+                return ResponseFailed(response);
+            }
+        }
+
         // Refresh & Verify
         // https://dev.to/moe23/refresh-jwt-with-refresh-tokens-in-asp-net-core-5-rest-api-step-by-step-3en5
-        
+
         private IEnumerable<LinkDto> CreateLinksForUser(string fields)
         {
             List<LinkDto> links = new();

@@ -66,7 +66,7 @@ const validateFormInputField = (form: IValidatableForm, field: IFormInputField):
         case FormInputFieldIds.Password:
             if (field.value.length < 8) {
                 result.isValid = false
-                result.errors.push("Minimum password length - 8 characters")
+                result.errors.push("Password must have at least 8 characters")
             }
             break;
         case FormInputFieldIds.PasswordConfirmation:

@@ -102,6 +102,8 @@ namespace Core.Application.Features.Commands.CreateFullUser
 
             public async Task<Response<AppUser>> Handle(Command request, CancellationToken cancellationToken)
             {
+                throw new Exception("Edit user with PATCH");
+
                 var newUser = _mapper.Map<AppUser>(request);
                 var result = await _userManager.CreateAsync(newUser, request.Password);
                 if (result.Succeeded)

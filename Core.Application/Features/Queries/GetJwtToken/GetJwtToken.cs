@@ -47,6 +47,9 @@ namespace Core.Application.Features.Queries.GetJwtToken
 					return Response<string>.Fail(null);
 				}
 
+				// todo check email confirmation
+				//var isEmailConfirmedResult = _userManager.IsEmailConfirmedAsync(user);
+
 				var result = await _signInManager.CheckPasswordSignInAsync(user, request.Password, lockoutOnFailure: false);
 
 				if (result.Succeeded)

@@ -97,8 +97,9 @@ namespace Core.Application.Features.Commands.CreateUser
 
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(newUser);
                     code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-                    var callbackUrl = _linkGenerator.GetPathByName(_httpContext, "ConfirmEmail", values: new { newUser.Id });
-
+                    var callbackUrl = _linkGenerator.GetUriByAction(_httpContext, "ConfirmEmail", 
+                        values: new { userId = newUser.Id, code });
+                    
                     await _emailSender.SendEmailAsync(request.Email, "Confirm your email",
                         $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl ?? "")}'>clicking here</a>.");
 
