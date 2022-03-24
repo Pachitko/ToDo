@@ -1,6 +1,7 @@
 //* global
 export const TOGGLE_THEME = 'TOGGLE_THEME';
 export const LOAD_THEME_FROM_STORAGE = 'LOAD_THEME_FROM_STORAGE';
+export const TOGGLE_LEFT_COLUMN = 'TOGGLE_LEFT_COLUMN';
 
 //* search
 export const SET_FILTER = 'SET_FILTER';

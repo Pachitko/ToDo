@@ -8,20 +8,20 @@ const TaskLists = () => {
     const taskLists = useAppSelector(state => state.tasks.taskLists)
     const smartTaskLists = useAppSelector(state => state.tasks.smartTaskLists)
     return (
-        <div>
+        <nav>
             <SSmartLists>
                 {smartTaskLists.map(smartTaskList => smartTaskList.isVisible &&
-                    <TaskListButton key={smartTaskList.id} list={smartTaskList} isUserDefined={false} />
+                    <TaskListButton key={smartTaskList.id} list={smartTaskList} />
                 )}
             </SSmartLists>
             <SUserDefinedLists>
                 {
                     taskLists.map((list) =>
-                        <TaskListButton key={list.id} list={list} isUserDefined />
+                        <TaskListButton key={list.id} list={list} />
                     )}
             </SUserDefinedLists>
             <AddList />
-        </div>
+        </nav>
     )
 }
 

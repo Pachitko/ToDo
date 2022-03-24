@@ -2,7 +2,7 @@ import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { Header } from './Layout/Header'
 import {
-    LeftColumn, TaskLists, CenterColumn, TaskList, RightColumn,
+    LeftColumn, CenterColumn, TaskList, RightColumn,
     RightColumnBottomPanel, TaskDetails
 } from './Layout/Main'
 import { useAppSelector } from "src/redux/hooks";
@@ -39,9 +39,7 @@ const App = () => {
                     <Route path="*" element={<Navigate to={'/tasks/all'} />} />
                     <Route path='/tasks/*' element={
                         <SMain>
-                            <LeftColumn>
-                                <TaskLists />
-                            </LeftColumn>
+                            <LeftColumn />
                             <CenterColumn>
                                 <TaskList />
                             </CenterColumn>

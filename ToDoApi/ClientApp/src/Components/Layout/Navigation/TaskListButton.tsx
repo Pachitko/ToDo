@@ -8,11 +8,10 @@ import { useAppSelector } from 'src/redux/hooks'
 import { ITaskList } from 'src/redux/reducers/tasks'
 
 type Props = {
-    list: ITaskList,
-    isUserDefined: boolean
+    list: ITaskList
 }
 
-const TaskListButton: React.FC<Props> = ({ list, isUserDefined }) => {
+const TaskListButton: React.FC<Props> = ({ list }) => {
     const dispatch = useDispatch()
     const activeList = useAppSelector(state => state.tasks.activeList)
 
@@ -31,7 +30,9 @@ const TaskListButton: React.FC<Props> = ({ list, isUserDefined }) => {
                 onClick={handleListSelect}>
                 <SListTitle>{list.title}</SListTitle>
             </STaskListLink>
-            {isUserDefined ?
+            <SNumberOfTask>
+            </SNumberOfTask>
+            {!list.isSmart ?
                 <SIconButton onClick={handleListDelete}>
                     <i className="fa-solid fa-times"></i>
                 </SIconButton>
@@ -41,6 +42,10 @@ const TaskListButton: React.FC<Props> = ({ list, isUserDefined }) => {
 }
 
 export default TaskListButton
+
+const SNumberOfTask = styled.div`
+
+`
 
 const STaskListBtnWrapper = styled.div`
     display: flex;

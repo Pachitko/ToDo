@@ -6,10 +6,11 @@ import { SIconButtonFilled, SPanel } from 'src/Components/UI';
 import { logout } from 'src/redux/actions/userActions';
 import { ThemeButton } from 'src/Components/UI/ThemeButton';
 import ContextMenu from 'src/Components/UI/ContextMenu';
+import { useNavigate } from 'react-router-dom';
 
 const HeaderButtonGroup: React.FC = () => {
-    const dispatch = useAppDispatch();
     const [isUserPanelActive, setIsUserPanelActive] = useState(false)
+    const dispatch = useAppDispatch();
     const user = useAppSelector(state => state.user)
 
     const handleLogout = () => {
@@ -20,31 +21,37 @@ const HeaderButtonGroup: React.FC = () => {
         setIsUserPanelActive(!isUserPanelActive)
     }
 
-    return (<SHeaderButtonGroup>
-        <SMenuBtnWrapper>
-            <SMenuBtn onClick={handleUserClick}>
-                <i className="fa-solid fa-user"></i>
-            </SMenuBtn>
-        </SMenuBtnWrapper>
-        {isUserPanelActive &&
-            <ContextMenu onClickOutside={handleUserClick} ctxMenuStyles={UserPanelStyle}>
-                <SUserButtonWrapper>
-                    <ThemeButton />
-                    <SUserButton onClick={handleLogout}>
-                        <i className="fa-solid fa-arrow-right-from-bracket"></i>
-                    </SUserButton>
-                </SUserButtonWrapper>
-                <SUserInfoWrapper>
-                    <SUserInfoFieldWrapper>
-                        <SUserName>{user.name}</SUserName>
-                    </SUserInfoFieldWrapper>
-                    <SUserInfoFieldWrapper>
-                        <span>{user.email}</span>
-                    </SUserInfoFieldWrapper>
-                </SUserInfoWrapper>
-            </ContextMenu>
-        }
-    </SHeaderButtonGroup >
+    return (
+        <SHeaderButtonGroup>
+            <SMenuBtnWrapper>
+                <SMenuBtn onClick={() => document.location = "https://github.com/Pachitko/ToDo"}>
+                    <i className="fa-brands fa-github"></i>
+                </SMenuBtn>
+            </SMenuBtnWrapper>
+            <SMenuBtnWrapper>
+                <SMenuBtn onClick={handleUserClick}>
+                    <i className="fa-solid fa-user"></i>
+                </SMenuBtn>
+            </SMenuBtnWrapper>
+            {isUserPanelActive &&
+                <ContextMenu onClickOutside={handleUserClick} ctxMenuStyles={UserPanelStyle}>
+                    <SUserButtonWrapper>
+                        <ThemeButton />
+                        <SUserButton onClick={handleLogout}>
+                            <i className="fa-solid fa-arrow-right-from-bracket"></i>
+                        </SUserButton>
+                    </SUserButtonWrapper>
+                    <SUserInfoWrapper>
+                        <SUserInfoFieldWrapper>
+                            <SUserName>{user.name}</SUserName>
+                        </SUserInfoFieldWrapper>
+                        <SUserInfoFieldWrapper>
+                            <span>{user.email}</span>
+                        </SUserInfoFieldWrapper>
+                    </SUserInfoWrapper>
+                </ContextMenu>
+            }
+        </SHeaderButtonGroup >
     )
 }
 
@@ -90,6 +97,7 @@ const SUserInfoFieldWrapper = styled.div`
 
 // Header
 const SHeaderButtonGroup = styled.div`
+    position: relative;
     display: flex;
     flex-direction: row;
     height: 100%;
@@ -100,6 +108,7 @@ const SMenuBtnWrapper = styled.div`
     width: 48px;
     height: 100%;
 `
+
 const SMenuBtn = styled.button`
     height: 100%;
     box-sizing: border-box;
@@ -110,7 +119,7 @@ const SMenuBtn = styled.button`
         background-color: ${p => p.theme.colors.primaryDark};
     }
     &>i{
-        color: white;
-        font-size: 24px;
+        color: ${p => p.theme.colors.white};
+        font-size: 1.5rem;
     }
 `

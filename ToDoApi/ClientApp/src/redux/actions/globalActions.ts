@@ -1,4 +1,4 @@
-import { LOAD_THEME_FROM_STORAGE, TOGGLE_THEME } from "./actionTypes";
+import { LOAD_THEME_FROM_STORAGE, TOGGLE_LEFT_COLUMN, TOGGLE_THEME } from "./actionTypes";
 
 export const toggleTheme = () => {
     return {
@@ -9,5 +9,11 @@ export const toggleTheme = () => {
 export const loadThemeFromStorage = () => {
     return {
         type: LOAD_THEME_FROM_STORAGE
+    }
+}
+
+export const toggleLeftColumn = () => {
+    return {
+        type: TOGGLE_LEFT_COLUMN
     }
 }

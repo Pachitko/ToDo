@@ -1,15 +1,17 @@
-import { LOAD_THEME_FROM_STORAGE, LOGOUT, TOGGLE_THEME } from "src/redux/actions/actionTypes";
+import { TOGGLE_LEFT_COLUMN, LOAD_THEME_FROM_STORAGE, LOGOUT, TOGGLE_THEME } from "src/redux/actions/actionTypes";
 import { ITheme, ThemeType } from "src/styles/styled";
 import { lightTheme, darkTheme } from 'src/styles/theme'
 
 export interface IGlobalState {
     theme: ITheme,
-    loading: boolean
+    loading: boolean,
+    isLeftColumnActive: boolean
 }
 
 const initialState: IGlobalState = {
     theme: lightTheme,
-    loading: false
+    loading: false,
+    isLeftColumnActive: true
 };
 
 const searchTool = (state = initialState, action: any): IGlobalState => {
@@ -31,7 +33,6 @@ const searchTool = (state = initialState, action: any): IGlobalState => {
             else {
                 newTheme = themeType === ThemeType.dark ? darkTheme : lightTheme;
             }
-
             return {
                 ...state,
                 theme: newTheme
@@ -39,6 +40,9 @@ const searchTool = (state = initialState, action: any): IGlobalState => {
         }
         case LOGOUT: {
             return initialState;
+        }
+        case TOGGLE_LEFT_COLUMN: {
+            return { ...state, isLeftColumnActive: !state.isLeftColumnActive }
         }
         default:
             return state;

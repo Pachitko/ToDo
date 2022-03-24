@@ -1,6 +1,6 @@
 import React from 'react'
 import { ITask } from 'src/redux/reducers/tasks'
-import { useAppDispatch } from 'src/redux/hooks';
+import { useAppDispatch, useAppSelector } from 'src/redux/hooks';
 import { selectTaskAction } from 'src/redux/actions/taskActions';
 import TaskImportanceCheckbox from 'src/Components/UI/TaskImportanceCheckbox';
 import TaskCompletionCheckBox from 'src/Components/UI/TaskCompletionCheckBox';
@@ -8,15 +8,16 @@ import styled from 'styled-components'
 
 const TaskItem = ({ task }: { task: ITask }) => {
     const dispatch = useAppDispatch();
+    const activeTask = useAppSelector(state => state.tasks.activeTask)
 
     const handleTaskSelect = () => {
         dispatch(selectTaskAction(task))
     }
 
     return (
-        <STaskItem>
+        <STaskItem isActive={activeTask?.id === task.id}>
             <TaskCompletionCheckBox task={task} />
-            <STaskBody onClick={handleTaskSelect}>
+            <STaskBodyButton onClick={handleTaskSelect}>
                 <STaskTitle>{task.title}</STaskTitle>
                 <STaskOptions>
                     <STaskDueDateOption>
@@ -26,7 +27,7 @@ const TaskItem = ({ task }: { task: ITask }) => {
                         {task.recurrence && <i className="fa-solid fa-repeat"></i>}
                     </STaskReccurenceOption>
                 </STaskOptions>
-            </STaskBody>
+            </STaskBodyButton>
             <TaskImportanceCheckbox task={task} />
         </STaskItem>
     )
@@ -34,26 +35,26 @@ const TaskItem = ({ task }: { task: ITask }) => {
 
 export default TaskItem
 
-const STaskItem = styled.div`
+const STaskItem = styled.div<{ isActive: boolean }>`
     display: flex;
     flex-direction: row;
     align-items: center;
     width: 100%;
     height: 48px;
     border-bottom: 1px solid ${p => p.theme.colors.surface};
-    border-top-left-radius: 5px;
-    border-top-right-radius: 5px;
+    background-color:${p => p.isActive && p.theme.colors.surfaceHover};
     &:hover{
-        background-color:${p => p.theme.colors.surface};
+        background-color:${p => p.isActive ? p.theme.colors.surfaceHover : p.theme.colors.surface};
         border-bottom: 1px solid transparent;
     }
 `
 
-const STaskBody = styled.button`
+const STaskBodyButton = styled.button`
+    height: 100%;
     display: flex;
     flex-direction: column;
+    justify-content: center;
     flex-grow: 1;
-    padding: 5px 0;
     cursor: pointer;
     text-align: left;
     margin-left: 5px;

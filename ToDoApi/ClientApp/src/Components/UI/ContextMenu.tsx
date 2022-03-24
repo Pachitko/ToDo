@@ -8,13 +8,6 @@ export interface ContextMenuProps {
     ctxMenuStyles: FlattenSimpleInterpolation
 }
 
-interface ContextMenuStyles {
-    top?: string,
-    right?: string,
-    bottom?: string,
-    left?: string,
-}
-
 const ContextMenu: React.FC<ContextMenuProps> = (props) => {
     const s = css``
     return (

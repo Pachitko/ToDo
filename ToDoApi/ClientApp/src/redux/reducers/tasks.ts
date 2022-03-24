@@ -103,7 +103,7 @@ const tasks = (state = initialState, action: any): ITasksState => {
             const { listId, taskId } = action.payload
             return {
                 ...state,
-                tasks: state.tasks.filter(t => t.toDoListId === listId && t.id !== taskId),
+                tasks: state.tasks.filter(t => t.id !== taskId),
                 activeTask: null,
                 isLoading: false
             };

@@ -7,7 +7,6 @@ import { useDispatch } from 'react-redux';
 import { convertUTCDateToLocalDate } from 'src/libs/utils'
 
 const RightColumnBottomPanel = () => {
-    const activeList = useAppSelector(state => state.tasks.activeList)
     const activeTask = useAppSelector(state => state.tasks.activeTask)
     const dispatch = useDispatch();
 
@@ -21,8 +20,8 @@ const RightColumnBottomPanel = () => {
                     ? `Создано ${convertUTCDateToLocalDate(new Date(activeTask.createdAt)).toLocaleDateString()}`
                     : null}
             </SCreatedAt>
-            {activeList !== null && activeTask !== null &&
-                <SRightColumnBottomPanelButton onClick={() => dispatch(deleteTaskAsync(activeList.id, activeTask.id))}>
+            {activeTask !== null &&
+                <SRightColumnBottomPanelButton onClick={() => dispatch(deleteTaskAsync(activeTask.toDoListId, activeTask.id))}>
                     <i className="fa-regular fa-trash-can"></i>
                 </SRightColumnBottomPanelButton>
             }

@@ -83,7 +83,7 @@ const SInputWrapper = styled.div`
 const SPropsWrapper = styled.div<{ active: boolean }>`
     display: ${p => p.active ? 'flex' : 'none'};
     padding-left: 8px;
-    color: ${p => p.theme.colors.onSurface}
+    color: ${p => p.theme.colors.onSurface};
 `
 
 const SAddTask = styled.div`
@@ -93,5 +93,6 @@ const SAddTask = styled.div`
     padding: ${({ theme }) => theme.padding.small}px;
     display: flex;
     flex-direction: column;
+    margin: 0 8px;
     margin-bottom: 16px;
 `

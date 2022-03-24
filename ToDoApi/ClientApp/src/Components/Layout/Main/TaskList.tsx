@@ -6,6 +6,8 @@ import { Route, Routes } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { loadTasksAsync, renameTaskListAsync } from 'src/redux/actions/taskActions';
 import AddTask from './AddTask';
+import { SIconButtonFilled } from 'src/Components/UI';
+import { toggleLeftColumn } from 'src/redux/actions/globalActions';
 
 const TaskList = () => {
     // const activeListId = useAppSelector(state => state.tasks.activeListId)
@@ -15,6 +17,7 @@ const TaskList = () => {
     const [title, setTitle] = useState('')
     const dispatch = useDispatch()
     const searchText = useAppSelector(state => state.searchTool.searchText)
+    const isLeftColumnActive = useAppSelector(state => state.global.isLeftColumnActive)
 
     useEffect(() => {
         if (activeTaskList) {
@@ -64,6 +67,10 @@ const TaskList = () => {
         dispatch(renameTaskListAsync(activeTaskList.id, title))
     }
 
+    const handleLeftColumnToggle = () => {
+        dispatch(toggleLeftColumn())
+    }
+
     if (activeTaskList === null)
         return <span>Список не найден</span>
 
@@ -72,6 +79,11 @@ const TaskList = () => {
             <Route path={activeTaskList.id} element={
                 <STaskListWrapper>
                     <STaskListTitleWrapper>
+                        {!isLeftColumnActive &&
+                            <SIconButtonFilled onClick={handleLeftColumnToggle}>
+                                <i className="fa-solid fa-bars" />
+                            </SIconButtonFilled>
+                        }
                         <STaskListTitle>
                             {activeTaskList.isSmart
                                 ? <span>{title}</span>
@@ -100,7 +112,11 @@ const TaskList = () => {
 export default TaskList
 
 const STaskListTitleWrapper = styled.div`
-    margin-bottom: 16px;
+    height: 48px;
+    margin: 0 8px;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
 `
 
 const STaskListTitle = styled.div`
@@ -131,10 +147,10 @@ const STaskListWrapper = styled.div`
     height: 100%;
     display: flex;
     flex-direction: column;
-    padding: 16px;
 `
 
 const STaskListItems = styled.div`
+    margin: 8px;
     overflow-y: auto;
     overflow-x: hidden;
 `
