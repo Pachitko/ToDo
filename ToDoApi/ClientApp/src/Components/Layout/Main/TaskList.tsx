@@ -99,6 +99,10 @@ const TaskList = () => {
 
 export default TaskList
 
+const STaskListTitleWrapper = styled.div`
+    margin-bottom: 16px;
+`
+
 const STaskListTitle = styled.div`
     padding: 0 4px;
     width: 100%;
@@ -124,12 +128,13 @@ const STaskListTitleInput = styled.input`
 `
 
 const STaskListWrapper = styled.div`
+    height: 100%;
+    display: flex;
+    flex-direction: column;
     padding: 16px;
 `
 
-const STaskListTitleWrapper = styled.div`
-    margin-bottom: 16px;
-`
-
 const STaskListItems = styled.div`
+    overflow-y: auto;
+    overflow-x: hidden;
 `

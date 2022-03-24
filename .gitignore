@@ -354,3 +354,5 @@ MigrationBackup/
 .ionide/
 
 **/Properties/
+
+ToDoApi/ClientApp/dist/

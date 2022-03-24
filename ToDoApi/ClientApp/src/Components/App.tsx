@@ -1,13 +1,12 @@
 import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
-import Layout from './Layout/Layout'
 import { Header } from './Layout/Header'
 import {
-    Main, LeftColumn, TaskLists, CenterColumn, TaskList, RightColumn,
+    LeftColumn, TaskLists, CenterColumn, TaskList, RightColumn,
     RightColumnBottomPanel, TaskDetails
 } from './Layout/Main'
 import { useAppSelector } from "src/redux/hooks";
-import { ThemeProvider } from "styled-components";
+import styled, { ThemeProvider } from "styled-components";
 import { Auth } from './LoginRegister'
 import { loginWithTokenAsync } from "src/redux/actions/userActions";
 import { useDispatch } from "react-redux";
@@ -34,12 +33,12 @@ const App = () => {
                 <Route path="*" element={<Auth />} />
             </Routes>
             :
-            <Layout>
+            <SLayout>
                 <Header />
                 <Routes>
                     <Route path="*" element={<Navigate to={'/tasks/all'} />} />
                     <Route path='/tasks/*' element={
-                        <Main>
+                        <SMain>
                             <LeftColumn>
                                 <TaskLists />
                             </LeftColumn>
@@ -50,12 +49,25 @@ const App = () => {
                                 <TaskDetails />
                                 <RightColumnBottomPanel />
                             </RightColumn>
-                        </Main>
+                        </SMain>
                     } />
                 </Routes>
-            </Layout >
+            </SLayout >
         }
     </ThemeProvider>
 }
 
 export default (App);
+
+const SLayout = styled.div`
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+`
+
+const SMain = styled.div`
+    flex-grow: 1;
+    display: flex;
+    flex-direction: row;
+    overflow: hidden;
+`

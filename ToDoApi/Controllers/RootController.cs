@@ -1,9 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 using ToDoApi.Models;
-using System.Linq;
 
 namespace ToDoApi.Controllers
 {

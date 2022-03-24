@@ -2,7 +2,6 @@ import { createGlobalStyle } from 'styled-components'
 
 export default createGlobalStyle`
   :root {
-    --color-text: #00509d;
   }
 
   * {

@@ -1,4 +1,3 @@
-export { default as Main } from './Main'
 export { default as TaskLists } from './TaskLists'
 export { default as TaskList } from './TaskList'
 export { default as LeftColumn } from './LeftColumn'
