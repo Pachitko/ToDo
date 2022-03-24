@@ -28,15 +28,24 @@ const TaskListButton: React.FC<Props> = ({ list }) => {
         <STaskListBtnWrapper>
             <STaskListLink to={list.id}
                 onClick={handleListSelect}>
-                <SListTitle>{list.title}</SListTitle>
+                <SListBody>
+                    <STaskListIcon>
+                        <i className={list.iconClass ? list.iconClass : "fa-solid fa-list"}></i>
+                    </STaskListIcon>
+                    <SListTitle>
+                        {list.title}
+                    </SListTitle>
+                </SListBody>
             </STaskListLink>
             <SNumberOfTask>
             </SNumberOfTask>
-            {!list.isSmart ?
-                <SIconButton onClick={handleListDelete}>
-                    <i className="fa-solid fa-times"></i>
-                </SIconButton>
-                : null}
+            {
+                !list.isSmart ?
+                    <SIconButton onClick={handleListDelete}>
+                        <i className="fa-solid fa-times"></i>
+                    </SIconButton>
+                    : null
+            }
         </STaskListBtnWrapper >
     )
 }
@@ -53,9 +62,6 @@ const STaskListBtnWrapper = styled.div`
     width: 100%;
     height: 32px;
     line-height: 32px;
-    & &>.active{
-        background-color: red;
-    }
 `
 
 const taskListLinkActive = css`
@@ -68,7 +74,7 @@ const taskListLinkActive = css`
 
 const STaskListLink = styled(NavLink)`
     color: ${p => p.theme.colors.onSurface};
-    padding-left: 16px;
+    padding-left: 4px;
     display: flex;
     height: 100%;
     flex-grow: 1;
@@ -81,6 +87,21 @@ const STaskListLink = styled(NavLink)`
     }
 `
 
-const SListTitle = styled.div`
+const SListBody = styled.div`
     flex-grow: 1;
+    display: flex;
+    >span{
+        flex-grow: 1;
+    }
+`
+
+const SListTitle = styled.div`
+
+`
+
+const STaskListIcon = styled.div`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 32px;
 `

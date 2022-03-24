@@ -36,6 +36,7 @@ export interface ITaskList {
     title: string,
     isVisible?: boolean,
     isSmart?: boolean,
+    iconClass?: string,
     filter?: (task: ITask) => boolean
 }
 
@@ -60,6 +61,7 @@ const initialState: ITasksState = {
             title: "All",
             isSmart: true,
             isVisible: true,
+            iconClass: "fa-solid fa-infinity",
             filter: (task: ITask) => true
         },
         {
@@ -67,6 +69,7 @@ const initialState: ITasksState = {
             title: "Important",
             isSmart: true,
             isVisible: true,
+            iconClass: "fa-solid fa-star",
             filter: (task: ITask) => task.isImportant
         },
         {
@@ -74,6 +77,7 @@ const initialState: ITasksState = {
             title: "Planned",
             isSmart: true,
             isVisible: true,
+            iconClass: "fa-regular fa-calendar",
             filter: (task: ITask) => !!task.dueDate
         }
     ]

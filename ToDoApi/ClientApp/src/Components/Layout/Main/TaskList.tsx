@@ -95,7 +95,7 @@ const TaskList = () => {
                         </STaskListTitle>
                     </STaskListTitleWrapper>
                     {/* todo change for smart lists */}
-                    <AddTask />
+                    {!activeTaskList.isSmart && <AddTask />}
                     <STaskListItems>
                         {
                             tasks.filter(t => activeTaskList?.isSmart ? activeTaskList.filter(t) : t.toDoListId === activeTaskList.id).map((task, i) =>
@@ -120,12 +120,15 @@ const STaskListTitleWrapper = styled.div`
 `
 
 const STaskListTitle = styled.div`
-    padding: 0 4px;
+    margin-left: 8px;
     width: 100%;
     font-weight: bold;
     font-size: 2rem;
     border: 1px solid transparent;
     color: ${p => p.theme.colors.primary};
+    >span{
+        padding-left: 4px;
+    }
 `
 
 const STaskListTitleInput = styled.input`
@@ -135,6 +138,7 @@ const STaskListTitleInput = styled.input`
     font-size: inherit;
     border: inherit;
     color: inherit;
+    padding-left: 4px;
     :focus{
         border: 1px solid ${p => p.theme.colors.onSurface};
     }
