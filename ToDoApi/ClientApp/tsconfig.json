@@ -18,8 +18,11 @@
     "strictPropertyInitialization": true,
     "strictFunctionTypes": true,
     "noImplicitThis": true,
-    "strictBindCallApply": true,
+    "strictBindCallApply": true
   },
+  //"include": [
+  //  "./**/*.ts"
+  //],
   "exclude": [
     "node_modules",
     "./dist/",

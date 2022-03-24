@@ -12,7 +12,6 @@ const SHeader = styled.header`
     position: sticky;
     background-color: ${p => p.theme.colors.primary};
     z-index: 49;
-    border-bottom: 2px solid ${p => p.theme.colors.primaryDark};
 `
 
 const Header: React.FC = () => {
