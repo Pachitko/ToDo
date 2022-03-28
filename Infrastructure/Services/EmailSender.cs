@@ -18,8 +18,8 @@ namespace Infrastructure.Services
 
         public Task SendEmailAsync(string email, string subject, string htmlMessage)
         {
-            throw new System.NotImplementedException();
-
+            _logger.LogWarning("throw new System.NotImplementedException()");
+            return Task.CompletedTask;
             // Receive settings from options
             MailAddress from = new("", "ToDo");
             MailAddress to = new(email);
