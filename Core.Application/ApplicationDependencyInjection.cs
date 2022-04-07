@@ -1,7 +1,7 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Core.Application.PipelineBehaviors;
+﻿using Core.Application.PipelineBehaviors;
 using FluentValidation;
 using MediatR;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Core.Application
 {

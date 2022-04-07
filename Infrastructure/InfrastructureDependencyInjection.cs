@@ -43,7 +43,7 @@ namespace Infrastructure
 
             services.AddScoped<IJwtGenerator, JwtGenerator>();
             services.AddScoped<IEmailSender, EmailSender>();
-
+            services.AddScoped<IEmailConfirmationLinkSender, EmailSender>();
             services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
 
             services.AddExternalLogin()
