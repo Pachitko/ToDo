@@ -1,7 +1,7 @@
 import React from 'react'
 import { useAppSelector } from 'src/redux/hooks'
 import styled from 'styled-components'
-import TaskListButton from '../Navigation/TaskListButton'
+import TaskListButton from '../../Navigation/TaskListButton'
 import AddList from './AddList'
 
 const TaskLists = () => {

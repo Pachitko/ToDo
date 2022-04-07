@@ -113,7 +113,6 @@ const tasks = (state = initialState, action: any): ITasksState => {
             };
         }
         case PATCH_TASK: {
-            console.log(PATCH_TASK);
             const { listId, patchedTask } = action.payload
             return {
                 ...state,
@@ -132,7 +131,6 @@ const tasks = (state = initialState, action: any): ITasksState => {
         }
         case LOAD_TASKS_SUCCESS: {
             const { taskLists, tasks } = action.payload
-            console.log(taskLists);
             return {
                 ...state,
                 activeList: state.smartTaskLists[0],
@@ -143,7 +141,6 @@ const tasks = (state = initialState, action: any): ITasksState => {
         }
         case LOAD_TASKS_ERROR: {
             const { error } = action.payload;
-            console.log(error);
             return { ...state, isLoading: false }
         }
         case POST_TASK: {
@@ -164,7 +161,6 @@ const tasks = (state = initialState, action: any): ITasksState => {
             };
         }
         case RENAME_TASK_LIST: {
-            console.log(RENAME_TASK_LIST);
             const { renamedTaskList } = action.payload
             return {
                 ...state,

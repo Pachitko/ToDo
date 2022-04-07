@@ -18,20 +18,16 @@ const initialState: IUserState = {
 const user = (state = initialState, action: any): IUserState => {
     switch (action.type) {
         case REGISTERING: {
-            console.log(REGISTERING);
             return { ...state, isRegistering: true, registrationErrors: {} }
         }
         case REGISTRATION_SUCCESS: {
-            console.log(REGISTRATION_SUCCESS);
             return { ...state, isRegistering: false, externalLoginPayload: null, registrationErrors: {} }
         }
         case REGISTRATION_ERROR: {
             const { response } = action.payload.error;
-            console.log(`${REGISTRATION_ERROR}:`, response);
             return { ...state, isRegistering: false, registrationErrors: response.data.errors }
         }
         case CONFIRM_EXTERNAL_REGISTRATION: {
-            console.log(CONFIRM_EXTERNAL_REGISTRATION);
             const externalLoginPayload: IExternalLoginPayload = action.payload.externalLoginPayload
             return { ...state, externalLoginPayload }
         }

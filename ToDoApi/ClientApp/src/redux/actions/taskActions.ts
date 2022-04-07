@@ -1,14 +1,103 @@
+import { ITaskListToCreate, ITaskToCreate } from 'src/libs/abstractions';
 import {
-    getTaskListsAsync, deleteTaskAsync, ITaskToCreate, postTaskAsync,
-    patchTaskAsync, ITaskListToCreate, postTaskListAsync, deleteTaskListAsync, getListTasksAsync, renameTaskListAsync
+    getTaskListsAsync, deleteTaskAsync, postTaskAsync,
+    patchTaskAsync, postTaskListAsync, deleteTaskListAsync,
+    getListTasksAsync, renameTaskListAsync
 } from 'src/libs/api';
 import { JsonPatch } from 'src/libs/jsonPatches';
 import { ITask, ITaskList } from '../reducers/tasks'
 import { AppDispatch, AppState } from '../store';
 import {
     SELECT_TASK, DELETE_TASK, SELECT_TASK_LIST, PATCH_TASK, HIDE_TASK_DETAILS,
-    TASKS_LOADING, LOAD_TASKS_SUCCESS, LOAD_TASKS_ERROR, POST_TASK, POST_TASK_LIST, DELETE_TASK_LIST, RENAME_TASK_LIST
+    TASKS_LOADING, LOAD_TASKS_SUCCESS, LOAD_TASKS_ERROR, POST_TASK,
+    POST_TASK_LIST, DELETE_TASK_LIST, RENAME_TASK_LIST
 } from './actionTypes'
+
+export const deleteTask = (listId: string, taskId: string) => {
+    return async (state: AppState, dispatch: AppDispatch) => {
+        dispatch(tasksLoadingAction())
+        try {
+            await deleteTaskAsync(listId, taskId)
+            dispatch(deleteTaskAction(listId, taskId))
+        } catch (error) {
+            dispatch(taskErrorAction(error))
+        }
+    }
+}
+
+export const loadTasks = () => {
+    return async (state: AppState, dispatch: AppDispatch) => {
+        dispatch(tasksLoadingAction())
+        try {
+            const lists = await getTaskListsAsync()
+            const tasks = await getListTasksAsync(lists)
+            dispatch(loadTasksSuccessAction(lists, tasks))
+        } catch (error) {
+            dispatch(taskErrorAction(error))
+        }
+    }
+}
+
+export const postTask = (listId: string, taskToCreate: ITaskToCreate) => {
+    return async (state: AppState, dispatch: AppDispatch) => {
+        dispatch(tasksLoadingAction())
+        try {
+            const createdTask = await postTaskAsync(listId, taskToCreate)
+            dispatch(postTaskAction(createdTask))
+        } catch (error) {
+            dispatch(taskErrorAction(error))
+        }
+    }
+}
+
+export const postTaskList = (taskListToCreate: ITaskListToCreate) => {
+    return async (state: AppState, dispatch: AppDispatch) => {
+        dispatch(tasksLoadingAction())
+        try {
+            const createdTaskList = await postTaskListAsync(taskListToCreate)
+            dispatch(postTaskListAction(createdTaskList))
+        } catch (error) {
+            dispatch(taskErrorAction(error))
+        }
+    }
+}
+
+export const patchTask = (listId: string, taskId: string, jsonPatchDocument: JsonPatch[]) => {
+    return async (state: AppState, dispatch: AppDispatch) => {
+        dispatch(tasksLoadingAction())
+        try {
+            const patchedTask = await patchTaskAsync(listId, taskId, jsonPatchDocument)
+            dispatch(patchTaskAcion(listId, patchedTask))
+        } catch (error) {
+            dispatch(taskErrorAction(error))
+        }
+    }
+}
+
+export const deleteTaskList = (listId: string) => {
+    return async (state: AppState, dispatch: AppDispatch) => {
+        dispatch(tasksLoadingAction())
+        try {
+            await deleteTaskListAsync(listId)
+            dispatch(deleteTaskListAction(listId))
+        } catch (error) {
+            dispatch(taskErrorAction(error))
+        }
+    }
+}
+
+export const renameTaskList = (listId: string, newTitle: string) => {
+    return async (state: AppState, dispatch: AppDispatch) => {
+        dispatch(tasksLoadingAction())
+        try {
+            const renamedTaskList = await renameTaskListAsync(listId, newTitle)
+            dispatch(renameTaskListAction(renamedTaskList))
+        } catch (error) {
+            dispatch(taskErrorAction(error))
+        }
+    }
+}
+
 
 export const selectTaskAction = (task: ITask) => {
     return {
@@ -112,92 +201,6 @@ export const taskErrorAction = (error: string) => {
         payload:
         {
             error
-        }
-    }
-}
-
-export const deleteTask = (listId: string, taskId: string) => {
-    return async (state: AppState, dispatch: AppDispatch) => {
-        dispatch(tasksLoadingAction())
-        try {
-            await deleteTaskAsync(listId, taskId)
-            dispatch(deleteTaskAction(listId, taskId))
-        } catch (error) {
-            dispatch(taskErrorAction(error))
-        }
-    }
-}
-
-export const loadTasks = () => {
-    return async (state: AppState, dispatch: AppDispatch) => {
-        dispatch(tasksLoadingAction())
-        try {
-            const lists = await getTaskListsAsync()
-            const tasks = await getListTasksAsync(lists)
-            dispatch(loadTasksSuccessAction(lists, tasks))
-        } catch (error) {
-            dispatch(taskErrorAction(error))
-        }
-    }
-}
-
-export const postTask = (listId: string, taskToCreate: ITaskToCreate) => {
-    return async (state: AppState, dispatch: AppDispatch) => {
-        dispatch(tasksLoadingAction())
-        try {
-            const createdTask = await postTaskAsync(listId, taskToCreate)
-            dispatch(postTaskAction(createdTask))
-        } catch (error) {
-            dispatch(taskErrorAction(error))
-        }
-    }
-}
-
-export const postTaskList = (taskListToCreate: ITaskListToCreate) => {
-    return async (state: AppState, dispatch: AppDispatch) => {
-        dispatch(tasksLoadingAction())
-        try {
-            const createdTaskList = await postTaskListAsync(taskListToCreate)
-            dispatch(postTaskListAction(createdTaskList))
-        } catch (error) {
-            dispatch(taskErrorAction(error))
-        }
-    }
-}
-
-export const patchTask = (listId: string, taskId: string, jsonPatchDocument: JsonPatch[]) => {
-    return async (state: AppState, dispatch: AppDispatch) => {
-        console.log(jsonPatchDocument);
-        dispatch(tasksLoadingAction())
-        try {
-            const patchedTask = await patchTaskAsync(listId, taskId, jsonPatchDocument)
-            dispatch(patchTaskAcion(listId, patchedTask))
-        } catch (error) {
-            dispatch(taskErrorAction(error))
-        }
-    }
-}
-
-export const deleteTaskList = (listId: string) => {
-    return async (state: AppState, dispatch: AppDispatch) => {
-        dispatch(tasksLoadingAction())
-        try {
-            await deleteTaskListAsync(listId)
-            dispatch(deleteTaskListAction(listId))
-        } catch (error) {
-            dispatch(taskErrorAction(error))
-        }
-    }
-}
-
-export const renameTaskList = (listId: string, newTitle: string) => {
-    return async (state: AppState, dispatch: AppDispatch) => {
-        dispatch(tasksLoadingAction())
-        try {
-            const renamedTaskList = await renameTaskListAsync(listId, newTitle)
-            dispatch(renameTaskListAction(renamedTaskList))
-        } catch (error) {
-            dispatch(taskErrorAction(error))
         }
     }
 }

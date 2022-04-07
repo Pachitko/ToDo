@@ -1,9 +1,8 @@
 ﻿using AutoMapper;
 using Core.Application.Abstractions;
 using Core.Application.Extensions;
-using Core.Application.Features.Commands.CreateFullUser;
 using Core.Application.Features.Commands.CreateUser;
-using Core.Application.Features.Commands.CreateUserWithGoogle;
+using Core.Application.Features.Commands.CreateUserWithExternalLoginProvider;
 using Core.Application.Features.Commands.DeleteUser;
 using Core.Application.Features.Queries.GetCurrentUser;
 using Core.Application.Features.Queries.GetUsers;
@@ -45,10 +44,14 @@ namespace ToDoApi.Controllers
         public async Task<IActionResult> GetUsersAsync([FromQuery] GetUsers.Query query)
         {
             if (!_propertyMappingService.ValidMappingExistsFor<AppUser>(query.OrderBy))
+            {
                 return BadRequest();
+            }
 
             if (!_propertyChecker.TypeHasProperties<AppUserDto>(query.Fields))
+            {
                 return BadRequest();
+            }
 
             var response = await Mediator.Send(query);
             if (response.Succeeded)
@@ -109,10 +112,14 @@ namespace ToDoApi.Controllers
         public async Task<ActionResult<AppUserDto>> GetUserAsync(string fields, [FromHeader(Name = "Accept")] string mediaType)
         {
             if (!MediaTypeHeaderValue.TryParse(mediaType, out MediaTypeHeaderValue parsedMediaType))
+            {
                 BadRequest();
+            }
 
             if (!_propertyChecker.TypeHasProperties<AppUserDto>(fields))
+            {
                 return BadRequest();
+            }
 
             var response = await Mediator.Send(new GetCurrentUser.Query());
             if (response.Succeeded)
@@ -122,7 +129,9 @@ namespace ToDoApi.Controllers
 
                 IEnumerable<LinkDto> links = new List<LinkDto>();
                 if (includeLinks)
+                {
                     links = CreateLinksForUser(fields);
+                }
 
                 var primaryMediaType = parsedMediaType.SubTypeWithoutSuffix.Value[0..(includeLinks ? ^8 : ^0)];
 
@@ -132,7 +141,9 @@ namespace ToDoApi.Controllers
                         .ShapeData(fields);
 
                     if (includeLinks)
+                    {
                         fullResourceToReturn.TryAdd("links", links);
+                    }
 
                     return Ok(fullResourceToReturn);
                 }
@@ -141,7 +152,9 @@ namespace ToDoApi.Controllers
                     .ShapeData(fields);
 
                 if (includeLinks)
+                {
                     friendlyResourceToReturn.TryAdd("links", links);
+                }
 
                 return Ok(friendlyResourceToReturn);
             }
@@ -166,7 +179,6 @@ namespace ToDoApi.Controllers
                 var resourceWithLinks = userToReturn.ShapeData(null);
                 resourceWithLinks.TryAdd("links", links);
 
-                //if (_userManager.Options.SignIn.RequireConfirmedAccount)
                 return CreatedAtAction(nameof(GetUserAsync), new
                 {
                     fields = ""
@@ -193,37 +205,8 @@ namespace ToDoApi.Controllers
                 var resourceWithLinks = userToReturn.ShapeData(null);
                 resourceWithLinks.TryAdd("links", links);
 
-                //if (_userManager.Options.SignIn.RequireConfirmedAccount)
                 return CreatedAtAction(nameof(GetUserAsync), new
                 {
-                    fields = ""
-                }, resourceWithLinks);
-            }
-            else
-            {
-                return ResponseFailed(response);
-            }
-        }
-
-        [HttpPost(Name = nameof(CreateFullUserAsync))]
-        [AllowAnonymous]
-        [RequestHeaderMatchesMediaType("Content-Type", "application/vnd.todo.createfullusercommand+json")]
-        [Consumes("application/vnd.todo.createfullusercommand+json")]
-        public async Task<ActionResult> CreateFullUserAsync(CreateFullUser.Command command)
-        {
-            var response = await Mediator.Send(command);
-            if (response.Succeeded)
-            {
-                var userToReturn = _mapper.Map<AppUserFullDto>(response.Value);
-                var links = CreateLinksForUser(null);
-
-                var resourceWithLinks = userToReturn.ShapeData(null);
-                resourceWithLinks.TryAdd("links", links);
-
-                //if (_userManager.Options.SignIn.RequireConfirmedAccount)
-                return CreatedAtAction(nameof(GetUserAsync), new
-                {
-                    userId = userToReturn.Id,
                     fields = ""
                 }, resourceWithLinks);
             }
@@ -263,18 +246,18 @@ namespace ToDoApi.Controllers
 
             if (string.IsNullOrWhiteSpace(fields))
             {
-                links.Add(new(Url.Link(nameof(GetUserAsync), new {  }), "self", "GET"));
+                links.Add(new(Url.Link(nameof(GetUserAsync), new { }), "self", "GET"));
             }
             else
             {
                 links.Add(new(Url.Link(nameof(GetUserAsync), new { fields }), "self", "GET"));
             }
 
-            links.Add(new(Url.Link(nameof(DeleteUserAsync), new {  }), "delete_user", "DELETE"));
+            links.Add(new(Url.Link(nameof(DeleteUserAsync), new { }), "delete_user", "DELETE"));
 
-            links.Add(new(Url.Link(nameof(TaskListsController.CreateToDoListAsync), new {  }), "create_taskList_for_user", "POST"));
+            links.Add(new(Url.Link(nameof(TaskListsController.CreateToDoListAsync), new { }), "create_taskList_for_user", "POST"));
 
-            links.Add(new(Url.Link(nameof(TaskListsController.GetToDoListsAsync), new {  }), "taskLists", "GET"));
+            links.Add(new(Url.Link(nameof(TaskListsController.GetToDoListsAsync), new { }), "taskLists", "GET"));
 
             //links.Add(new(Url.Link(nameof(CreateUserAsync), new { userId }), "create_user", "POST"));
 
@@ -288,10 +271,14 @@ namespace ToDoApi.Controllers
             links.Add(new(CreateResourcePageUri(query, nameof(GetUsersAsync), ResourcePageUriType.Current), "self", "GET"));
 
             if (hasPrevious)
+            {
                 links.Add(new(CreateResourcePageUri(query, nameof(GetUsersAsync), ResourcePageUriType.PreviousPage), "previousPage", "GET"));
+            }
 
             if (hasNext)
+            {
                 links.Add(new(CreateResourcePageUri(query, nameof(GetUsersAsync), ResourcePageUriType.NextPage), "nextPage", "GET"));
+            }
 
             return links;
         }

@@ -3,7 +3,6 @@ import rootReducer from "./reducers/index";
 
 const loggerMiddleware = (store: any) => (next: any) => (action: any) => {
     const result = next(action);
-    // console.log(store.getState());
     return result;
 }
 

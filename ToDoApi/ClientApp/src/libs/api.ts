@@ -135,7 +135,6 @@ export const postTaskAsync = async (listId: string, taskToCreate: ITaskToCreate)
     try {
         const response = await instance(getToken()).post(`taskLists/${listId}/tasks`, taskToCreate)
         const createdTask = response.data as ITask
-        console.log(createdTask);
         return createdTask
     } catch (error) {
         throw error
@@ -150,7 +149,6 @@ export const patchTaskAsync = async (listId: string, taskId: string, jsonPatchDo
         const response = await instance(getToken())
             .patch(`taskLists/${listId}/tasks/${taskId}`, data,)
         const patchedTask = response.data as ITask
-        console.log(patchedTask);
         return patchedTask
     } catch (error) {
         throw error
@@ -161,7 +159,6 @@ export const postTaskListAsync = async (taskListToCreate: ITaskListToCreate): Pr
     try {
         const response = await instance(getToken()).post(`taskLists`, taskListToCreate)
         const createdTaskList = response.data as ITaskList
-        console.log(createdTaskList);
         return createdTaskList
     } catch (error) {
         throw error
@@ -191,7 +188,6 @@ export const registerUserAsync = async (userToCreate: IUserToRegister): Promise<
     try {
         const response = await instance().post(`users`, userToCreate)
         const createdUser = response.data as ICreatedUser
-        console.log("CreatedUser:", createdUser);
         return createdUser
     } catch (error) {
         throw error
@@ -202,7 +198,6 @@ export const registerWithExternalProviderAsync = async (externalLoginPayload: IE
     try {
         const response = await instance().post(`users/external`, externalLoginPayload)
         const createdUser = response.data as ICreatedUser
-        console.log("Google created user:", createdUser);
         return createdUser
     } catch (error) {
         throw error

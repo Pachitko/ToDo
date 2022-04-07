@@ -3,8 +3,8 @@ import { SInput, STextButton } from 'src/Components/UI';
 import styled from 'styled-components';
 import { useDispatch } from 'react-redux';
 import { postTask } from 'src/redux/actions/taskActions';
-import { ITaskToCreate } from 'src/libs/api';
 import { useAppSelector } from 'src/redux/hooks';
+import { ITaskToCreate } from 'src/libs/abstractions';
 
 const AddTask: React.FC = () => {
     const [isInputActive, setIsInputActive] = useState(false)
@@ -63,7 +63,7 @@ const AddTask: React.FC = () => {
 export default AddTask
 
 const STaskTitleInput = styled(SInput) <{ active: boolean }>`
-    color: ${p => p.theme.colors.black};
+    color: ${p => p.theme.colors.onSurface};
     padding: 8px;
     width: 100%;
     background-color: ${p => p.active && 'transparent'};

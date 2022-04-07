@@ -15,6 +15,7 @@ const initialState: IGlobalState = {
 };
 
 const searchTool = (state = initialState, action: any): IGlobalState => {
+    console.log(action.type);
     switch (action.type) {
         case TOGGLE_THEME: {
             const newTheme = state.theme.type === ThemeType.light ? darkTheme : lightTheme;

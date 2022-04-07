@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { SButton, SInput, STextButton } from 'src/Components/UI';
+import { SButton, SInput } from 'src/Components/UI';
 import styled from 'styled-components';
 import { useDispatch } from 'react-redux';
 import { postTaskList } from 'src/redux/actions/taskActions';
@@ -49,7 +49,7 @@ const AddList: React.FC = () => {
 export default AddList
 
 const STaskTitleInput = styled(SInput) <{ active: boolean }>`
-    color: ${p => p.theme.colors.black};
+    color: ${p => p.theme.colors.onSurface};
     padding: 8px;
     width: 100%;
     background-color: ${p => p.active && 'transparent'};

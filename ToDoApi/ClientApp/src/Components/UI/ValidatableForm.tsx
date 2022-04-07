@@ -27,7 +27,6 @@ const ValidateableForm: FC<Props> = ({ additionalPanelContent, formInitialState,
     const handleSubmit = (e: BaseSyntheticEvent) => {
         e.preventDefault();
         validateForm(form)
-        console.log("submit: ", form);
 
         if (form.isValid) {
             onSubmit(form)
