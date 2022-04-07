@@ -4,7 +4,7 @@ import TaskItem from './TaskItem';
 import styled from 'styled-components'
 import { Route, Routes } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { loadTasksAsync, renameTaskListAsync } from 'src/redux/actions/taskActions';
+import { loadTasks, renameTaskList } from 'src/redux/actions/taskActions';
 import AddTask from './AddTask';
 import { SIconButtonFilled } from 'src/Components/UI';
 import { toggleLeftColumn } from 'src/redux/actions/globalActions';
@@ -26,7 +26,7 @@ const TaskList = () => {
     }, [activeTaskList?.title])
 
     useEffect(() => {
-        dispatch(loadTasksAsync())
+        dispatch(loadTasks())
     }, [])
 
     // if (isTasksLoading) {
@@ -64,7 +64,7 @@ const TaskList = () => {
         if (activeTaskList === null)
             return
 
-        dispatch(renameTaskListAsync(activeTaskList.id, title))
+        dispatch(renameTaskList(activeTaskList.id, title))
     }
 
     const handleLeftColumnToggle = () => {

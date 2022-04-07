@@ -4,7 +4,7 @@ import { SPanel } from 'src/Components/UI';
 import CompleteTaskCheckbox from 'src/Components/UI/TaskCompletionCheckBox';
 import ImportantTaskCheckbox from 'src/Components/UI/TaskImportanceCheckbox';
 import { replaceTaskTitlePatch } from 'src/libs/jsonPatches';
-import { patchTaskAsync } from 'src/redux/actions/taskActions';
+import { patchTask } from 'src/redux/actions/taskActions';
 import { useAppSelector } from 'src/redux/hooks';
 import styled from 'styled-components';
 import { DueDateSectionItem } from './DueDateSectionItem';
@@ -37,7 +37,7 @@ const TaskDetails = () => {
         if (activeTask === undefined)
             return
 
-        dispatch(patchTaskAsync(activeTask.toDoListId, activeTask.id,
+        dispatch(patchTask(activeTask.toDoListId, activeTask.id,
             [replaceTaskTitlePatch(title ? title : '')]))
     }
 

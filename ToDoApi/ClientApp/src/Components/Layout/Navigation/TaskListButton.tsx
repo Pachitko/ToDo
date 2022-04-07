@@ -1,7 +1,7 @@
 import React from 'react'
 import { NavLink } from 'react-router-dom'
 import styled, { css } from 'styled-components'
-import { deleteTaskListAsync, selectTaskListAction } from 'src/redux/actions/taskActions'
+import { deleteTaskList, selectTaskListAction } from 'src/redux/actions/taskActions'
 import { useDispatch } from 'react-redux'
 import { SIconButton } from 'src/Components/UI'
 import { useAppSelector } from 'src/redux/hooks'
@@ -21,7 +21,7 @@ const TaskListButton: React.FC<Props> = ({ list }) => {
     }
 
     const handleListDelete = () => {
-        dispatch(deleteTaskListAsync(list.id))
+        dispatch(deleteTaskList(list.id))
     }
 
     return (

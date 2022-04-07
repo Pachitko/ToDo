@@ -1,36 +1,59 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import styled from "styled-components";
 import Login from "./Login";
-import Register from "./Register";
+import Registration from "./Registration";
 import { SInput, SPanel } from 'src/Components/UI'
-import { Navigate, NavLink, Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes, useNavigate } from 'react-router-dom';
 import { ThemeButton } from '../UI/ThemeButton';
+import ExternalProviderRegistration from './ExternalProviderRegistration';
+import { useAppSelector } from 'src/redux/hooks';
+import { useLocation } from 'react-router-dom';
 
 const Auth: React.FC = () => {
+    const navigate = useNavigate()
+    const externalLoginPayload = useAppSelector(state => state.user.externalLoginPayload)
+    const isLogging = useAppSelector(state => state.auth.isLogging)
+    const isRegistering = useAppSelector(state => state.user.isRegistering)
+    const location = useLocation()
+
+    useEffect(() => {
+        if (externalLoginPayload) {
+            navigate("/auth/external")
+        }
+        else if (location.pathname === "/auth/external") {
+            navigate("/auth/login")
+        }
+    }, [externalLoginPayload])
+
+    if (isRegistering) {
+        return (
+            <SPanel>
+                <STitle>Registering</STitle>
+            </SPanel>
+        )
+    }
+
+    if (isLogging) {
+        return (
+            <SPanel>
+                <STitle>Logging</STitle>
+            </SPanel>
+        )
+    }
+
     return (
         <AuthLayout>
-            <SPanelsWrapper>
-                <SPanel>
-                    <AuthForm>
-                        <Routes>
-                            {/* <Route index element={<Login />} /> */}
-                            <Route path='/login' element={<Login />} />
-                            <Route path='/register' element={<Register />} />
-                            <Route path='*' element={<Navigate to={'/login'} />} />
-                        </Routes>
-                    </AuthForm>
-                </SPanel>
-                <SSeparator />
-                <SAdditionalPanel>
-                    <Routes>
-                        <Route path='/login' element={<NavLink to={"/register"}>Register</NavLink>} />
-                        <Route path='/register' element={<NavLink to={"/login"}>Login</NavLink>} />
-                    </Routes>
-                </SAdditionalPanel>
-            </SPanelsWrapper>
             <SThemeButtonWrapper>
                 <ThemeButton />
             </SThemeButtonWrapper>
+            <SPanelsWrapper>
+                <Routes>
+                    <Route path="login" element={<Login />} />
+                    <Route path="registration" element={<Registration />} />
+                    <Route path="external" element={<ExternalProviderRegistration />} />
+                    <Route path="*" element={<Navigate to={'/login'} />} />
+                </Routes>
+            </SPanelsWrapper>
         </AuthLayout>
     );
 }
@@ -55,24 +78,24 @@ const AuthLayout = styled.div`
     }
 `
 
-const AuthForm = styled.form`
+export const AuthForm = styled.form`
     width: 260px;
     display: flex;
     flex-direction: column;
     padding: ${props => props.theme.padding.small}px;
 `
 
-const SAdditionalPanel = styled(SPanel)`
+export const SAdditionalPanel = styled(SPanel)`
     text-align: center;
     >a{
         color: ${({ theme }) => theme.colors.onSurface};
     }
 `
 
-const SPanelsWrapper = styled.div`
+export const SPanelsWrapper = styled.div`
 `
 
-const SSeparator = styled.div`
+export const SSeparator = styled.div`
     height: 16px;
 `
 
@@ -86,7 +109,12 @@ export const SAuthInputWrapper = styled.div`
     margin-bottom: 16px;
 `
 
-export const SAuthError = styled.div`
+export const SInputFieldErrors = styled.div`
+    color: ${p => p.theme.colors.error};
+    margin-bottom: 4px;
+`
+
+export const SSummary = styled.div`
     color: ${p => p.theme.colors.error};
     margin-bottom: 4px;
 `

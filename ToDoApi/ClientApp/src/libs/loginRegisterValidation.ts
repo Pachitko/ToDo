@@ -7,12 +7,17 @@ export enum FormInputFieldIds {
 
 export interface IValidatableForm {
     title: string,
+    submitText: string,
+    summary?: string,
     inputFields: {
         [key: string]: IFormInputField
     },
     validationResults: {
         [key: string]: IValidationResult,
     }
+    additionalInputFieldErrors: {
+        [key: string]: string[],
+    },
     isValid: boolean,
 }
 
@@ -70,17 +75,12 @@ const validateFormInputField = (form: IValidatableForm, field: IFormInputField):
             }
             break;
         case FormInputFieldIds.PasswordConfirmation:
-            if (field.value.length === 0 || field.value !== form.inputFields[FormInputFieldIds.Password].value) {
+            if (field.value !== form.inputFields[FormInputFieldIds.Password].value) {
                 result.isValid = false
                 result.errors.push("Password missmatch")
             }
             break;
     }
-
-    // if (form.additionalFieldErrors[field.id]) {
-    //     result.errors.concat(form.additionalFieldErrors[field.id])
-    //     // result.isValid = false
-    // }
 
     form.validationResults[result.id] = result
     return field;

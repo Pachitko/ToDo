@@ -3,7 +3,7 @@ import { useDispatch } from 'react-redux'
 import { SIconButton } from 'src/Components/UI'
 import TaskDetailsContextMenu from 'src/Components/Layout/Main/RightColumn/TaskDetailsContextMenu'
 import { removeTaskDueDatePatch, removeTaskRecurrencePatch, replaceTaskDueDatePatch } from 'src/libs/jsonPatches'
-import { patchTaskAsync } from 'src/redux/actions/taskActions'
+import { patchTask } from 'src/redux/actions/taskActions'
 import { SSectionBodyButton, SSectionContent, SSectionIcon, SSectionItem } from './TaskDetailStyles'
 import { ITask } from 'src/redux/reducers/tasks'
 import styled from 'styled-components'
@@ -18,13 +18,13 @@ export const DueDateSectionItem: React.FC<{ activeTask: ITask }> = ({ activeTask
     }
 
     const handleClear = () => {
-        dispatch(patchTaskAsync(activeTask.toDoListId, activeTask.id,
+        dispatch(patchTask(activeTask.toDoListId, activeTask.id,
             [removeTaskDueDatePatch(), removeTaskRecurrencePatch()]))
     }
 
     const handleSet = (e: any) => {
         setIsFocused(false)
-        dispatch(patchTaskAsync(activeTask.toDoListId, activeTask.id, [replaceTaskDueDatePatch(e.target.value)]))
+        dispatch(patchTask(activeTask.toDoListId, activeTask.id, [replaceTaskDueDatePatch(e.target.value)]))
     }
 
     return (

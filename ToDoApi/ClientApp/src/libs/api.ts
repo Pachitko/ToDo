@@ -1,74 +1,98 @@
-import axios, { AxiosError } from "axios"
-import { ITask, ITaskList, Recurrence } from "src/redux/reducers/tasks";
-import { IUser } from "src/redux/reducers/user"
+import axios, { AxiosRequestConfig } from "axios"
+import { ITask, ITaskList } from "src/redux/reducers/tasks";
+import { IIdentity } from "src/redux/reducers/auth"
 import { JsonPatch } from "./jsonPatches";
-
-const baseURL = 'https://localhost:5001/api/';
-
-export type IUserToken = string | null
-
-// const withToken = () => {
-// }
+import { ILoginResult, ITaskToCreate, ITaskListToCreate, IUserToRegister, ICreatedUser, IExternalLoginPayload, IUserToken } from "./abstractions/index";
 
 const getToken = () => localStorage.getItem("token")
 
-interface Config {
-    [key: string]: any
+const instance = (token: IUserToken = null) => {
+    const config: AxiosRequestConfig<any> = {
+        timeout: 5000,
+        baseURL: 'https://localhost:5001/api/',
+    }
+
+    if (token) {
+        config.headers =
+        {
+            ...config.headers,
+            "Authorization": `Bearer ${token}`
+        }
+    }
+
+    return axios.create(config)
 }
 
-const getConfig = (token: IUserToken): Config => ({
-    baseURL,
-    headers: {
-        "Authorization": `Bearer ${token}`
-    }
-})
-
-export const loginAsync = async (username: string, password: string): Promise<IUserToken> => {
+export const loginWithExternalProviderAsync = async (providerName: string, tokenId: string): Promise<ILoginResult> => {
     try {
-        const response = await axios.post("users/token", {
+        const response = await instance().post("auth/external",
+            {
+                providerName: providerName,
+                tokenId: tokenId
+            }, {
+            headers: {
+                'Access-Control-Allow-Origin': "true",
+                'Cache-Control': 'no-cache',
+                'Pragma': 'no-cache',
+                'Expires': '0',
+            }
+        })
+        return response.data
+    } catch (error) {
+        throw error
+    }
+}
+
+export const loginAsync = async (username: string, password: string): Promise<ILoginResult> => {
+    try {
+        const response = await instance().post("auth/login", {
             "Username": username,
             "Password": password,
-        }, { baseURL })
-        const token = response.data.token
-
-        if (!token)
-            throw new Error("Token in null");
-
-        return token
+        })
+        return response.data
     }
     catch (error) {
         throw error
     }
 }
 
-export const getMeAsync = async (token: IUserToken): Promise<IUser | null> => {
-    if (!token)
+export const verifyTokenAsync = async (token: IUserToken): Promise<boolean> => {
+    try {
+        const response = await instance(token).get("auth/verifyToken")
+        return response.data
+    }
+    catch (error) {
+        throw error
+    }
+}
+
+export const getMeAsync = async (token: IUserToken): Promise<IIdentity | null> => {
+    if (!token) {
         throw new Error("Token in null");
+    }
 
     try {
-        const config = getConfig(token)
-        config.headers["Accept"] = "application/vnd.todo.user.friendly.hateoas+json"
+        const config: AxiosRequestConfig<any> = {
+            headers: {
+                "Accept": "application/json"
+            }
+        }
 
-        const response = await axios.get("users/me?fields=username,email", config)
-        const user = response.data;
-        console.log(response);
-
-        if (!user)
-            throw new Error("User info not found");
+        const response = await instance(token).get("users/me?fields=username,email", config)
+        const identity = response.data;
 
         return {
-            name: user.userName,
-            email: user.email,
-            token: token,
+            username: identity.userName,
+            email: identity.email
         }
     } catch (error) {
         throw error
     }
 }
 
-export const getTaskLists = async (): Promise<ITaskList[]> => {
+export const getTaskListsAsync = async (): Promise<ITaskList[]> => {
     try {
-        const response = await axios.get(`taskLists`, getConfig(getToken()))
+        const response = await instance(getToken()).get(`taskLists`)
         const taskLists: ITaskList[] = response.data.map((l: ITaskList) => {
             return {
                 ...l
@@ -80,11 +104,11 @@ export const getTaskLists = async (): Promise<ITaskList[]> => {
     }
 }
 
-export const getListTasks = async (taskLists: ITaskList[]): Promise<ITask[]> => {
+export const getListTasksAsync = async (taskLists: ITaskList[]): Promise<ITask[]> => {
     try {
         const result: ITask[] = []
         for (const list of taskLists) {
-            const response = await axios.get(`taskLists/${list.id}/tasks`, getConfig(getToken()))
+            const response = await instance(getToken()).get(`taskLists/${list.id}/tasks`)
             const tasks: ITask[] = response.data.map((t: ITask) => {
                 return {
                     ...t
@@ -98,27 +122,18 @@ export const getListTasks = async (taskLists: ITaskList[]): Promise<ITask[]> => 
     }
 }
 
-export const deleteTask = async (listId: string, taskId: string) => {
+export const deleteTaskAsync = async (listId: string, taskId: string) => {
     try {
-        const response = await axios.delete(`taskLists/${listId}/tasks/${taskId}`, getConfig(getToken()))
+        const response = await instance(getToken()).delete(`taskLists/${listId}/tasks/${taskId}`)
         return response.data
     } catch (error) {
         throw error
     }
 }
 
-export interface ITaskToCreate {
-    title: string,
-    isCompleted: boolean | null,
-    isImportant: boolean | null,
-    dueDate: Date | null,
-    recurrence: Recurrence | null
-}
-
-export const postTask = async (listId: string, taskToCreate: ITaskToCreate): Promise<ITask> => {
+export const postTaskAsync = async (listId: string, taskToCreate: ITaskToCreate): Promise<ITask> => {
     try {
-        const response = await axios.post(`taskLists/${listId}/tasks`,
-            taskToCreate, getConfig(getToken()))
+        const response = await instance(getToken()).post(`taskLists/${listId}/tasks`, taskToCreate)
         const createdTask = response.data as ITask
         console.log(createdTask);
         return createdTask
@@ -127,13 +142,13 @@ export const postTask = async (listId: string, taskToCreate: ITaskToCreate): Pro
     }
 }
 
-export const patchTask = async (listId: string, taskId: string, jsonPatchDocument: JsonPatch[]): Promise<ITask> => {
+export const patchTaskAsync = async (listId: string, taskId: string, jsonPatchDocument: JsonPatch[]): Promise<ITask> => {
     try {
         const data = {
             jsonPatchDocument
         }
-        const response = await axios.patch(`taskLists/${listId}/tasks/${taskId}`,
-            data, getConfig(getToken()))
+        const response = await instance(getToken())
+            .patch(`taskLists/${listId}/tasks/${taskId}`, data,)
         const patchedTask = response.data as ITask
         console.log(patchedTask);
         return patchedTask
@@ -142,13 +157,9 @@ export const patchTask = async (listId: string, taskId: string, jsonPatchDocumen
     }
 }
 
-export interface ITaskListToCreate {
-    title: string
-}
-export const postTaskList = async (taskListToCreate: ITaskListToCreate): Promise<ITaskList> => {
+export const postTaskListAsync = async (taskListToCreate: ITaskListToCreate): Promise<ITaskList> => {
     try {
-        const response = await axios.post(`taskLists`,
-            taskListToCreate, getConfig(getToken()))
+        const response = await instance(getToken()).post(`taskLists`, taskListToCreate)
         const createdTaskList = response.data as ITaskList
         console.log(createdTaskList);
         return createdTaskList
@@ -157,36 +168,41 @@ export const postTaskList = async (taskListToCreate: ITaskListToCreate): Promise
     }
 }
 
-export const deleteTaskList = async (listId: string) => {
+export const deleteTaskListAsync = async (listId: string) => {
     try {
-        const response = await axios.delete(`taskLists/${listId}`, getConfig(getToken()))
+        const response = await instance(getToken()).delete(`taskLists/${listId}`)
         return response.data
     } catch (error) {
         throw error
     }
 }
 
-export const renameTaskList = async (listId: string, newTitle: string) => {
+export const renameTaskListAsync = async (listId: string, newTitle: string) => {
     try {
-        const response = await axios.post(`taskLists/${listId}`, { newTitle }, getConfig(getToken()))
+        const response = await instance(getToken()).post(`taskLists/${listId}`, { newTitle })
         return response.data as ITaskList
     } catch (error) {
         throw error
     }
 }
 
-export interface IUserToRegister {
-    username: string,
-    email: string,
-    password: string,
-    passwordConfirmation: string,
+
+export const registerUserAsync = async (userToCreate: IUserToRegister): Promise<ICreatedUser> => {
+    try {
+        const response = await instance().post(`users`, userToCreate)
+        const createdUser = response.data as ICreatedUser
+        console.log("CreatedUser:", createdUser);
+        return createdUser
+    } catch (error) {
+        throw error
+    }
 }
 
-export const registerUser = async (userToCreate: IUserToRegister): Promise<IUser> => {
+export const registerWithExternalProviderAsync = async (externalLoginPayload: IExternalLoginPayload): Promise<ICreatedUser> => {
     try {
-        const response = await axios.post(`users`, userToCreate, getConfig(getToken()))
-        const createdUser = response.data as IUser
-        console.log("CreatedUser:", createdUser);
+        const response = await instance().post(`users/external`, externalLoginPayload)
+        const createdUser = response.data as ICreatedUser
+        console.log("Google created user:", createdUser);
         return createdUser
     } catch (error) {
         throw error

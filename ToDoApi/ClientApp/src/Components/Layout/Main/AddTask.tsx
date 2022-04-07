@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { SInput, STextButton } from 'src/Components/UI';
 import styled from 'styled-components';
 import { useDispatch } from 'react-redux';
-import { postTaskAsync } from 'src/redux/actions/taskActions';
+import { postTask } from 'src/redux/actions/taskActions';
 import { ITaskToCreate } from 'src/libs/api';
 import { useAppSelector } from 'src/redux/hooks';
 
@@ -38,7 +38,7 @@ const AddTask: React.FC = () => {
         }
         setTaskTitle('')
         setIsInputActive(false)
-        dispatch(postTaskAsync(activeList.id, taskToCreate))
+        dispatch(postTask(activeList.id, taskToCreate))
     }
 
     return (

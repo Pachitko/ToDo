@@ -1,17 +1,15 @@
 import React, { useState } from 'react'
 import styled, { css } from 'styled-components'
 import { useAppDispatch, useAppSelector } from 'src/redux/hooks'
-import BackScreen from 'src/Components/UI/BackScreen';
-import { SIconButtonFilled, SPanel } from 'src/Components/UI';
-import { logout } from 'src/redux/actions/userActions';
+import { SIconButtonFilled } from 'src/Components/UI';
+import { logout } from 'src/redux/actions/authActions';
 import { ThemeButton } from 'src/Components/UI/ThemeButton';
 import ContextMenu from 'src/Components/UI/ContextMenu';
-import { useNavigate } from 'react-router-dom';
 
 const HeaderButtonGroup: React.FC = () => {
     const [isUserPanelActive, setIsUserPanelActive] = useState(false)
     const dispatch = useAppDispatch();
-    const user = useAppSelector(state => state.user)
+    const identity = useAppSelector(state => state.auth.identity)
 
     const handleLogout = () => {
         dispatch(logout())
@@ -43,10 +41,10 @@ const HeaderButtonGroup: React.FC = () => {
                     </SUserButtonWrapper>
                     <SUserInfoWrapper>
                         <SUserInfoFieldWrapper>
-                            <SUserName>{user.name}</SUserName>
+                            <SUserName>{identity?.username}</SUserName>
                         </SUserInfoFieldWrapper>
                         <SUserInfoFieldWrapper>
-                            <span>{user.email}</span>
+                            <span>{identity?.email}</span>
                         </SUserInfoFieldWrapper>
                     </SUserInfoWrapper>
                 </ContextMenu>

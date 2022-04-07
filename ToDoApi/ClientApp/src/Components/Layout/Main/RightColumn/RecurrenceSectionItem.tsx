@@ -3,7 +3,7 @@ import { useDispatch } from 'react-redux'
 import { SIconButton } from 'src/Components/UI'
 import TaskDetailsContextMenu from 'src/Components/Layout/Main/RightColumn/TaskDetailsContextMenu'
 import { removeTaskRecurrencePatch, replaceTaskRecurrencePatch } from 'src/libs/jsonPatches'
-import { patchTaskAsync } from 'src/redux/actions/taskActions'
+import { patchTask } from 'src/redux/actions/taskActions'
 import { SSectionBodyButton, SSectionContent, SSectionIcon, SSectionItem } from './TaskDetailStyles'
 import { ITask, RecurenceType, Recurrence } from 'src/redux/reducers/tasks'
 import styled from 'styled-components'
@@ -20,7 +20,7 @@ export const RecurrenceSectionItem: React.FC<{ activeTask: ITask }> = ({ activeT
     }
 
     const handleClear = () => {
-        dispatch(patchTaskAsync(activeTask.toDoListId, activeTask.id, [removeTaskRecurrencePatch()]))
+        dispatch(patchTask(activeTask.toDoListId, activeTask.id, [removeTaskRecurrencePatch()]))
     }
 
     const handleRecurrenceIntervalChange = (e: any) => {
@@ -35,7 +35,7 @@ export const RecurrenceSectionItem: React.FC<{ activeTask: ITask }> = ({ activeT
             startedAt: activeTask.dueDate ? activeTask.dueDate : new Date()
         }
         setIsFocused(false)
-        dispatch(patchTaskAsync(activeTask.toDoListId, activeTask.id, [replaceTaskRecurrencePatch(newRecurrence)]))
+        dispatch(patchTask(activeTask.toDoListId, activeTask.id, [replaceTaskRecurrencePatch(newRecurrence)]))
     }
 
     const stringifyRecurrence = (recurrence: Recurrence): string => {

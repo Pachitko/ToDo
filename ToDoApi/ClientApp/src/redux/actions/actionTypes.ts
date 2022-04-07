@@ -23,13 +23,21 @@ export const POST_TASK_LIST = 'POST_TASK_LIST';
 export const RENAME_TASK_LIST = 'RENAME_TASK_LIST';
 
 //* user
-export const LOGGING = 'LOGGING';
-export const LOGIN_SUCCESS = 'LOGIN_SUCCESS';
-export const LOGIN_ERROR = 'LOGIN_ERROR';
-
 export const REGISTERING = 'REGISTERING';
 export const REGISTRATION_SUCCESS = 'REGISTRATION_SUCCESS';
 export const REGISTRATION_ERROR = 'REGISTRATION_ERROR';
+export const CONFIRM_EXTERNAL_REGISTRATION = 'CONFIRM_EXTERNAL_REGISTRATION';
+
+export const EXTERNAL_REGISTRATION = 'EXTERNAL_REGISTRATION';
+
+export const GET_ME = 'GET_ME';
+
+//* auth
+export const LOGGING = 'LOGGING';
+export const LOGIN_SUCCESS = 'LOGIN_SUCCESS';
+export const LOGIN_ERROR = 'LOGIN_ERROR';
+export const SET_IDENTITY = 'SET_IDENTITY';
+
+export const EXTERNAL_LOGIN = 'EXTERNAL_LOGIN';
 
 export const LOGOUT = 'LOGOUT';
-export const GET_ME = 'GET_ME';

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { SButton, SInput, STextButton } from 'src/Components/UI';
 import styled from 'styled-components';
 import { useDispatch } from 'react-redux';
-import { postTaskListAsync } from 'src/redux/actions/taskActions';
+import { postTaskList } from 'src/redux/actions/taskActions';
 
 const AddList: React.FC = () => {
     const [isInputActive, setIsInputActive] = useState(false)
@@ -26,7 +26,7 @@ const AddList: React.FC = () => {
 
         setListTitle('')
         setIsInputActive(false)
-        dispatch(postTaskListAsync({ title: taskListTitle }))
+        dispatch(postTaskList({ title: taskListTitle }))
     }
 
     return (

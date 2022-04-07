@@ -1,7 +1,7 @@
 import React from 'react';
 import { STaskCheckBox, STaskCheckBoxLabel } from './TaskCheckBoxStyles'
 import { useDispatch } from 'react-redux';
-import { patchTaskAsync } from 'src/redux/actions/taskActions';
+import { patchTask } from 'src/redux/actions/taskActions';
 import { useAppSelector } from 'src/redux/hooks';
 import { replaceTaskIsImportantPatch } from 'src/libs/jsonPatches';
 import { ITask } from 'src/redux/reducers/tasks';
@@ -14,7 +14,7 @@ const TaskImportanceCheckbox: React.FC<Props> = ({ task }) => {
     const dispatch = useDispatch();
 
     const handleCheckBoxChange = (e: any) => {
-        dispatch(patchTaskAsync(task.toDoListId, task.id, [replaceTaskIsImportantPatch(e.target.checked)]))
+        dispatch(patchTask(task.toDoListId, task.id, [replaceTaskIsImportantPatch(e.target.checked)]))
     }
 
     return (

@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { deleteTaskAsync, hideTaskDetailsAction } from 'src/redux/actions/taskActions';
+import { deleteTask, hideTaskDetailsAction } from 'src/redux/actions/taskActions';
 import { useAppSelector } from 'src/redux/hooks';
 import { SIconButtonFilled } from 'src/Components/UI';
 import { useDispatch } from 'react-redux';
@@ -21,7 +21,7 @@ const RightColumnBottomPanel = () => {
                     : null}
             </SCreatedAt>
             {activeTask !== null &&
-                <SRightColumnBottomPanelButton onClick={() => dispatch(deleteTaskAsync(activeTask.toDoListId, activeTask.id))}>
+                <SRightColumnBottomPanelButton onClick={() => dispatch(deleteTask(activeTask.toDoListId, activeTask.id))}>
                     <i className="fa-regular fa-trash-can"></i>
                 </SRightColumnBottomPanelButton>
             }

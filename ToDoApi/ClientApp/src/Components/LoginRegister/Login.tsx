@@ -1,20 +1,23 @@
-import React, { BaseSyntheticEvent, FC, useState } from 'react';
-import { SButton } from 'src/Components/UI'
-import { loginAsync } from 'src/redux/actions/userActions';
+import React, { FC } from 'react';
+import { login } from 'src/redux/actions/authActions';
 import { useDispatch } from 'react-redux';
-import { SAuthInput, SAuthInputWrapper, SAuthError, STitle } from './Auth';
-import { FormInputFieldIds, IValidatableForm, validateForm } from 'src/libs/loginRegisterValidation';
+import { FormInputFieldIds, IValidatableForm } from 'src/libs/loginRegisterValidation';
 import { useAppSelector } from 'src/redux/hooks';
+import GoogleLoginButton from '../UI/GoogleLoginButton';
+import ValidateableForm from '../UI/ValidatableForm';
+import { NavLink } from 'react-router-dom';
 
 const Login: FC = () => {
     const dispatch = useDispatch()
-    const loginError = useAppSelector(state => state.user.loginError)
-    const isLogging = useAppSelector(state => state.user.isLogging)
+    const loginError = useAppSelector(state => state.auth.loginError)
 
-    const [form, setForm] = useState<IValidatableForm>({
+    const formInitialState: IValidatableForm = {
         title: "LOGIN",
+        submitText: "Log in",
         isValid: false,
         validationResults: {},
+        additionalInputFieldErrors: {},
+        summary: loginError?.message,
         inputFields: {
             [`${FormInputFieldIds.Username}`]: {
                 id: FormInputFieldIds.Username,
@@ -28,61 +31,25 @@ const Login: FC = () => {
                 htmlType: "password",
                 label: "Password"
             }
-        },
-    })
-
-    const handleInputChange = (e: BaseSyntheticEvent) => {
-        const field = form.inputFields[e.target.id]
-        field.value = e.target.value
-
-        validateForm(form)
-        setForm({ ...form })
-    }
-
-    const handleLogin = (e: BaseSyntheticEvent) => {
-        e.preventDefault();
-        validateForm(form)
-        if (form.isValid) {
-            dispatch(loginAsync(form.inputFields[FormInputFieldIds.Username].value,
-                form.inputFields[FormInputFieldIds.Password].value))
-        } else {
-            setForm({ ...form })
         }
     }
 
-    if (isLogging) {
-        return <STitle>Logging</STitle>
+    const handleSubmit = (form: IValidatableForm) => {
+        dispatch(login(form.inputFields[FormInputFieldIds.Username].value,
+            form.inputFields[FormInputFieldIds.Password].value))
     }
 
     return (
-        <>
-            <STitle>
-                {form.title}
-            </STitle>
-            {Object.keys(form.inputFields).map(fieldName => {
-                const field = form.inputFields[fieldName]
-                const validationResult = form.validationResults[fieldName]
-                const isValid = validationResult === undefined || validationResult.isValid
-                return (
-                    <SAuthInputWrapper key={field.id}>
-                        <SAuthError>
-                            {validationResult &&
-                                validationResult.errors.map((e, i) => <span key={i}>{e}</span>)}
-                        </SAuthError>
-                        <SAuthInput isValid={isValid}
-                            value={field.value} id={field.id}
-                            placeholder={field.label} type={field.htmlType}
-                            onChange={handleInputChange}
-                        />
-                    </SAuthInputWrapper>
-                )
-            })}
-            {loginError &&
-                <SAuthError>
-                    <span>Invalid email or password</span>
-                </SAuthError>}
-            <SButton type='submit' onClick={handleLogin}>Log in</SButton>
-        </>
+        <ValidateableForm
+            formInitialState={formInitialState}
+            onSubmit={handleSubmit}
+            children={
+                <GoogleLoginButton />
+            }
+            additionalPanelContent={
+                <NavLink to={"/auth/registration"}>Registration</NavLink>
+            }
+        />
     );
 }
 
