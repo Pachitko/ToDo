@@ -6,13 +6,13 @@ using System.Threading;
 using FluentValidation;
 using Core.Application.Abstractions;
 
-namespace Core.Application.Features.Queries.GetJwtToken
+namespace Core.Application.Features.Commands.Login
 {
-    public partial class GetJwtToken
+    public partial class Login
 	{
-		public record Query(string Username, string Password) : IRequestWrapper<string>;
+		public record Query(string Username, string Password) : IRequestWrapper<LoginResult>;
 
-		public class QueryValidator : AbstractValidator<GetJwtToken.Query>
+		public class QueryValidator : AbstractValidator<Login.Query>
 		{
 			public QueryValidator()
 			{
@@ -25,7 +25,7 @@ namespace Core.Application.Features.Queries.GetJwtToken
 			}
 		}
 
-		public class QueryHandler : IHandlerWrapper<GetJwtToken.Query, string>
+		public class QueryHandler : IHandlerWrapper<Login.Query, LoginResult>
         {
 			private readonly UserManager<AppUser> _userManager;
 			private readonly SignInManager<AppUser> _signInManager;
@@ -39,25 +39,29 @@ namespace Core.Application.Features.Queries.GetJwtToken
 				_jwtGenerator = jwtGenerator ?? throw new System.ArgumentNullException(nameof(jwtGenerator));
 			}
 
-			public async Task<Response<string>> Handle(GetJwtToken.Query request, CancellationToken cancellationToken)
+			public async Task<Response<LoginResult>> Handle(Login.Query request, CancellationToken cancellationToken)
 			{
 				var user = await _userManager.FindByNameAsync(request.Username);
 				if (user == null)
 				{
-					return Response<string>.Fail(null);
+					return Response<LoginResult>.Ok(null);
 				}
 
-				// todo check email confirmation
-				//var isEmailConfirmedResult = _userManager.IsEmailConfirmedAsync(user);
-
-				var result = await _signInManager.CheckPasswordSignInAsync(user, request.Password, lockoutOnFailure: false);
+				SignInResult result = await _signInManager.CheckPasswordSignInAsync(user, request.Password, lockoutOnFailure: false);
+				LoginResult loginResult = new()
+				{
+					Succeeded = result.Succeeded,
+					IsLockedOut = result.IsLockedOut,
+					IsNotAllowed = result.IsNotAllowed,
+					RequiresTwoFactor= result.RequiresTwoFactor
+				};
 
 				if (result.Succeeded)
 				{
-					return Response<string>.Ok(await _jwtGenerator.CreateTokenAsync(user));
+					loginResult.Token = await _jwtGenerator.CreateTokenAsync(user);
 				}
 
-				return Response<string>.Fail(null);
+				return Response<LoginResult>.Ok(loginResult);
 			}
 		}
     }

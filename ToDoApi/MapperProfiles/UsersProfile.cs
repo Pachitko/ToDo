@@ -12,7 +12,7 @@ namespace ToDoApi.MapperProfiles
         public UsersProfile()
         {
             CreateMap<AppUser, AppUserDto>()
-                .ForMember(dest => dest.Name, o => o.MapFrom(src => $"{src.UserProfile.FirstName} {src.UserProfile.MiddleName} {src.UserProfile.LastName}"))
+                .ForMember(dest => dest.Name, o => o.MapFrom(src => $"{src.UserProfile.FirstName} {src.UserProfile.MiddleName} {src.UserProfile.LastName}".Trim()))
                 .ForMember(dest => dest.Age, o => o.MapFrom(src => src.UserProfile.DateOfBirth.GetCurrentAge(src.UserProfile.DateOfDeath)));
 
             CreateMap<AppUser, AppUserFullDto>()

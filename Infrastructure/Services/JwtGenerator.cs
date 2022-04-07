@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.Services
 {
-    public class JwtGenerator : IJwtGenerator
+    internal class JwtGenerator : IJwtGenerator
     {
         private readonly JwtOptions _jwtOptions;
         private readonly IUserClaimsPrincipalFactory<AppUser> _userClaimsPrincipalFactory;
@@ -49,7 +49,7 @@ namespace Infrastructure.Services
 
             JwtSecurityTokenHandler tokenHandler = new();
 
-            SecurityToken token = tokenHandler.CreateToken(tokenDescriptor);
+            JwtSecurityToken token = tokenHandler.CreateJwtSecurityToken(tokenDescriptor);
 
             return tokenHandler.WriteToken(token);
         }

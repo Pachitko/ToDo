@@ -20,14 +20,7 @@ namespace Core.Application.Features.Commands.CreateUser
 {
     public partial class CreateUser
     {
-        public record Command : IRequestWrapper<AppUser>
-        {
-            public string Username { get; set; }
-            public string Email { get; set; }
-            public string Password { get; set; }
-            public string PasswordConfirmation { get; set; }
-        }
-
+        public record Command(string Username, string Email, string Password, string PasswordConfirmation) : IRequestWrapper<AppUser>;
         public class CommandValidator : AbstractValidator<CreateUser.Command>
         {
             public CommandValidator(UserManager<AppUser> userManager)

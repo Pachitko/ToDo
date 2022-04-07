@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.Services
 {
-    public class LocalFileStorageService : IFileStorageService
+    internal class LocalFileStorageService : IFileStorageService
     {
         private readonly string _basePath;
         public LocalFileStorageService(string basePath)

@@ -20,6 +20,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Serialization;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Security.Claims;
@@ -145,22 +146,22 @@ namespace ToDoApi
             var jwtOptions = jwtSection.Get<JwtOptions>();
             services.Configure<JwtOptions>(jwtSection);
 
-            services.AddAuthentication(options =>
+            services.AddAuthentication(o =>
             {
+                o.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
                 // Override Identity default schemes
-                //options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultSignInScheme = "";
+                o.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                o.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                o.DefaultSignInScheme = "";
             })
-                .AddJwtBearer(config =>
+                .AddJwtBearer(o =>
                 {
                     SymmetricSecurityKey jwtKey = jwtOptions.GetSymmetricSecurityKey();
 
                     //config.Events.on
-                    config.RequireHttpsMetadata = false;
-                    config.SaveToken = true;
-                    config.TokenValidationParameters = new TokenValidationParameters
+                    o.RequireHttpsMetadata = false;
+                    o.SaveToken = true;
+                    o.TokenValidationParameters = new TokenValidationParameters
                     {
                         ValidateLifetime = true,
                         ValidateIssuerSigningKey = true,
@@ -213,8 +214,10 @@ namespace ToDoApi
                 options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
                     In = ParameterLocation.Header,
-                    Description = "Please insert JWT with Bearer into field",
+                    Description = "JWT Authorization header using the Bearer scheme",
                     Name = "Authorization",
+                    BearerFormat = "JWT",
+                    Scheme = "Bearer",
                     Type = SecuritySchemeType.ApiKey
                 });
                 options.AddSecurityRequirement(new OpenApiSecurityRequirement {
@@ -227,11 +230,11 @@ namespace ToDoApi
                          Id = "Bearer"
                        }
                       },
-                      new string[] { }
+                      Array.Empty<string>()
                     }
                   });
 
-                options.CustomSchemaIds(type => type.ToString());
+                options.CustomSchemaIds(type => type.FullName);
                 options.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
             });
         }
@@ -242,7 +245,7 @@ namespace ToDoApi
             app.UseSwaggerUI(options =>
             {
                 options.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
-                options.RoutePrefix = string.Empty;
+                options.RoutePrefix = "swagger";
             });
 
             if (env.IsDevelopment())

@@ -3,10 +3,9 @@ using Core.Application.Abstractions;
 using Core.Application.Extensions;
 using Core.Application.Features.Commands.CreateFullUser;
 using Core.Application.Features.Commands.CreateUser;
+using Core.Application.Features.Commands.CreateUserWithGoogle;
 using Core.Application.Features.Commands.DeleteUser;
-using Core.Application.Features.Commands.ConfirmEmail;
 using Core.Application.Features.Queries.GetCurrentUser;
-using Core.Application.Features.Queries.GetJwtToken;
 using Core.Application.Features.Queries.GetUsers;
 using Core.Application.Helpers;
 using Core.Domain.Entities;
@@ -179,6 +178,33 @@ namespace ToDoApi.Controllers
             }
         }
 
+        [HttpPost("external", Name = nameof(CreateUserWithExternalLoginProviderAsync))]
+        [AllowAnonymous]
+        [RequestHeaderMatchesMediaType("Content-Type", "application/json", "application/vnd.todo.createusercommand+json")]
+        [Consumes("application/json", "application/vnd.todo.createusercommand+json")]
+        public async Task<ActionResult> CreateUserWithExternalLoginProviderAsync(CreateUserWithExternalLoginProvider.Command command)
+        {
+            var response = await Mediator.Send(command);
+            if (response.Succeeded)
+            {
+                var userToReturn = _mapper.Map<AppUserDto>(response.Value);
+                var links = CreateLinksForUser(null);
+
+                var resourceWithLinks = userToReturn.ShapeData(null);
+                resourceWithLinks.TryAdd("links", links);
+
+                //if (_userManager.Options.SignIn.RequireConfirmedAccount)
+                return CreatedAtAction(nameof(GetUserAsync), new
+                {
+                    fields = ""
+                }, resourceWithLinks);
+            }
+            else
+            {
+                return ResponseFailed(response);
+            }
+        }
+
         [HttpPost(Name = nameof(CreateFullUserAsync))]
         [AllowAnonymous]
         [RequestHeaderMatchesMediaType("Content-Type", "application/vnd.todo.createfullusercommand+json")]
@@ -221,51 +247,11 @@ namespace ToDoApi.Controllers
             }
         }
 
-        [HttpPost("token")]
-        [AllowAnonymous]
-        [Consumes("application/json")]
-        [Produces("application/json")]
-        public async Task<ActionResult> GetTokenAsync([FromBody] GetJwtToken.Query query)
-        {
-            var response = await Mediator.Send(query);
-            if (response.Succeeded)
-            {
-                return Ok(new { token = response.Value });
-            }
-            else
-            {
-                return ResponseFailed(response);
-            }
-        }
-
-        [HttpOptions("token")]
-        public ActionResult GetUserTokenOptions()
-        {
-            Response.Headers.Remove("Allow");
-            Response.Headers.Add("Allow", "GET");
-            return Ok();
-        }
-
         [HttpOptions]
         public ActionResult GetUsersOptions()
         {
             Response.Headers.Add("Allow", "GET,POST,OPTIONS");
             return Ok();
-        }
-
-        [HttpGet("confirm")]
-        [AllowAnonymous]
-        public async Task<IActionResult> ConfirmEmail([FromQuery] ConfirmEmail.Command command)
-        {
-            var response = await Mediator.Send(command);
-            if (response.Succeeded)
-            {
-                return Ok(response.Value);
-            }
-            else
-            {
-                return ResponseFailed(response);
-            }
         }
 
         // Refresh & Verify

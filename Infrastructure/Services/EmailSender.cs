@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.Services
 {
-    public class EmailSender : IEmailSender
+    internal class EmailSender : IEmailSender
     {
         private readonly ILogger<EmailSender> _logger;
 

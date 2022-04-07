@@ -8,6 +8,9 @@ using Core.Domain.Entities;
 using Infrastructure.Services;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Core.Application.Abstractions;
+using Infrastructure.Extensions;
+using Infrastructure.Services.ExternalLogin.Google;
+using System.Collections.Generic;
 
 namespace Infrastructure
 {
@@ -24,7 +27,7 @@ namespace Infrastructure
                         o => o.MigrationsAssembly("Infrastructure"))
                     .UseLoggerFactory(loggerFactory));
 
-            services.AddIdentity<AppUser, AppRole>(options =>
+            services.AddIdentityCore<AppUser>(options =>
             {
                 options.User.RequireUniqueEmail = true;
                 options.Password.RequireNonAlphanumeric = false;
@@ -32,12 +35,23 @@ namespace Infrastructure
                 options.Password.RequiredLength = 8;
             })
                 .AddDefaultTokenProviders()
-                .AddEntityFrameworkStores<ApplicationDbContext>();
+                .AddSignInManager<SignInManager<AppUser>>()
+                .AddRoles<AppRole>()
+                .AddRoleManager<RoleManager<AppRole>>()
+                .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddErrorDescriber<CustomIdentityErrorDescriber>();
 
             services.AddScoped<IJwtGenerator, JwtGenerator>();
             services.AddScoped<IEmailSender, EmailSender>();
 
             services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
+
+            services.AddExternalLogin()
+                .AddExternalLoginProvider<GoogleOptions, GoogleLoginProvider>(GoogleLoginDefaults.ProviderName, o =>
+                {
+                    o.Audience = new List<string>() { configuration.GetSection("ExternalLogin:Google:ClientId").Value };
+                    o.ClientSecret = configuration.GetSection("ExternalLogin:Google:ClientSecret").Value;
+                });
 
             return services;
         }

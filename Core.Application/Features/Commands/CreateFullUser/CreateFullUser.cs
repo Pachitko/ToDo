@@ -21,7 +21,8 @@ namespace Core.Application.Features.Commands.CreateFullUser
 {
     public partial class CreateFullUser
     {
-        public record Command : CreateUser.CreateUser.Command, IRequestWrapper<AppUser>
+        public record Command(string Username, string Email, string Password, string PasswordConfirmation) 
+            : CreateUser.CreateUser.Command(Username, Email, Password, PasswordConfirmation), IRequestWrapper<AppUser>
         {
             public string MiddleName { get; set; }
             public string FirstName { get; set; }

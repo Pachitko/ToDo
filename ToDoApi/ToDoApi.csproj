@@ -32,10 +32,6 @@
     <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Options\" />
-  </ItemGroup>
-
   <Target Name="Test" BeforeTargets="BeforeBuild" Condition="false">
     <Error Condition="!Exists('App.Debug.config')" Text="File App.Debug.config not found"></Error>
     <Copy SourceFiles="App.config;App.config" DestinationFiles="$(OutputPath)/Test/App.config;$(OutputPath)/Test/App.test.config"></Copy>
@@ -43,5 +39,7 @@
     <Message Text="$(MessageText)" Condition="'$(Configuration)' == 'Debug'" Importance="high"></Message>
     <Message Text="$(MessageText)" Condition="'$(Configuration)' == 'Release'" Importance="high"></Message>
   </Target>
+
+  <ProjectExtensions><VisualStudio><UserProperties properties_4launchsettings_1json__JsonSchema="" /></VisualStudio></ProjectExtensions>
 
 </Project>

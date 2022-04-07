@@ -1,11 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 using ToDoApi.Models;
 
 namespace ToDoApi.Controllers
 {
     [Route("api")]
+    [ApiController]
     [AllowAnonymous]
     public class RootController : ControllerBase
     {
