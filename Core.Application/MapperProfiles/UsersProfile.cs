@@ -9,8 +9,8 @@ namespace Core.Application.MapperProfiles
         public UsersProfile()
         {
             CreateMap<CreateUser.Command, AppUser>();
-               //.ForPath(dest => dest.UserProfile.FirstName, o => o.MapFrom(src => src.FirstName))
-               //.ForPath(dest => dest.UserProfile.LastName, o => o.MapFrom(src => src.LastName));
+            //.ForPath(dest => dest.UserProfile.FirstName, o => o.MapFrom(src => src.FirstName))
+            //.ForPath(dest => dest.UserProfile.LastName, o => o.MapFrom(src => src.LastName));
         }
     }
 }

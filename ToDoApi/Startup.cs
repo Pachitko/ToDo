@@ -80,7 +80,7 @@ namespace ToDoApi
                 .AddMvcOptions(o =>
                 {
                     var newtonsoftJsonOutputFormatter = o.OutputFormatters
-                       .OfType<NewtonsoftJsonOutputFormatter>().FirstOrDefault();
+                        .OfType<NewtonsoftJsonOutputFormatter>().FirstOrDefault();
 
                     if (newtonsoftJsonOutputFormatter is not null)
                     {
@@ -131,7 +131,7 @@ namespace ToDoApi
                         };
                     };
                 });
-            
+
             services.AddCors(options =>
             {
                 options.AddDefaultPolicy(builder =>

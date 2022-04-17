@@ -11,7 +11,7 @@ namespace ToDoApi
             services.AddTransient<IPropertyChecker, PropertyChecker>();
             services.AddTransient<IPropertyMappingService, PropertyMappingService>();
             services.AddAutoMapper(typeof(ToDoApiDependencyInjectionn).Assembly);
-            
+
             return services;
         }
     }
