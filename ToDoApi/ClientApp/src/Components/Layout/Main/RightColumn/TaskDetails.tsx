@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { SPanel } from 'src/Components/UI';
+import { PanelCss } from 'src/Components/UI';
 import CompleteTaskCheckbox from 'src/Components/UI/TaskCompletionCheckBox';
 import ImportantTaskCheckbox from 'src/Components/UI/TaskImportanceCheckbox';
 import { replaceTaskTitlePatch } from 'src/libs/jsonPatches';
@@ -61,11 +61,12 @@ const TaskDetails = () => {
 
 export default TaskDetails;
 
-const SSection = styled(SPanel)`
-background-color: ${p => p.theme.colors.surface};
-display: flex;
-margin-bottom: 8px;
-padding: 0;
+const SSection = styled.div`
+    ${PanelCss};
+    background-color: ${p => p.theme.colors.surface};
+    display: flex;
+    margin-bottom: 8px;
+    padding: 0;
 `
 
 const STaskDetails = styled.div`

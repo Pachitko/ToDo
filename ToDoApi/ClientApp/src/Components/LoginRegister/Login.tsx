@@ -6,6 +6,7 @@ import { useAppSelector } from 'src/redux/hooks';
 import GoogleLoginButton from '../UI/GoogleLoginButton';
 import ValidateableForm from '../UI/ValidatableForm';
 import { NavLink } from 'react-router-dom';
+import { SAdditionalPanel, SSeparator } from './Auth';
 
 const Login: FC = () => {
     const dispatch = useDispatch()
@@ -40,16 +41,19 @@ const Login: FC = () => {
     }
 
     return (
-        <ValidateableForm
-            formInitialState={formInitialState}
-            onSubmit={handleSubmit}
-            children={
-                <GoogleLoginButton />
-            }
-            additionalPanelContent={
+        <>
+            <ValidateableForm
+                formInitialState={formInitialState}
+                onSubmit={handleSubmit}
+                children={
+                    <GoogleLoginButton />
+                }
+            />
+            <SSeparator />
+            <SAdditionalPanel>
                 <NavLink to={"/auth/registration"}>Registration</NavLink>
-            }
-        />
+            </SAdditionalPanel>
+        </>
     );
 }
 

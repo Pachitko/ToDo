@@ -5,6 +5,7 @@ import { FormInputFieldIds, IValidatableForm } from 'src/libs/loginRegisterValid
 import { useAppSelector } from 'src/redux/hooks';
 import { registerWithExternalProvider } from 'src/redux/actions/userActions';
 import ValidateableForm from '../UI/ValidatableForm';
+import { SAdditionalPanel, SSeparator } from './Auth';
 
 const ExternalProviderRegistration: FC = () => {
     const dispatch = useDispatch();
@@ -38,16 +39,17 @@ const ExternalProviderRegistration: FC = () => {
     }
 
     return (
-        <ValidateableForm
-            formInitialState={formInitialState}
-            onSubmit={handleSubmit}
-            additionalPanelContent={
-                <>
-                    <NavLink to={"/auth/registration"}>Registration</NavLink>
-                    <NavLink to={"/auth/login"}>Log in</NavLink>
-                </>
-            }
-        />
+        <>
+            <ValidateableForm
+                formInitialState={formInitialState}
+                onSubmit={handleSubmit}
+            />
+            <SSeparator />
+            <SAdditionalPanel>
+                <NavLink to={"/auth/registration"}>Registration</NavLink>
+                <NavLink to={"/auth/login"}>Log in</NavLink>
+            </SAdditionalPanel>
+        </>
     );
 }
 

@@ -1,12 +1,16 @@
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 
-const SPanel = styled.div`
+const PanelCss = css`
     background-color: ${({ theme }) => theme.colors.surface};
     border-radius: ${({ theme }) => theme.border.radius};
     box-shadow: ${({ theme }) => theme.shadow.light.medium};
     padding: ${({ theme }) => theme.padding.small}px;
     display: flex;
     flex-direction: column;
+`
+
+const SPanel = styled.div`
+    ${PanelCss};
 `
 
 const SInput = styled.input`
@@ -114,4 +118,4 @@ const SIconButton = styled.button`
     }
 `
 
-export { SPanel, SButton, SInput, SIconButtonFilled, SIconCheckBox, SButtonFilled, STextButton, SIconButton }
+export { SPanel, PanelCss, SButton, SInput, SIconButtonFilled, SIconCheckBox, SButtonFilled, STextButton, SIconButton }

@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import styled from "styled-components";
 import Login from "./Login";
 import Registration from "./Registration";
-import { SInput, SPanel } from 'src/Components/UI'
+import { SInput, SPanel, PanelCss } from 'src/Components/UI'
 import { Navigate, Route, Routes, useNavigate } from 'react-router-dom';
 import { ThemeButton } from '../UI/ThemeButton';
 import ExternalProviderRegistration from './ExternalProviderRegistration';
@@ -78,14 +78,8 @@ const AuthLayout = styled.div`
     }
 `
 
-export const AuthForm = styled.form`
-    width: 260px;
-    display: flex;
-    flex-direction: column;
-    padding: ${props => props.theme.padding.small}px;
-`
-
-export const SAdditionalPanel = styled(SPanel)`
+export const SAdditionalPanel = styled.div`
+    ${PanelCss};
     text-align: center;
     >a{
         color: ${({ theme }) => theme.colors.onSurface};

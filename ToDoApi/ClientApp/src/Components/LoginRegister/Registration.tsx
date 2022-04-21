@@ -6,6 +6,7 @@ import { IUserToRegister } from 'src/libs/abstractions';
 import { FormInputFieldIds, IValidatableForm } from 'src/libs/loginRegisterValidation';
 import { useAppSelector } from 'src/redux/hooks';
 import ValidateableForm from '../UI/ValidatableForm';
+import { SAdditionalPanel, SSeparator } from './Auth';
 
 const Registration: FC = () => {
     const dispatch = useDispatch();
@@ -56,15 +57,16 @@ const Registration: FC = () => {
     }
 
     return (
-        <ValidateableForm
-            formInitialState={formInitialState}
-            onSubmit={handleSubmit}
-            additionalPanelContent={
-                <>
-                    <NavLink to={"/auth/login"}>Log in</NavLink>
-                </>
-            }
-        />
+        <>
+            <ValidateableForm
+                formInitialState={formInitialState}
+                onSubmit={handleSubmit}
+            />
+            <SSeparator />
+            <SAdditionalPanel>
+                <NavLink to={"/auth/login"}>Log in</NavLink>
+            </SAdditionalPanel>
+        </>
     );
 }
 

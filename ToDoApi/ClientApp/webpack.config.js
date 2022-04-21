@@ -12,6 +12,7 @@ module.exports = (args) => {
       filename: "bundle.js",
       publicPath: '/'
     },
+    devtool: 'source-map',
     // devtool: "nosources-source-map",
     devServer: {
       // static: {
