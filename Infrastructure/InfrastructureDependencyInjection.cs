@@ -19,12 +19,11 @@ namespace Infrastructure
         public static IServiceCollection AddInfrastructureServices(this IServiceCollection services,
             ILoggerFactory loggerFactory, IConfiguration configuration)
         {
-            //ILogger logger = loggerFactory.CreateLogger<InfrastructureServicesRegistration>();
-
+            var connectionString = configuration.GetConnectionString("DBCS");
             services.AddDbContext<ApplicationDbContext>(options =>
                 options
-                    .UseSqlServer(configuration.GetConnectionString("MSSQL"),
-                        o => o.MigrationsAssembly("Infrastructure"))
+                    .UseNpgsql(connectionString)
+                    .UseSnakeCaseNamingConvention()
                     .UseLoggerFactory(loggerFactory));
 
             services.AddIdentityCore<AppUser>(options =>

@@ -1,6 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection;
+using System.IO;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Infrastructure.Data
 {
@@ -8,14 +11,20 @@ namespace Infrastructure.Data
     {
         public ApplicationDbContext CreateDbContext(string[] args)
         {
-            //string environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
-            IConfiguration configuration = new ConfigurationBuilder()
+            Assembly currentAssembly = typeof(ApplicationDbContext).Assembly;
+            IConfigurationRoot configuration = new ConfigurationBuilder()
                 .AddUserSecrets<ApplicationDbContextFactory>()
                 .Build();
 
             var builder = new DbContextOptionsBuilder<ApplicationDbContext>();
-            var connectionString = configuration.GetConnectionString("MSSQL");
-            builder.UseSqlServer(connectionString);
+            var connectionString = configuration.GetConnectionString("DBCS");
+            builder.UseNpgsql(connectionString, o =>
+            {
+                o.MigrationsAssembly(currentAssembly.GetName().Name);
+                o.MigrationsHistoryTable("__efmigrationshistory", "public");
+            })
+            .UseSnakeCaseNamingConvention()
+            .ReplaceService<IHistoryRepository, LoweredCaseMigrationHistoryRepository>();
 
             return new ApplicationDbContext(builder.Options);
         }

@@ -47,7 +47,7 @@ namespace Infrastructure.Data
 
         private void InitializeEntities(EntityTypeBuilder<ToDoList> builder)
         {
-            builder.HasKey(l => l.Id).IsClustered();
+            builder.HasKey(l => l.Id);
             builder.Property(i => i.Title).HasMaxLength(128).IsRequired();
             builder
                 .HasMany(l => l.ToDoItems)
@@ -62,8 +62,8 @@ namespace Infrastructure.Data
             builder.Property(i => i.UserId);
 
             builder.Property(i => i.Title).HasMaxLength(128).IsRequired();
-            builder.Property(i => i.CreatedAt).HasDefaultValueSql("GETDATE()");
-            builder.Property(i => i.ModifiedAt).HasDefaultValueSql("GETDATE()");
+            builder.Property(i => i.CreatedAt).HasDefaultValueSql("now()");
+            builder.Property(i => i.ModifiedAt).HasDefaultValueSql("now()");
 
             builder.OwnsOne(u => u.Recurrence);
         }
