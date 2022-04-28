@@ -1,18 +1,23 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Builder;
 using ToDoApi;
+using System;
+using Microsoft.Extensions.DependencyInjection;
+using Infrastructure.Data;
 
-var builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 builder.WebHost.ConfigureKestrel(o =>
 {
     o.AddServerHeader = false;
 });
 
-var startup = new Startup(builder.Configuration);
-
+Startup startup = new(builder.Configuration);
 startup.ConfigureServices(builder.Services);
 
-var app = builder.Build();
+WebApplication app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+    await scope.ServiceProvider.SeedDataAsync();
 
 startup.Configure(app, app.Environment);
 

@@ -32,15 +32,20 @@ namespace Infrastructure.Data
                 if (!context.Users.Any())
                 {
                     UserProfile adminProfile = new() { FirstName = "AdminFirstName", LastName = "AdminLastName" };
-                    AppUser admin = new("Admin") { Email = "admin@mail.ru" };
-                    admin.UserProfile = adminProfile;
+                    AppUser admin = new("Admin")
+                    {
+                        Email = "admin@mail.ru",
+                        UserProfile = adminProfile
+                    };
                     await userManager.CreateAsync(admin, "Password0");
                     await userManager.AddToRoleAsync(admin, "Admin");
-                    //await userManager.AddClaimAsync(user, new Claim(ClaimTypes.Role, "Admin"));
 
                     UserProfile userProfile = new() { FirstName = "UserFirstName", LastName = "UserLastName" };
-                    AppUser user = new("User") { Email = "user@mail.ru" };
-                    user.UserProfile = userProfile;
+                    AppUser user = new("User")
+                    {
+                        Email = "user@mail.ru",
+                        UserProfile = userProfile
+                    };
                     await userManager.CreateAsync(user, "Password0");
                     await userManager.AddToRoleAsync(user, "User");
 
