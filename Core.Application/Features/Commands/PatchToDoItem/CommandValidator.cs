@@ -21,7 +21,7 @@ namespace Core.Application.Features.Commands.PatchToDoItem
 
             public CommandValidator()
             {
-                RuleForEach(c => c.jsonPatchDocument.Operations)
+                RuleForEach(c => c.JsonPatchDocument.Operations)
                     .ChildRules(opertaion =>
                     {
                         opertaion.RuleFor(operation => operation.path).Must(path =>
@@ -38,7 +38,7 @@ namespace Core.Application.Features.Commands.PatchToDoItem
                         })
                             .WithMessage(opertaion => $"The property at path '{opertaion.path}' is immutable or does not exist.");
                     })
-                        .OverridePropertyName(command => command.jsonPatchDocument)
+                        .OverridePropertyName(command => command.JsonPatchDocument)
                         .WithMessage("qwerty");
             }
         }

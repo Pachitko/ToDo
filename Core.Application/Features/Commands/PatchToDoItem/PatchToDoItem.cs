@@ -5,8 +5,6 @@ using System.Threading.Tasks;
 using Core.Domain.Entities;
 using Infrastructure.Data;
 using System.Threading;
-using System.Linq;
-using AutoMapper;
 using MediatR;
 using System;
 
@@ -14,7 +12,7 @@ namespace Core.Application.Features.Commands.PatchToDoItem
 {
     public partial class PatchToDoItem
     {
-        public record Command(Guid ToDoItemId, JsonPatchDocument<ToDoItem> jsonPatchDocument) : IRequestWrapper<ToDoItem>;
+        public record Command(Guid ToDoItemId, JsonPatchDocument<ToDoItem> JsonPatchDocument) : IRequestWrapper<ToDoItem>;
 
         public class CommandHandler : IHandlerWrapper<PatchToDoItem.Command, ToDoItem>
         {
@@ -33,10 +31,10 @@ namespace Core.Application.Features.Commands.PatchToDoItem
                 if (response.Succeeded)
                 {
                     var toDoItemFromDb = _dbContext.ToDoItems.Attach(response.Value).Entity;
-                    request.jsonPatchDocument.ApplyTo(toDoItemFromDb);
+                    request.JsonPatchDocument.ApplyTo(toDoItemFromDb);
 
                     toDoItemFromDb.ModifiedAt = DateTime.UtcNow;
-                    if(toDoItemFromDb.Recurrence is not null)
+                    if (toDoItemFromDb.Recurrence is not null)
                         if (toDoItemFromDb.DueDate is null)
                             toDoItemFromDb.DueDate = DateTime.Today;
 
