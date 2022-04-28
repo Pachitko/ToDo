@@ -11,14 +11,18 @@ using FluentAssertions;
 using AutoMapper;
 using Xunit;
 using Moq;
+using MediatR;
+using Core.Application.Features.Notifications.UserCreated;
 
 namespace UnitTests.Core.Application.Features.Commands
 {
     public class CreateUserTests
     {
+        private readonly Mock<IMediator> _mediatorMock;
         private readonly IMapper _mapper;
         public CreateUserTests()
         {
+            _mediatorMock = new Mock<IMediator>();
             MapperConfiguration mapperConfiguration = new(cfg =>
             {
                 cfg.AddProfile<UsersProfile>();
@@ -29,8 +33,7 @@ namespace UnitTests.Core.Application.Features.Commands
         [Theory, AutoMoqData]
         public async void CreateUser_CreateUserFailure_ShouldResponseFailWithNullResultAndOneIdentityError(
             Mock<UserManager<AppUser>> userManagerMock,
-            [Frozen] ILogger<CreateUser.CommandHandler> logger,
-            [Frozen] IEmailConfirmationLinkSender emailConfirmationLinkSender)
+            [Frozen] ILogger<CreateUser.CommandHandler> logger)
         {
             var command = UserExtensions.GetCreateUserCommand();
             userManagerMock.Setup(x => x.CreateAsync(It.IsAny<AppUser>(), command.Password))
@@ -39,7 +42,7 @@ namespace UnitTests.Core.Application.Features.Commands
                     Code = "Username",
                     Description = "Username already exists"
                 }));
-            CreateUser.CommandHandler handler = new(_mapper, userManagerMock.Object, logger, emailConfirmationLinkSender);
+            CreateUser.CommandHandler handler = new(_mediatorMock.Object, _mapper, userManagerMock.Object, logger);
 
             var response = await handler.Handle(command, CancellationToken.None);
 

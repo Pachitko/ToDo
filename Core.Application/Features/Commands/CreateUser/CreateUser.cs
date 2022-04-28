@@ -1,8 +1,10 @@
 ﻿using Core.Application.Abstractions;
+using Core.Application.Features.Notifications.UserCreated;
 using Core.Application.Responses;
 using Core.Domain.Entities;
 using FluentValidation;
 using FluentValidation.Validators;
+using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using System.Linq;
@@ -47,35 +49,31 @@ namespace Core.Application.Features.Commands.CreateUser
         {
             private readonly UserManager<AppUser> _userManager;
             private readonly ILogger<CommandHandler> _logger;
+            private readonly IMediator _mediator;
             private readonly IMapper _mapper;
-            private readonly IEmailConfirmationLinkSender _emailConfirmationLinkSender;
 
-            public CommandHandler(IMapper mapper, UserManager<AppUser> userManager,
-                 ILogger<CommandHandler> logger, IEmailConfirmationLinkSender emailConfirmationLinkSender)
+            public CommandHandler(IMediator mediator, IMapper mapper, UserManager<AppUser> userManager,
+                ILogger<CommandHandler> logger)
             {
+                _mediator = mediator;
                 _mapper = mapper;
                 _userManager = userManager;
                 _logger = logger;
-                _emailConfirmationLinkSender = emailConfirmationLinkSender;
             }
 
             public async Task<Response<AppUser>> Handle(Command request, CancellationToken cancellationToken)
             {
                 var newUser = _mapper.Map<AppUser>(request);
-                var result = await _userManager.CreateAsync(newUser, request.Password);
-                if (result.Succeeded)
+                var userCreationResult = await _userManager.CreateAsync(newUser, request.Password);
+                if (userCreationResult.Succeeded)
                 {
                     _logger.LogInformation("User created a new account using password.");
-                    await _userManager.AddToRoleAsync(newUser, "User");
-
-                    await _emailConfirmationLinkSender.SendConfirmationCodeAsync(newUser);
-
+                    await _mediator.Publish(new UserCreated(newUser), cancellationToken);
                     return Response<AppUser>.Ok(newUser);
                 }
                 else
                 {
-                    var errors = result.Errors.Select(e => new ResponseError(e.Code, e.Description));
-
+                    var errors = userCreationResult.Errors.Select(e => new ResponseError(e.Code, e.Description));
                     return Response<AppUser>.Fail(errors, null);
                 }
             }
