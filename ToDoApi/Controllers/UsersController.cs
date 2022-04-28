@@ -216,7 +216,7 @@ namespace ToDoApi.Controllers
             }
         }
 
-        [HttpDelete("{userId}", Name = nameof(DeleteUserAsync))]
+        [HttpDelete(Name = nameof(DeleteUserAsync))]
         public async Task<ActionResult> DeleteUserAsync([FromRoute] DeleteUserById.Command command)
         {
             var response = await Mediator.Send(command);
