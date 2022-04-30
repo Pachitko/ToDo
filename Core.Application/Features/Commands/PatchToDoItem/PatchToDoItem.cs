@@ -7,6 +7,7 @@ using Infrastructure.Data;
 using System.Threading;
 using MediatR;
 using System;
+using Core.Application.Features.Notifications.ToDoPatchDocumentApplied;
 
 namespace Core.Application.Features.Commands.PatchToDoItem
 {
@@ -33,10 +34,7 @@ namespace Core.Application.Features.Commands.PatchToDoItem
                     var toDoItemFromDb = _dbContext.ToDoItems.Attach(response.Value).Entity;
                     request.JsonPatchDocument.ApplyTo(toDoItemFromDb);
 
-                    toDoItemFromDb.ModifiedAt = DateTime.UtcNow;
-                    if (toDoItemFromDb.Recurrence is not null)
-                        if (toDoItemFromDb.DueDate is null)
-                            toDoItemFromDb.DueDate = DateTime.Today;
+                    await _mediator.Publish(new ToDoPatchDocumentApplied(toDoItemFromDb), cancellationToken);
 
                     var updatedEntry = _dbContext.ToDoItems.Update(toDoItemFromDb);
                     await _dbContext.SaveChangesAsync(cancellationToken);

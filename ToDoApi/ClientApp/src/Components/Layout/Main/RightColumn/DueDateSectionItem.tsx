@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { BaseSyntheticEvent, ChangeEvent, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { SIconButton } from 'src/Components/UI'
 import TaskDetailsContextMenu from 'src/Components/Layout/Main/RightColumn/TaskDetailsContextMenu'
@@ -24,7 +24,7 @@ export const DueDateSectionItem: React.FC<{ activeTask: ITask }> = ({ activeTask
 
     const handleSet = (e: any) => {
         setIsFocused(false)
-        dispatch(patchTask(activeTask.toDoListId, activeTask.id, [replaceTaskDueDatePatch(e.target.value)]))
+        dispatch(patchTask(activeTask.toDoListId, activeTask.id, [replaceTaskDueDatePatch(new Date(e.target.value))]))
     }
 
     return (
