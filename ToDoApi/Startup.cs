@@ -20,7 +20,6 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Serialization;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Security.Claims;
@@ -39,17 +38,11 @@ namespace ToDoApi
 
         public void ConfigureServices(IServiceCollection services)
         {
-            ILoggerFactory loggerFactory = LoggerFactory.Create(builder =>
-            {
-                builder.AddConsole();
-                builder.AddFilter(l => l == LogLevel.None);
-            });
-
-            services.AddInfrastructureServices(loggerFactory, Configuration);
+            services.AddInfrastructureServices(Configuration);
 
             services.AddApiVersioning(o =>
             {
-                o.DefaultApiVersion = new ApiVersion(1, 0); // default
+                o.DefaultApiVersion = new ApiVersion(1, 0);
                 o.AssumeDefaultVersionWhenUnspecified = true;
                 o.ReportApiVersions = true;
                 o.ApiVersionReader = ApiVersionReader.Combine(

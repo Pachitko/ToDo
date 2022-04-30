@@ -38,8 +38,7 @@ namespace Core.Application.Features.Commands.PatchToDoItem
                         })
                             .WithMessage(opertaion => $"The property at path '{opertaion.path}' is immutable or does not exist.");
                     })
-                        .OverridePropertyName(command => command.JsonPatchDocument)
-                        .WithMessage("qwerty");
+                        .OverridePropertyName(command => command.JsonPatchDocument);
             }
         }
     }

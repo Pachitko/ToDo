@@ -11,13 +11,15 @@ namespace ToDoApi.Controllers
     public class RootController : ControllerBase
     {
         [HttpGet(Name = nameof(GetRoot))]
+        [ResponseCache(Duration = 15, Location = ResponseCacheLocation.Any)]
         public ActionResult<List<LinkDto>> GetRoot()
         {
-            List<LinkDto> links = new();
-
-            links.Add(new(Url.Link(nameof(GetRoot), null), "self", "GET"));
-            links.Add(new(Url.Link(nameof(UsersController.GetUsersAsync), null), "users", "GET"));
-            links.Add(new(Url.Link(nameof(UsersController.CreateUserAsync), null), "create_user", "POST"));
+            List<LinkDto> links = new()
+            {
+                new(Url.Link(nameof(GetRoot), null), "self", "GET"),
+                new(Url.Link(nameof(UsersController.GetUsersAsync), null), "users", "GET"),
+                new(Url.Link(nameof(UsersController.CreateUserAsync), null), "create_user", "POST")
+            };
 
             return links;
         }

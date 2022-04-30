@@ -61,7 +61,7 @@ namespace ToDoApi.Controllers
         [Authorize]
         public ActionResult<bool> VerifyToken()
         {
-            var accessToken = HttpContext.Request.Headers["Authorization"].ToString()["Bearer ".Length..];
+            var accessToken = HttpContext.Request.Headers.Authorization.ToString()["Bearer ".Length..];
 
             try
             {
@@ -78,7 +78,7 @@ namespace ToDoApi.Controllers
                     }
                 }
             }
-            catch (Exception e)
+            catch (Microsoft.IdentityModel.Tokens.SecurityTokenExpiredException e)
             {
                 _logger.LogError(e.ToString());
                 return false;
