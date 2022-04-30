@@ -1,15 +1,22 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Builder;
-using ToDoApi;
-using System;
-using Microsoft.Extensions.DependencyInjection;
 using Infrastructure.Data;
+using ToDoApi;
+using Serilog;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .CreateLogger();
+
 builder.WebHost.ConfigureKestrel(o =>
 {
     o.AddServerHeader = false;
 });
+
+builder.Host.UseSerilog();
 
 Startup startup = new(builder.Configuration);
 startup.ConfigureServices(builder.Services);
@@ -21,4 +28,4 @@ using (var scope = app.Services.CreateScope())
 
 startup.Configure(app, app.Environment);
 
-app.Run();
+await app.RunAsync();

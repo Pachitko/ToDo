@@ -16,9 +16,14 @@ namespace Infrastructure
 {
     public static class InfrastructureDependencyInjection
     {
-        public static IServiceCollection AddInfrastructureServices(this IServiceCollection services,
-            ILoggerFactory loggerFactory, IConfiguration configuration)
+        public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
         {
+            ILoggerFactory loggerFactory = LoggerFactory.Create(builder =>
+            {
+                builder.AddConsole();
+                builder.AddFilter(l => l == LogLevel.None);
+            });
+
             var connectionString = configuration.GetConnectionString("DBCS");
             services.AddDbContext<ApplicationDbContext>(options =>
                 options
