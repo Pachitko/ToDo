@@ -21,9 +21,7 @@ using Newtonsoft.Json.Serialization;
 using Serilog;
 using System;
 using System.Linq;
-using System.Net;
 using System.Security.Claims;
-using ToDoApi.Models;
 
 namespace ToDoApi
 {
@@ -93,7 +91,7 @@ namespace ToDoApi
                 })
                 .ConfigureApiBehaviorOptions(setup =>
                 {
-                    //setup.SuppressModelStateInvalidFilter = true;
+                    // setup.SuppressModelStateInvalidFilter = true;
                     setup.InvalidModelStateResponseFactory = ctx =>
                     {
                         var problemDetailsFactory = ctx.HttpContext.RequestServices.GetRequiredService<ProblemDetailsFactory>();
@@ -234,21 +232,21 @@ namespace ToDoApi
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            app.UseSwagger();
-            app.UseSwaggerUI(options =>
-            {
-                options.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
-                options.RoutePrefix = "swagger";
-            });
-
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
             else
             {
-                app.UseExceptionHandler(HandleException);
+                app.UseExceptionHandler(CustomExceptionHandler.HandleException);
             }
+
+            app.UseSwagger();
+            app.UseSwaggerUI(options =>
+            {
+                options.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+                options.RoutePrefix = "swagger";
+            });
 
             app.UseHttpsRedirection();
 
@@ -311,23 +309,6 @@ namespace ToDoApi
             options.FallbackPolicy = new AuthorizationPolicyBuilder()
                 .RequireAuthenticatedUser() // add DenyAnonymousAuthorizationRequirement
                 .Build();
-        }
-
-        private void HandleException(IApplicationBuilder app)
-        {
-            app.Run(async ctx =>
-            {
-                ctx.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-                ctx.Response.ContentType = "application/json";
-
-                //var exceptionHandlerFeature = ctx.Features.Get<IExceptionHandlerFeature>();
-
-                await ctx.Response.WriteAsync(new ErrorDetails()
-                {
-                    StatusCode = ctx.Response.StatusCode,
-                    Message = "Internal Server Error."
-                }.ToString());
-            });
         }
 
         private static NewtonsoftJsonPatchInputFormatter GetJsonPatchInputFormatter()
