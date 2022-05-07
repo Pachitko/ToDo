@@ -171,7 +171,7 @@ namespace ToDoApi
                     };
                 });
 
-            services.AddResponseCaching();
+            services.AddStackExchangeRedisCache(o => o.Configuration = "localhost");
 
             services.AddAuthorization(options => ConfigureAuthorization(options));
 
@@ -268,7 +268,6 @@ namespace ToDoApi
             }
 
             app.UseStaticFiles(staticFileOptions);
-            app.UseResponseCaching();
 
             app.UseRouting();
             app.UseCors();
