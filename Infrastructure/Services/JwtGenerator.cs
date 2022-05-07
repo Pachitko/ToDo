@@ -59,7 +59,7 @@ namespace Infrastructure.Services
             JwtSecurityToken token = tokenHandler.CreateJwtSecurityToken(tokenDescriptor);
             string tokenString = tokenHandler.WriteToken(token);
 
-            _logger.LogDebug("Done creating JWT token for user {UserId}", user.Id);
+            _logger.LogDebug("JWT token created for user {UserId}", user.Id);
             return tokenString;
         }
     }

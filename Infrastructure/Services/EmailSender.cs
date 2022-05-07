@@ -66,7 +66,7 @@ namespace Infrastructure.Services
 
             client.SendAsync(emailMessage, null);
 
-            _logger.LogWarning($"Email has been sent: \nto: {email}\nSubject: {subject}\nHtmlMesage: {htmlMessage};");
+            _logger.LogDebug("Email has been sent: \nto: {email}\nSubject: {subject}\nHtmlMesage: {htmlMessage};", email, subject, htmlMessage);
             return Task.CompletedTask;
         }
     }
