@@ -43,7 +43,7 @@ namespace Infrastructure.Services
 
         public Task SendEmailAsync(string email, string subject, string htmlMessage)
         {
-            _logger.LogWarning("NotImplementedException");
+            _logger.LogError(new NotImplementedException(), "");
             return Task.CompletedTask;
             // todo Receive settings from options
             MailAddress from = new("", "ToDo");

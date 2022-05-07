@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.Net.Http.Headers;
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Threading.Tasks;
@@ -80,7 +81,7 @@ namespace ToDoApi.Controllers
             }
             catch (Microsoft.IdentityModel.Tokens.SecurityTokenExpiredException e)
             {
-                _logger.LogError(e.ToString());
+                _logger.LogError(e, "Token verification failed");
                 return false;
             }
 

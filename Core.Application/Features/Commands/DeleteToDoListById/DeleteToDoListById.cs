@@ -29,7 +29,7 @@ namespace Core.Application.Features.Commands.DeleteToDoListById
                 if (response.Succeeded)
                 {
                     _dbContext.ToDoLists.Remove(response.Value);
-                    await _dbContext.SaveChangesAsync();
+                    await _dbContext.SaveChangesAsync(cancellationToken);
                     return Response<bool?>.Ok(true);
                 }
                 else

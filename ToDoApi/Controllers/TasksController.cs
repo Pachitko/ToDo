@@ -42,7 +42,7 @@ namespace ToDoApi.Controllers
         public async Task<ActionResult<ToDoItemDto>> GetToDoItemAsync([FromRoute] GetToDoItemById.Query query)
         {
             var response = await Mediator.Send(query);
-            if(response.Succeeded)
+            if (response.Succeeded)
             {
                 return Ok(_mapper.Map<ToDoItemDto>(response.Value));
             }
@@ -62,9 +62,9 @@ namespace ToDoApi.Controllers
             {
                 var toDoItemToReturn = _mapper.Map<ToDoItemDto>(response.Value);
                 return CreatedAtAction(nameof(GetToDoItemAsync),
-                    new 
+                    new
                     {
-                        toDoListId = command.ToDoListId, 
+                        toDoListId = command.ToDoListId,
                         toDoItemId = toDoItemToReturn.Id
                     }, toDoItemToReturn
                 );
