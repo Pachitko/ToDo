@@ -11,7 +11,7 @@ using System;
 using Core.Application.Features.Commands.RenameToDoList;
 
 namespace ToDoApi.Controllers
-{ 
+{
     [ApiController]
     [Route("api/[controller]")]
     public class TaskListsController : BaseApiController
@@ -28,7 +28,7 @@ namespace ToDoApi.Controllers
         public async Task<ActionResult<List<ToDoListDto>>> GetToDoListsAsync([FromRoute] GetToDoLists.Query query)
         {
             var response = await Mediator.Send(query);
-            if(response.Succeeded)
+            if (response.Succeeded)
             {
                 return _mapper.Map<List<ToDoListDto>>(response.Value);
             }
@@ -42,7 +42,7 @@ namespace ToDoApi.Controllers
         public async Task<ActionResult<ToDoListDto>> GetToDoListAsync([FromRoute] GetToDoListById.Query query)
         {
             var response = await Mediator.Send(query);
-            if(response.Succeeded)  
+            if (response.Succeeded)
             {
                 return Ok(_mapper.Map<ToDoListDto>(response.Value));
             }
@@ -59,8 +59,8 @@ namespace ToDoApi.Controllers
             if (response.Succeeded)
             {
                 var toDoListToReturn = _mapper.Map<ToDoListDto>(response.Value);
-                return CreatedAtAction(nameof(GetToDoListAsync), 
-                    new 
+                return CreatedAtAction(nameof(GetToDoListAsync),
+                    new
                     {
                         toDoListId = toDoListToReturn.Id
                     }, toDoListToReturn);

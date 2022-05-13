@@ -1,9 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore.Design;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
-using System.IO;
-using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Infrastructure.Data
 {
@@ -13,7 +12,7 @@ namespace Infrastructure.Data
         {
             Assembly currentAssembly = typeof(ApplicationDbContext).Assembly;
             IConfigurationRoot configuration = new ConfigurationBuilder()
-                .AddUserSecrets<ApplicationDbContextFactory>()
+                .AddUserSecrets(currentAssembly)
                 .Build();
 
             var builder = new DbContextOptionsBuilder<ApplicationDbContext>();

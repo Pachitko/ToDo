@@ -17,7 +17,7 @@ const RightColumnBottomPanel = () => {
             </SRightColumnBottomPanelButton>
             <SCreatedAt>
                 {activeTask?.createdAt
-                    ? `Создано ${convertUTCDateToLocalDate(new Date(activeTask.createdAt)).toLocaleDateString()}`
+                    ? `Created ${convertUTCDateToLocalDate(new Date(activeTask.createdAt)).toLocaleDateString()}`
                     : null}
             </SCreatedAt>
             {activeTask !== null &&

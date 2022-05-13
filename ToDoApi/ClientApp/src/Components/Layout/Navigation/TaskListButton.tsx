@@ -33,9 +33,7 @@ const TaskListButton: React.FC<Props> = ({ list }) => {
                         <i className={list.iconClass ? list.iconClass : "fa-solid fa-list"}></i>
                     </STaskListIcon>
                     <SListTitle>
-                        <div>
-                            {list.title}
-                        </div>
+                        {list.title}
                     </SListTitle>
                 </SListBody>
             </STaskListLink>

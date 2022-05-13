@@ -11,7 +11,7 @@ namespace Core.Domain.Entities
         public string LastName { get; init; }
 
         public DateTimeOffset? DateOfBirth { get; set; }
-        
+
         public DateTimeOffset? DateOfDeath { get; set; }
     }
 }
