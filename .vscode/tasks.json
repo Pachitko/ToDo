@@ -19,8 +19,8 @@
             "args": [
                 "publish",
                 "${workspaceFolder}/ToDoApi/ToDoApi.csproj",
-                "/property:GenerateFullPaths=true",
-                "/consoleloggerparameters:NoSummary"
+                "-p:Configuration=Release",
+                "-p:PublishProfile=FolderProfile"
             ],
             "problemMatcher": "$msCompile"
         },

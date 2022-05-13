@@ -24,12 +24,13 @@
     <ProjectReference Include="..\Core.Domain\Core.Domain.csproj"/>
     <ProjectReference Include="..\Infrastructure\Infrastructure.csproj"/>
   </ItemGroup>
-  <Target Name="Test" BeforeTargets="BeforeBuild" Condition="false">
-    <Error Condition="!Exists('App.Debug.config')" Text="File App.Debug.config not found"/>
-    <Copy SourceFiles="App.config;App.config" DestinationFiles="$(OutputPath)/Test/App.config;$(OutputPath)/Test/App.test.config"/>
-    <Message Text="$(SpaRoot)" Importance="high"/>
-    <Message Text="$(MessageText)" Condition="'$(Configuration)' == 'Debug'" Importance="high"/>
-    <Message Text="$(MessageText)" Condition="'$(Configuration)' == 'Release'" Importance="high"/>
+  <Target Name="Test" BeforeTargets="BeforeBuild" Condition="true">
+    <!-- <Error Condition="!Exists('App.Debug.config')" Text="File App.Debug.config not found"/> -->
+    <!-- <Copy SourceFiles="App.config;App.config" DestinationFiles="$(OutputPath)/Test/App.config;$(OutputPath)/Test/App.test.config"/> -->
+    <Message Text=" " Importance="high"/>
+    <Message Text="SPA root: '$(SpaRoot)'" Importance="high"/>
+    <Message Text="$(Configuration)" Importance="high"/>
+    <Message Text=" " Importance="high"/>
   </Target>
   <ProjectExtensions>
     <VisualStudio>
