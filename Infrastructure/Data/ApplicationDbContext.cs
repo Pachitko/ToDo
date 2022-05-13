@@ -6,6 +6,7 @@ using System;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Core.Domain.Interfaces;
 using Core.DomainServices.Abstractions;
+using Microsoft.AspNetCore.Identity;
 
 namespace Infrastructure.Data
 {
@@ -27,6 +28,35 @@ namespace Infrastructure.Data
             builder.Entity<AppUser>(InitializeEntities);
             builder.Entity<ToDoItem>(InitializeEntities);
             builder.Entity<ToDoList>(InitializeEntities);
+
+            builder.Entity<AppUser>(entity =>
+            {
+                entity.ToTable(name: "users");
+            });
+            builder.Entity<IdentityUserClaim<Guid>>(entity =>
+            {
+                entity.ToTable("user_claims");
+            });
+            builder.Entity<AppRole>(entity =>
+            {
+                entity.ToTable(name: "roles");
+            });
+            builder.Entity<IdentityRoleClaim<Guid>>(entity =>
+            {
+                entity.ToTable("role_claims");
+            });
+            builder.Entity<IdentityUserRole<Guid>>(entity =>
+            {
+                entity.ToTable("user_roles");
+            });
+            builder.Entity<IdentityUserLogin<Guid>>(entity =>
+            {
+                entity.ToTable("user_logins");
+            });
+            builder.Entity<IdentityUserToken<Guid>>(entity =>
+            {
+                entity.ToTable("user_tokens");
+            });
         }
 
         private void InitializeEntities(EntityTypeBuilder<AppUser> builder)
