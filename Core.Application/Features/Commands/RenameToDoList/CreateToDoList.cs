@@ -1,8 +1,8 @@
 ﻿using Core.Application.Features.Queries.GetToDoListById;
+using Core.DomainServices.Abstractions;
 using Core.Application.Responses;
 using System.Threading.Tasks;
 using Core.Domain.Entities;
-using Infrastructure.Data;
 using System.Threading;
 using FluentValidation;
 using AutoMapper;
@@ -47,7 +47,7 @@ namespace Core.Application.Features.Commands.RenameToDoList
 
                     _dbContext.ToDoLists.Attach(toDoListFromDb);
                     toDoListFromDb.Title = request.NewTitle;
-                    
+
                     await _dbContext.SaveChangesAsync(cancellationToken);
 
                     var updatedToDoList = _mapper.Map<ToDoList>(toDoListFromDb);

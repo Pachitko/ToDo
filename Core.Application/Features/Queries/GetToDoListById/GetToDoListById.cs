@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Core.DomainServices.Abstractions;
 using Core.Application.Responses;
 using System.Threading.Tasks;
 using Core.Domain.Entities;
-using Infrastructure.Data;
 using System.Threading;
 using System.Linq;
 using MediatR;
@@ -33,7 +33,7 @@ namespace Core.Application.Features.Queries.GetToDoListById
                     var toDoListFromDb = _dbContext.ToDoLists
                         .AsNoTracking()
                         .FirstOrDefault(l => l.Id == request.ToDoListId && l.UserId == response.Value.Id);
-                    if(toDoListFromDb is null)
+                    if (toDoListFromDb is null)
                         return Response<ToDoList>.Fail();
                     else
                         return Response<ToDoList>.Ok(toDoListFromDb);

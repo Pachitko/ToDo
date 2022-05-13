@@ -11,6 +11,7 @@ using Core.Application.Abstractions;
 using Infrastructure.Extensions;
 using Infrastructure.Services.ExternalLogin.Google;
 using System.Collections.Generic;
+using Core.DomainServices.Abstractions;
 
 namespace Infrastructure
 {

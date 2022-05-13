@@ -1,13 +1,13 @@
-﻿using Core.Application.Features.Queries.GetToDoItemById;
+﻿using Core.Application.Features.Notifications.ToDoPatchDocumentApplied;
+using Core.Application.Features.Queries.GetToDoItemById;
 using Microsoft.AspNetCore.JsonPatch;
+using Core.DomainServices.Abstractions;
 using Core.Application.Responses;
 using System.Threading.Tasks;
 using Core.Domain.Entities;
-using Infrastructure.Data;
 using System.Threading;
 using MediatR;
 using System;
-using Core.Application.Features.Notifications.ToDoPatchDocumentApplied;
 
 namespace Core.Application.Features.Commands.PatchToDoItem
 {

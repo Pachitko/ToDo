@@ -1,9 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Core.DomainServices.Abstractions;
 using System.Collections.Generic;
 using Core.Application.Responses;
 using System.Threading.Tasks;
 using Core.Domain.Entities;
-using Infrastructure.Data;
 using System.Threading;
 using System;
 using MediatR;
@@ -28,7 +28,7 @@ namespace Core.Application.Features.Queries.GetToDoItems
             public async Task<Response<IList<ToDoItem>>> Handle(Query request, CancellationToken cancellationToken)
             {
                 var response = await _mediator.Send(new GetToDoListById.GetToDoListById.Query(request.ToDoListId), cancellationToken);
-                if(response.Succeeded)
+                if (response.Succeeded)
                 {
                     var toDoListFromDb = response.Value;
                     _dbContext.Entry(toDoListFromDb).State = EntityState.Unchanged;

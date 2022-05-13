@@ -5,6 +5,7 @@ using Core.Domain.Entities;
 using System;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Core.Domain.Interfaces;
+using Core.DomainServices.Abstractions;
 
 namespace Infrastructure.Data
 {

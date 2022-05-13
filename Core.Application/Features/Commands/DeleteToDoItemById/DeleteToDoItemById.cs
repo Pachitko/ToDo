@@ -1,8 +1,8 @@
 ﻿using Core.Application.Features.Queries.GetToDoItemById;
+using Core.DomainServices.Abstractions;
 using System.Collections.Generic;
 using Core.Application.Responses;
 using System.Threading.Tasks;
-using Infrastructure.Data;
 using System.Threading;
 using MediatR;
 using System;

@@ -1,8 +1,8 @@
 ﻿using Core.Application.Features.Queries.GetCurrentUser;
+using Core.DomainServices.Abstractions;
 using Core.Application.Responses;
 using System.Threading.Tasks;
 using Core.Domain.Entities;
-using Infrastructure.Data;
 using System.Threading;
 using FluentValidation;
 using AutoMapper;

@@ -1,10 +1,10 @@
 ﻿using Core.Application.Features.Queries.GetCurrentUser;
 using Microsoft.EntityFrameworkCore;
+using Core.DomainServices.Abstractions;
 using Core.Application.Responses;
 using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
 using Core.Domain.Entities;
-using Infrastructure.Data;
 using System.Threading;
 using MediatR;
 using System;
@@ -31,7 +31,7 @@ namespace Core.Application.Features.Queries.GetToDoItemById
             public async Task<Response<ToDoItem>> Handle(Query request, CancellationToken cancellationToken)
             {
                 var currentUserResponse = await _mediator.Send(new GetCurrentUser.GetCurrentUser.Query());
-                if(currentUserResponse.Succeeded)
+                if (currentUserResponse.Succeeded)
                 {
                     var toDoItemFromDb = await _dbContext.ToDoItems
                         .AsNoTracking()

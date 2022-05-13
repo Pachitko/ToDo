@@ -1,8 +1,8 @@
 ﻿using Core.Application.Features.Queries.GetCurrentUser;
+using Core.DomainServices.Abstractions;
 using Core.Application.Responses;
 using System.Threading.Tasks;
 using Core.Domain.Entities;
-using Infrastructure.Data;
 using System.Threading;
 using FluentValidation;
 using AutoMapper;
@@ -16,7 +16,7 @@ namespace Core.Application.Features.Commands.CreateToDoItem
         // todo edit according to the ToDoItem Entity
         public record Command(Guid ToDoListId, string Title, bool? IsCompleted, bool? IsImportant, DateTime ModifiedAt,
             DateTime CreatedAt, DateTime? DueDate, Recurrence Recurrence) : IRequestWrapper<ToDoItem>;
-       
+
         public class CommandValidator : AbstractValidator<CreateToDoItem.Command>
         {
             public CommandValidator()

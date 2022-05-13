@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Core.Domain.Entities;
 using System.Threading;
 
-namespace Infrastructure.Data
+namespace Core.DomainServices.Abstractions
 {
     public interface IApplicationDbContext
     {
