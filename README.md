@@ -1,10 +1,9 @@
+<h1 align="center">To Do App</h1>
 <h3 align="center">Login Page</h3>
 <p align="center"><img src="https://user-images.githubusercontent.com/38788505/182655784-09f3d373-d628-4267-a417-4822f8e53e25.png"></p>
 
 <h3 align="center">Main Page</h3>
 <p align="center"><img src="https://user-images.githubusercontent.com/38788505/182656367-fad1dc1a-798c-44ce-a2aa-31f7cfa7ee3b.png"></p>
-
-<h1 align="center">Fullstack To Do App</h1>
 
 # Functionality:
 - Login/registration
